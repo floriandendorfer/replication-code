@@ -4,7 +4,7 @@
 
 | name |            |  value |
 | ---: | ---------: | ------: |
-| constant | &#968; |  |
+| constant | &#946;_{1} |  |
 | constant | &beta |  |
 | constant | &beta |  |
 | constant | &beta |  |
