@@ -18,7 +18,7 @@
 |  | revenue fee | $f$ | 0.142 |
 |  | arrival rate | $\mu$ | 20,000 |
 |  | adjustment prob. | $\upsilon_r$ | 0.019 |
-|  | review prob. | $\upsilon_r$ | $0.2938\ln(N_{jt}+1)$ |
+|  | review prob. | $\upsilon_r$ | 0.2938 $\ln(N_{jt}+1)$ |
 |  | max. no. of reviews | $\bar N$ | 20 |
 |  | max. no. of listings | $J$ | 2,000 |
 
