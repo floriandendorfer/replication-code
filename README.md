@@ -22,7 +22,14 @@
 |  | max. no. of reviews | $\bar N$ | 20 |
 |  | max. no. of listings | $J$ | 2,000 |
 
+## Monte Carlo simulation
 
-### Replication code
+## Demand estimation
 
-**Replication code**
+## Supply estimation
+
+## Counterfactual
+
+%### Replication code
+
+%**Replication code**
