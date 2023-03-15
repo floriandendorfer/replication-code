@@ -30,6 +30,8 @@
 
 ## Counterfactual
 
+## Effect decomposition
+
 %### Replication code
 
 %**Replication code**
