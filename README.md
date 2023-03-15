@@ -4,7 +4,7 @@
 
 | name |            |  value |
 | ---: | ---------: | ------: |
-| constant | &#946;_{1} |  |
+| constant | $\beta_1$ &#946;_{1} |  |
 | constant | &beta |  |
 | constant | &beta |  |
 | constant | &beta |  |
