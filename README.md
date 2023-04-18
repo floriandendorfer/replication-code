@@ -26,9 +26,13 @@
 
 <table style="text-align:center"><tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td colspan="2"><em>Dependent variable:</em></td></tr>
 <tr><td></td><td colspan="2" style="border-bottom: 1px solid black"></td></tr>
-<tr><td style="text-align:left"></td><td>$p$</td><td>100 * booked</td></tr>
+<tr><td style="text-align:left"></td><td>$p$</td><td>$100 \times booked$</td></tr>
 <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td></tr>
-<tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">K</td><td>2.408<sup>***</sup></td><td>1.206<sup>***</sup></td></tr>
+<tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr>
+<tr><td style="text-align:left">Constant</td><td>96.452<sup>***</sup></td><td>-32.612<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(0.006)</td><td>(4.907)</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td></tr>
+<tr><td style="text-align:left">$K$</td><td>2.408<sup>***</sup></td><td>1.206<sup>***</sup></td></tr>
 <tr><td style="text-align:left"></td><td>(0.002)</td><td>(0.140)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td></tr>
 <tr><td style="text-align:left">N</td><td>-1.183<sup>***</sup></td><td>-0.776<sup>***</sup></td></tr>
@@ -37,20 +41,17 @@
 <tr><td style="text-align:left">p</td><td></td><td>0.627<sup>***</sup></td></tr>
 <tr><td style="text-align:left"></td><td></td><td>(0.051)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td></tr>
-<tr><td style="text-align:left">beta.2.</td><td>3.107<sup>***</sup></td><td>2.232<sup>***</sup></td></tr>
+<tr><td style="text-align:left">mid-scale</td><td>3.107<sup>***</sup></td><td>2.232<sup>***</sup></td></tr>
 <tr><td style="text-align:left"></td><td>(0.006)</td><td>(0.265)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td></tr>
-<tr><td style="text-align:left">beta.3.</td><td>5.249<sup>***</sup></td><td>3.082<sup>***</sup></td></tr>
+<tr><td style="text-align:left">up-sclae</td><td>5.249<sup>***</sup></td><td>3.082<sup>***</sup></td></tr>
 <tr><td style="text-align:left"></td><td>(0.006)</td><td>(0.339)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td></tr>
-<tr><td style="text-align:left">beta.4.</td><td>8.335<sup>***</sup></td><td>4.637<sup>***</sup></td></tr>
+<tr><td style="text-align:left">luxury</td><td>8.335<sup>***</sup></td><td>4.637<sup>***</sup></td></tr>
 <tr><td style="text-align:left"></td><td>(0.006)</td><td>(0.471)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td></tr>
-<tr><td style="text-align:left">K:N</td><td>-0.018<sup>***</sup></td><td>-0.007<sup>**</sup></td></tr>
+<tr><td style="text-align:left">$K\times N$</td><td>-0.018<sup>***</sup></td><td>-0.007<sup>**</sup></td></tr>
 <tr><td style="text-align:left"></td><td>(0.0001)</td><td>(0.003)</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td></tr>
-<tr><td style="text-align:left">Constant</td><td>96.452<sup>***</sup></td><td>-32.612<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.006)</td><td>(4.907)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td></tr>
 <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>432,386</td><td>432,386</td></tr>
 <tr><td style="text-align:left">R<sup>2</sup></td><td>0.958</td><td>0.024</td></tr>
