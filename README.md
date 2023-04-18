@@ -24,10 +24,9 @@
 
 ## Monte Carlo simulation
 
-|| <center> (1) </center> |  <center> (2) </center> |
+|| <p style="text-align: center;">(1))</p> |  <p style="text-align: center;">(2))</p> |
 | ---: | ---------: | ------: |
 || <center> $p$ </center> |  <center> $100\times booked$ </center> |
-| ---: | ---------: | ------: |
 |constant|                        96.452***     |                -32.612***  |        
 | |                 |                (0.006)    |             (4.907)   |
 |$K$|                 |              2.408***     |   1.206***    |       
@@ -46,8 +45,8 @@ luxury |                        8.335***            |            4.637***       
   ||      (0.0001)| (0.0003)           |                                                                      
 |observations    |                 432,386           |              432,386         |  
 |R2               |                 0.958             |              0.024           | 
-|Adjusted R2      |                 0.958              |             0.024            |
-|F Statistic      |   1,625,097.000*** (df = 6; 432379)| 1,529.817*** (df = 7; 432378)|
+|adjusted R2      |                 0.958              |             0.024            |
+|F statistic      |   1,625,097.000*** (df = 6; 432379)| 1,529.817*** (df = 7; 432378)|
 
 Note: *p<0.1; **p<0.05; ***p<0.01
 
