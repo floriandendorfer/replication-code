@@ -18,11 +18,19 @@
 |  | revenue fee | $f$ | 0.142 |
 |  | arrival rate | $\mu$ | 20,000 |
 |  | adjustment prob. | $\upsilon_r$ | 0.019 |
-|  | review prob. | $\upsilon_r$ | 0.2938 $\ln(N_{jt}+1)$ |
+|  | review prob. | $\upsilon_r$ | 0.2938 $\ln(N_{jt}+2)\frac{4}{7}$ |
 |  | max. no. of reviews | $\bar N$ | 20 |
 |  | max. no. of listings | $J$ | 2,000 |
 
 ## Monte Carlo simulation
+
+|  | (1) |            |  (2) |
+|  | $p$ |            |  $100\times booked$ |
+| ---: | ---: | ---------: | ------: |
+| demand | price | $\alpha$ | -0.0105 |
+|| constant | $\beta_1$ | -13.9974 |
+|| mid-scale | $\beta_2$ | 0.1884 |
+|| up-scale | $\beta_3$ | 0.3084 |
 
 ||(1)|(2)|
 ||$p$|$100\times booked$|
