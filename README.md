@@ -44,7 +44,7 @@
 <tr><td style="text-align:left">mid-scale</td><td>3.107<sup>***</sup></td><td>2.232<sup>***</sup></td></tr>
 <tr><td style="text-align:left"></td><td>(0.006)</td><td>(0.265)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td></tr>
-<tr><td style="text-align:left">up-sclae</td><td>5.249<sup>***</sup></td><td>3.082<sup>***</sup></td></tr>
+<tr><td style="text-align:left">up-scale</td><td>5.249<sup>***</sup></td><td>3.082<sup>***</sup></td></tr>
 <tr><td style="text-align:left"></td><td>(0.006)</td><td>(0.339)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td></tr>
 <tr><td style="text-align:left">luxury</td><td>8.335<sup>***</sup></td><td>4.637<sup>***</sup></td></tr>
@@ -57,7 +57,7 @@
 <tr><td style="text-align:left">R<sup>2</sup></td><td>0.958</td><td>0.024</td></tr>
 <tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.958</td><td>0.024</td></tr>
 <tr><td style="text-align:left">Residual Std. Error</td><td>1.407 (df = 432379)</td><td>47.025 (df = 432378)</td></tr>
-<tr><td style="text-align:left">F Statistic</td><td>1,625,097.000<sup>***</sup> (df = 6; 432379)</td><td>1,529.817<sup>***</sup> (df = 7; 432378)</td></tr>
+<tr><td style="text-align:left">F Statistic</td><td>1,625,097.000<sup>***</sup></td><td>1,529.817<sup>***</sup></td></tr>
 <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="2" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
 </table>
 
