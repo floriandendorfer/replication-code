@@ -26,7 +26,7 @@
 
 <table style="text-align:center"><tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td colspan="2"><em>Dependent variable:</em></td></tr>
 <tr><td></td><td colspan="2" style="border-bottom: 1px solid black"></td></tr>
-<tr><td style="text-align:left"></td><td>p</td><td>100 * booked</td></tr>
+<tr><td style="text-align:left"></td><td>$p$</td><td>100 * booked</td></tr>
 <tr><td style="text-align:left"></td><td>(1)</td><td>(2)</td></tr>
 <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">K</td><td>2.408<sup>***</sup></td><td>1.206<sup>***</sup></td></tr>
 <tr><td style="text-align:left"></td><td>(0.002)</td><td>(0.140)</td></tr>
