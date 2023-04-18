@@ -24,13 +24,13 @@
 
 ## Monte Carlo simulation
 
-|  | (1) |            |  (2) |
-|  | $p$ |            |  $100\times booked$ |
-| ---: | ---: | ---------: | ------: |
-| demand | price | $\alpha$ | -0.0105 |
-|| constant | $\beta_1$ | -13.9974 |
-|| mid-scale | $\beta_2$ | 0.1884 |
-|| up-scale | $\beta_3$ | 0.3084 |
+| (1)            |  (2) |
+| $p$ |            |  $100\times booked$ |
+| ---: | ---------: | ------: |
+| constant | $\alpha$ | -0.0105 |
+| $K$ |2.408***     |                   1.206***    |  
+| mid-scale | $\beta_2$ | 0.1884 |
+| up-scale | $\beta_3$ | 0.3084 |
 
 ||(1)|(2)|
 ||$p$|$100\times booked$|
