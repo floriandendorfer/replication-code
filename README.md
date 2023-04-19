@@ -56,7 +56,7 @@
 <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>433,079</td><td>433,079</td></tr>
 <tr><td style="text-align:left">R<sup>2</sup></td><td>0.411</td><td>0.026</td></tr>
 <tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.411</td><td>0.026</td></tr>
-<tr><td style="text-align:left">Residual Std. Error</td><td>9.147 (df = 433072)</td><td>47.022 (df = 433071)</td></tr>
+<tr><td style="text-align:left">Residual Std. Error</td><td>9.147</td><td>47.022</td></tr>
 <tr><td style="text-align:left">F Statistic</td><td>50,345.540<sup>***</sup></td><td>1,645.427<sup>***</sup> </td></tr>
 <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td colspan="2" style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
 </table>
