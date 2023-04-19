@@ -38,6 +38,10 @@
 <tr><td style="text-align:left">$N$</td><td>-0.834<sup>***</sup></td><td>-1.807<sup>***</sup></td></tr>
 <tr><td style="text-align:left"></td><td>(0.004)</td><td>(0.022)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td></tr>
+<tr><td style="text-align:left">$K\times N$</td><td>-0.049<sup>***</sup></td><td>-0.025<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(0.001)</td><td>(0.003)</td></tr>
+<tr><td style="text-align:left"></td><td></td><td></td></tr>
 <tr><td style="text-align:left">$p$</td><td></td><td>-0.315<sup>***</sup></td></tr>
 <tr><td style="text-align:left"></td><td></td><td>(0.008)</td></tr>
 <tr><td style="text-align:left"></td><td></td><td></td></tr>
@@ -49,10 +53,6 @@
 <tr><td style="text-align:left"></td><td></td><td></td></tr>
 <tr><td style="text-align:left">luxury</td><td>10.070<sup>***</sup></td><td>11.762<sup>***</sup></td></tr>
 <tr><td style="text-align:left"></td><td>(0.040)</td><td>(0.220)</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td></tr>
-<tr><td style="text-align:left">$K\times N$</td><td>-0.049<sup>***</sup></td><td>-0.025<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.001)</td><td>(0.003)</td></tr>
-<tr><td style="text-align:left"></td><td></td><td></td></tr>
 <tr><td colspan="3" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>433,079</td><td>433,079</td></tr>
 <tr><td style="text-align:left">R<sup>2</sup></td><td>0.411</td><td>0.026</td></tr>
 <tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.411</td><td>0.026</td></tr>
