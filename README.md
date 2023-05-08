@@ -4,23 +4,23 @@
 
 |  | name |            |  value |
 | ---: | ---: | ---------: | ------: |
-| demand | price | $\alpha$ | -0.0105 |
-|| constant | $\beta_1$ | -13.9974 |
-|| mid-scale | $\beta_2$ | 0.1884 |
-|| up-scale | $\beta_3$ | 0.3084 |
-|| luxury | $\beta_4$ | 0.4544 |
-|| quality | $\gamma$ | 3.4554 |
-|| prior | $a$ | 7.8516 |
-||  | $b$ | 4.3545 |
-| supply | mean entry cost | $\bar \kappa$ | 25,106 |
-|| mean scrap value | $\bar \phi$ | 18,535 |
-| other | discount factor | $\delta$ | 0.99 |
+| demand | price | $\alpha$ | -0.0008 |
+|| constant | $\beta_1$ | -14.0368 |
+|| mid-scale | $\beta_2$ | -13.7769 |
+|| up-scale | $\beta_3$ | -13.7284 |
+|| luxury | $\beta_4$ | -13.7971 |
+|| quality | $\gamma$ | 5.9013 |
+|| prior | $a$ | 9.6511 |
+||  | $b$ | 4.664 |
+| supply | mean entry cost | $\bar \kappa$ | ? |
+|| mean scrap value | $\bar \phi$ | ? |
+| other | discount factor | $\delta$ | 0.999 |
 |  | revenue fee | $f$ | 0.142 |
-|  | arrival rate | $\mu$ | 20,000 |
-|  | adjustment prob. | $\upsilon_r$ | 0.019 |
-|  | review prob. | $\upsilon_r$ | 0.2938 $\ln(N_{jt}+2)\frac{4}{7}$ |
+|  | arrival rate | $\mu$ | 23,000 |
+|  | adjustment prob. | $\upsilon_a$ | 0.019 |
+|  | review prob. | $\upsilon_r$ | 0.1817 |
 |  | max. no. of reviews | $\bar N$ | 20 |
-|  | max. no. of listings | $J$ | 2,000 |
+|  | max. no. of listings | $J$ | 1,800 |
 
 ## Monte Carlo simulation
 
