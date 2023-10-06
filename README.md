@@ -26,7 +26,7 @@
   <li>Preliminarily define state $x$ as $(N,K)$.</li>
   <li>Load dataset into R and run the regression $$ B_{it} = a P_{it} + e_{jt}. $$ </li>
 </ul>
-$B_i$
+$B_\sb{x}$
 + \sum_{i}b_{x_i} + \sum_{\tau}b_{\tau} + \sum_{j}b_{j}
 
 | type | avg price | avg reviews | avg booking prob |  avg rating |
