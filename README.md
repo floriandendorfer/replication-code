@@ -24,10 +24,8 @@
   <li>Compute <i>gross</i> daily rates as $$P = p + \frac{\text{cleaning fee}}{\text{avg booking length}}.$$</li>
   <li>Cap $N$ at 20. Define the number of good reviews as $$K = \frac{1}{4}(r-1)N.$$</li>
   <li>Preliminarily define state $x$ as $(N,K)$.</li>
-  <li>Load dataset into R and run the regression $$ B_{it} = a P_{it} + e_{jt}. $$ </li>
+  <li>Load dataset into R and run the regression $$ B = a P + \sum b(x) + \sumb(\tau) + \sumb(j) e_{jt}. $$ </li>
 </ul>
-B\_x
-+ $\sum x$_{i}b_{x_i} + \sum_{\tau}b_{\tau} + \sum_{j}b_{j}
 
 | type | avg price | avg reviews | avg booking prob |  avg rating |
 | ---: | ---: | ---------: | ------: | ------: |
