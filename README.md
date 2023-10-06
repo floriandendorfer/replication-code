@@ -24,11 +24,11 @@
   <li>Compute <i>gross</i> daily rates as $$P = p + \frac{\text{cleaning fee}}{\text{avg booking length}}.$$</li>
   <li>Cap $N$ at 20. Define the number of good reviews as $$K = \frac{1}{4}(r-1)N.$$</li>
   <li>Preliminarily define state $x$ as $(N,K)$.</li>
-  <li>Load dataset into R and run the regression $B = aP + \sum b(x) + \sum b(\tau) + \sum b(j) + e$. </li>
-  <li>$B = aP + e$ </li>
+  <li>Load dataset into R and run the regression $B = aP + \sum b(x) + \sum b(\tau) + \sum b(j) + e$, where $b(x)$, $b(\tau)$ and $b(j)$ are state, week-year and id dummies respectively </li>
+  <li> Types 1 through 4 are defined based on which quartile $b(j)$ falls into. </li>
 </ul>
 
-| type | avg price | avg reviews | avg booking prob |  avg rating |
+| type | avg price | avg reviews | avg booking prob | avg rating |
 | ---: | ---: | ---------: | ------: | ------: |
 | 1 | \$198.35 | 7.08 | 10.13% | 4.35 stars |
 | 2 | \$216,78 | 8.98 | 32.2% | 4.33 stars |
@@ -37,6 +37,11 @@
 
 ## Demand Estimation
 
+<ul>
+  <li> On average, there are 635.03 bookings per day. Assuming there are 20,000 consumers every day, Airbnb's market share is 3.17%.  </li>
+  <li> Defining a 'month' as a 4 week interval, aggregate the daily data to the month level. </li>
+  <li> A . </li>
+</ul>
 
 ### Model parameters
 
