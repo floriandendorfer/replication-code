@@ -1,6 +1,16 @@
 # Replication code
 
-## Model parameters
+## Dataset Preparation
+
+<ul>
+  <li>Read in <code>MSA_new-york-newark-jersey-city-ny-nj-pa_Property_Extended_Match_2021-11-19.csv</code> (data on properties) </li>
+  <li>Restrict properties to entire homes in Manhattan with exactly 1 bedroom, 1 bathroom, at most 2 guests, at least 1 photo, no pets allowed.</li>
+  <li>Read in <code>MSA_new-york-newark-jersey-city-ny-nj-pa_Daily_Match_2021-11-19.csv</code> (daily booking data)</li>
+  <li>Edgar Mitchell</li>
+  <li>Alan Shepard</li>
+</ul>
+
+### Model parameters
 
 |  | name |            |  value |
 | ---: | ---: | ---------: | ------: |
