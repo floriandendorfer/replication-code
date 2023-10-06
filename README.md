@@ -23,7 +23,9 @@
   <li>Drop properties if their daily rate $p$ is ever at or above the 99 percentile or below the 1 percentile.</li>
   <li>Compute <l>gross</li> daily rates as $$P = p + \frac{\text{cleaning fee}}{\text{avg booking length}}.$$</li>
   <li>Cap $N$ at 20. Define the number of good reviews as $$K = \frac{1}{4}(r-1)N.$$</li>
-  <li>Define state $x$ over $N,K$ and type $t\in\{1,2,3,4\}$. State space $S$ is  | 1 2 3 | | 4 5 6 | | 7 8 9 |
+  <li>Define state $x$ over $N,K$ and type $t\in\{1,2,3,4\}$. State space $S$ is </li>
+</ul>
+| 1 2 3 | | 4 5 6 | | 7 8 9 |
   $$ \begin{array}{cccccc}  
   0 & 0 & 1 & 0 & 0 & 0 \\ 
   0 & 1 & 1 & 0 & 0 & 0 \\ 
@@ -33,9 +35,7 @@
   2 & 2 & 1 & 0 & 0 & 0 \\
   ... & ... & ... & ... & ... & ... \\
   20 & 20 & 0 & 0 & 0 & 1 
-  \end{array} $$</li>
-</ul>
-
+  \end{array} $$
 
 
 ### Model parameters
