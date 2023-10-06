@@ -12,8 +12,8 @@
   <li>If the number of reviews $N$ is missing for a id-day, fill in the last observed $N$ of the same property.</li>
   <li>If $N$ for a id-day is missing and N has been observe prior, fill in the first observed $N$ of the same property.</li>
   <li>If $N$ is still missing, set $N$ equal to zero.</li>
-  <li>Replace zero average ratings, with missings and multiply average ratings less or equal to 10 by 10 (coding errors).</li>
-  <li>If the average rating $r$ is missing for a id-day, fill in the last observed $r$ of the same property.</li>
+  <li>Replace zero ratings, with missings and multiply average ratings less or equal to 10 by 10 (coding errors).</li>
+  <li>If the rating $r$ is missing for a id-day, fill in the last observed $r$ of the same property.</li>
   <li>If the $r$ is missing for a id-day and no $r$ has been observe prior, fill in the first observed $r$ of the same property.</li>
   <li>If the cleaning fee is missing for a id-day, fill in the last observed cleaning fee of the same property.</li>
   <li>If the cleaning fee for a id-day is missing and cleaning fee has been observe prior, fill in the first observed cleaning fee of the same property.</li>
@@ -23,20 +23,13 @@
   <li>Drop properties if their daily rate $p$ is ever at or above the 99 percentile or below the 1 percentile.</li>
   <li>Compute <l>gross</li> daily rates as $$P = p + \frac{\text{cleaning fee}}{\text{avg booking length}}.$$</li>
   <li>Cap $N$ at 20. Define the number of good reviews as $$K = \frac{1}{4}(r-1)N.$$</li>
-  <li>Define state $x$ over $N,K$ and type $t\in\{1,2,3,4\}$. State space $S$ is </li>
+  <li>Preliminarily define state $x$ as $(N,K)$.</li>
+  <li>Load dataset into R and run the regression $$ B_{it} = a P_{it} + \sum_{i}b_{x_i} + \sum_{\tau}b_{\tau} + \sum_{j}b_{j}  $$. </li>
 </ul>
-| 1 2 3 | | 4 5 6 | | 7 8 9 |
-  $$ \begin{array}{cccccc}  
-  0 & 0 & 1 & 0 & 0 & 0 \\ 
-  0 & 1 & 1 & 0 & 0 & 0 \\ 
-  1 & 1 & 1 & 0 & 0 & 0 \\ 
-  2 & 0 & 1 & 0 & 0 & 0 \\
-  2 & 1 & 1 & 0 & 0 & 0 \\
-  2 & 2 & 1 & 0 & 0 & 0 \\
-  ... & ... & ... & ... & ... & ... \\
-  20 & 20 & 0 & 0 & 0 & 1 
-  \end{array} $$
 
+type | avg price | avg reviews | avg booking prob |  avg rating |
+| ---: | ---: | ---------: | ------: |
+| 1 | \$198.35 | 7.08 | 10.13% | 4.35 stars |
 
 ### Model parameters
 
