@@ -21,15 +21,21 @@
   <li>Drop all id-days that are anything else but reserved ($B=1$) or available ($B=0$).</li> 
   <li>Drop properties that are never booked during their lifetime.</li>
   <li>Drop properties if their daily rate $p$ is ever at or above the 99 percentile or below the 1 percentile.</li>
-  <li>Compute <l>gross</li> daily rates as $$P = p + \frac{\text{cleaning fee}}{\text{avg booking length}}.$$</li>
+  <li>Compute <i>gross</i> daily rates as $$P = p + \frac{\text{cleaning fee}}{\text{avg booking length}}.$$</li>
   <li>Cap $N$ at 20. Define the number of good reviews as $$K = \frac{1}{4}(r-1)N.$$</li>
   <li>Preliminarily define state $x$ as $(N,K)$.</li>
-  <li>Load dataset into R and run the regression $$ B_{it} = a P_{it} + \sum_{i}b_{x_i} + \sum_{\tau}b_{\tau} + \sum_{j}b_{j} + e_{jt} $$. </li>
+  <li>Load dataset into R and run the regression $$ B_{it} = a P_{it} + e_{jt}. $$ </li>
 </ul>
 
 | type | avg price | avg reviews | avg booking prob |  avg rating |
 | ---: | ---: | ---------: | ------: | ------: |
 | 1 | \$198.35 | 7.08 | 10.13% | 4.35 stars |
+| 2 | \$216,78 | 8.98 | 32.2% | 4.33 stars |
+| 3 | \$192.96 | 12.36 | 65.65% | 4.56 stars |
+| 4 | \$188.11 | 10.53 | 85.87% | 4.58 stars |
+
+## Demand Estimation
+
 
 ### Model parameters
 
