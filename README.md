@@ -9,16 +9,19 @@
   <li>Read in <code>New_York-Newark_Property_Trajectory.csv</code> (~bi-monthly ratings data) and merge with daily bookings data. </li>
   <li>Restrict observation period to 01/01/2016 to 31/12/2019 (4y).</li>
   <li>For each property, drop all observations <l>before</li> first ever booking. AirDNA may have filled in zeros for dates that predate market entry.</li>
-  <li>If the number of reviews N is missing for a id-day, fill in the last observed N of the same property.</li>
-  <li>If N for a id-day is missing and N has been observe prior, fill in the first observed N of the same property.</li>
-  <li>If N is still missing, set N equal to zero.</li>
+  <li>If the number of reviews $N$ is missing for a id-day, fill in the last observed $N$ of the same property.</li>
+  <li>If $N$ for a id-day is missing and N has been observe prior, fill in the first observed $N$ of the same property.</li>
+  <li>If $N$ is still missing, set $N$ equal to zero.</li>
   <li>Replace zero average ratings, with missings and multiply average ratings less or equal to 10 by 10 (coding errors).</li>
   <li>If the average rating is missing for a id-day, fill in the last observed average rating of the same property.</li>
   <li>If the average rating is missing for a id-day and no average rating has been observe prior, fill in the first observed one of the same property.</li>
   <li>If the cleaning fee is missing for a id-day, fill in the last observed cleaning fee of the same property.</li>
   <li>If the cleaning fee for a id-day is missing and cleaning fee has been observe prior, fill in the first observed cleaning fee of the same property.</li>
   <li>If the cleaning fee is still missing or zero, set it to the average across properties.</li>
-  <li>Drop all id-days that are anything else but reserved ($B=1$) or available ($B=0$).</li>  
+  <li>Drop all id-days that are anything else but reserved ($B=1$) or available ($B=0$).</li> 
+  <li>Drop properties that are never booked during their lifetime.</li>
+  <li>Drop properties if their daily rate $p$ is ever at or above the 99 percentile or below the 1 percentile.</li>
+  <li>Compute <l>gross</li> daily rates as $P = p + \frac{\text{cleaning fee}}{\text{avg booking length}}$</li> 
 </ul>
 
 ### Model parameters
