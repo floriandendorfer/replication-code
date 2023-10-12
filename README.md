@@ -8,7 +8,6 @@
   <li>Read in <code>MSA_new-york-newark-jersey-city-ny-nj-pa_Daily_Match_2021-11-19.csv</code> (daily booking data) for these properties. </li>
   <li>Read in <code>New_York-Newark_Property_Trajectory.csv</code> (~bi-monthly ratings data) and merge with daily bookings data. </li>
   <li>Restrict observation period to 01/01/2016 to 31/12/2019 (4y).</li>
-  <li>For each property, drop all observations <l>before</li> first ever booking. AirDNA may have filled in zeros for dates that predate market entry.</li>
   <li>If the number of reviews $N$ is missing for a id-day, fill in the last observed $N$ of the same property.</li>
   <li>If $N$ for a id-day is missing and N has been observe prior, fill in the first observed $N$ of the same property.</li>
   <li>If $N$ is still missing, set $N$ equal to zero.</li>
@@ -30,10 +29,10 @@
 
 | type | avg price | avg reviews | avg booking prob | avg rating |
 | ---: | ---: | ---------: | ------: | ------: |
-| 1 | \$198.35 | 7.08 | 10.13% | 4.35 stars |
-| 2 | \$216.78 | 8.98 | 32.2% | 4.33 stars |
-| 3 | \$192.96 | 12.36 | 65.65% | 4.56 stars |
-| 4 | \$188.11 | 10.53 | 85.87% | 4.58 stars |
+| 1 | \$198.97 | 8.09 | 11.22% | 4.33 stars |
+| 2 | \$218.30 | 7.60 | 29.48% | 4.32 stars |
+| 3 | \$193.54 | 11.71 | 64.14% | 4.57 stars |
+| 4 | \$188.83 | 9.65 | 83.56% | 4.57 stars |
 
 ## Demand Estimation
 
@@ -44,41 +43,25 @@
   <li> The share of the outside good is $s_0 = 1- \sum s$. </li>
   <li> A property's market share <i>within</i> a certain type is $s_{t} = \frac{B}{\sum_{t}B_t}$. </li>
   <li> Drop month-ids if the market share is zero. 63.04% of the original dataset remain. </li>
-  <li> Use non-linear least squares (NLLS) to estimate $$\ln(s) - \ln(s_0) = \gamma\frac{expit(\psi)\exp(\iota) + K}{\exp(\iota) + N} + 1.146\alphaP + \sum b(t) + \xi. $$ </li>
+  <li> Use GMM to estimate $$\ln(s) - \ln(s_0) = \gamma\frac{\text{expit}(\psi)\exp(\iota) + K}{\exp(\iota) + N} + 1.146\alpha P + \sum b(t) + \xi. $$ </li>
+  <li> The moment conditions are $$ \begin{vector} 1 \\ 2 \\ 3 \end{vector} $$ </li>
 </ul>
 
 | coef | estimate | std err | sign |
 | ---: | ---: | ---------: | ------: |
-| $\psi$ | 0.641 | -- | -- |
-| $\iota$ | 2.152 | -- | -- |
-| $\alpha$ | -0.001 | -- | -- |
-| $\beta_1$ | -11.435 | -- | -- |
-| $\beta_2$ | -11.090 | -- | -- |
-| $\beta_3$ | -10.908 | -- | -- |
-| $\beta_4$ | -10.571 | -- | -- |
-| $\gamma$ | 0.993 | -- | -- |
+| $\psi$ | -0.263 | (0.1630) |  |
+| $\iota$ | 1.372 | (0.1311) | *** |
+| $\alpha$ | -0.001 | (0.0000) | *** |
+| $\beta_1$ | -11.170 | (0.0520) | *** |
+| $\beta_2$ | -10.860 | (0.0516) | *** |
+| $\beta_3$ | -10.579 | (0.0518) | *** |
+| $\beta_4$ | -10.333 | (0.0044) | *** |
+| $\gamma$ | 0.764 | (0.0610) | *** |
 
 <ul>
-  <li> Define <code>availability</code> as the number of days (out of 28 days per 'month') that a month-id is in the dataset. Idea: properties with large opportunity costs are less often available and charge higher prices. Corr coef: 0.06. </li>
-  <li> As $\alpha$ is most likely biased </li>
+  <li> $\alpha$ is most likely biased because it is correlated with unobserved </li>
 </ul>
 
-| coef | estimate | std err | sign |
-| ---: | ---: | ---------: | ------: |
-| $\psi$ | 0.641 | -- | -- | 2.183| -- | -- |
-| $\iota$ | 2.152 | -- | -- | 2.051| -- | -- |
-| $\alpha$ | -0.001 | -- | -- | -0.033| -- | -- |
-| $\beta_1$ | -11.435 | -- | -- | -13.614| -- | -- |
-| $\beta_2$ | -11.090 | -- | -- | -12.809| -- | -- |
-| $\beta_3$ | -10.908 | -- | -- | -13.019| -- | -- |
-| $\beta_4$ | -10.571 | -- | -- | -12.905| -- | -- |
-| $\gamma$ | 0.993 | -- | -- | 10.967| -- | -- |
-
-<ul>
-  <li> Using <code>#hosts_total</code> and <code>#hosts_type</code> as instruments (for $P$ and $s_t$ respectively) use IV-GMM to estimate $$\ln(s) - \ln(s_0) = \gamma\frac{expit(\psi)\exp(\iota) + K}{\exp(\iota) + N} + 1.146\alphaP + \sum b(t) + \sigma\ln(s_t) + \xi. $$ </li>
-  <li> Define <code>#hosts_total</code> as the percent deviation in the total number of ids in a given month from the average number of ids. </li>
-  <li> Define <code>#hosts_type</code> as the share of ids associated with a certain type relative to the number of ids of all types in a given month. </li>
-</ul>
 
 ## Estimation Results
 
