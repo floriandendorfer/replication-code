@@ -68,7 +68,7 @@
 | 112595 | 6.9125 |5.9358 | 1.0000 | 4.3333 | 5.7321 |7.8519 | 274.0000 |
 
 <ul>
-  <li> Test the relevance of $z$ by regressing $p$ on $z$, type dummies, $N, K, NK, N^2, K^2, N^2K, NK^2$ and $N^2K^2$. We find that <i>ceteris paribus</i> a one day longer average reservation length coincides with a 0.023
+  <li> Test the relevance of $z$ by regressing $p$ on $z$, type dummies, $N, K, NK, N^2, K^2, N^2K, NK^2$ and $N^2K^2$. We find that <i>ceteris paribus</i> a one day longer average reservation length coincides with a 0.023 decrease in the daily rental rate.
 </ul>
 
 <table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
@@ -120,6 +120,21 @@
 <tr><td style="text-align:left">F Statistic</td><td>79,303.910<sup>***</sup> (df = 13; 105913)</td></tr>
 <tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
 </table>
+
+<ul>
+  <li>  </li>
+</ul>
+
+| coef | estimate | std err | sign | estimate | std err | sign |
+| ---: | ---: | ---------: | ------: | ---: | ---: | ---------: |
+| $\psi$ | -0.263 | (0.1630) |  | -0.263 | (0.1630) |  |
+| $\iota$ | 1.372 | (0.1311) | *** | -0.263 | (0.1630) |  |
+| $\alpha$ | -0.001 | (0.0000) | *** | -0.263 | (0.1630) |  |
+| $\beta_1$ | -11.170 | (0.0520) | *** | -0.263 | (0.1630) |  |
+| $\beta_2$ | -10.860 | (0.0516) | *** | -0.263 | (0.1630) |  |
+| $\beta_3$ | -10.579 | (0.0518) | *** | -0.263 | (0.1630) |  |
+| $\beta_4$ | -10.333 | (0.0044) | *** | -0.263 | (0.1630) |  |
+| $\gamma$ | 0.764 | (0.0610) | *** | -0.263 | (0.1630) |  |
 
 ## Estimation Results
 
