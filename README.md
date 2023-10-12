@@ -44,7 +44,7 @@
   <li> A property's market share <i>within</i> a certain type is $s_{t} = \frac{B}{\sum_{t}B_t}$. </li>
   <li> Drop month-ids if the market share is zero. 63.04% of the original dataset remain. </li>
   <li> Use GMM to estimate $$\ln(s) - \ln(s_0) = \gamma\frac{\text{expit}(\psi)\exp(\iota) + K}{\exp(\iota) + N} + 1.146\alpha P + \sum b(t) + \xi. $$ </li>
-  <li> The moment conditions are $$ \begin{bvector} 1 \\ 2 \\ 3 \end{bvector} $$ </li>
+  <li> The moment conditions are $ \xiZ $, where $Z$ includes $N,K,KN,P,t_1,t_2,t_3,t_4$. </li>
 </ul>
 
 | coef | estimate | std err | sign |
@@ -59,9 +59,72 @@
 | $\gamma$ | 0.764 | (0.0610) | *** |
 
 <ul>
-  <li> $\alpha$ is most likely biased because it is correlated with unobserved </li>
+  <li> $\alpha$ is most likely biased because it is correlated with the unobserved quality of a property. </li>
+  <li> To address this, define instrument $z$ as the <i>average booking length</i> in days; whether a property tends to be booked short- or long-term should not have a direct effect on the <i>probability</i> that it is booked. However, the marginal cost of providing the Airbnb presumably decreases in the number of days the guest stays at the property (notably the host has to be physically present on the first day). Thus, the reservation length reflects the marginal cost (and, as the marginal cost is partially passed on to guests, is correlated with the rental rate) but does not relate to a property's unobserved quality. </li>
 </ul>
 
+|count  |  2298598 |
+|mean  |   6.8496 |
+|std   |   6.1752 |
+|min   |   1.0000 |
+|25%   |   4.2727 |
+|50%   |   5.6684 |
+|75%   |   7.7353 |
+|max   |   274.0000 |
+
+<ul>
+  <li> Test the relevance of $z$ by regressing $p$ on $z$, type dummies, $N, K, NK, N^2, K^2, N^2K, NK^2$ and $N^2K^2$. We find that <i>ceteris paribus</i> a one day longer average reservation length coincides with a 0.023
+</ul>
+
+<table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
+<tr><td></td><td colspan="1" style="border-bottom: 1px solid black"></td></tr>
+<tr><td style="text-align:left"></td><td>p</td></tr>
+<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">z</td><td>-0.023<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(0.005)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">type.1</td><td>288.723<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(10.367)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">type.2</td><td>305.906<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(10.357)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">type.3</td><td>282.740<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(10.361)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">type.4</td><td>277.917<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(10.362)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">poly(N, 2)1</td><td>-36,044.900<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(2,363.653)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">poly(N, 2)2</td><td>7,619.265<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(857.593)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">poly(K, 2)1</td><td>47,937.280<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(3,519.021)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">poly(K, 2)2</td><td>10,007.650<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(1,238.603)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">poly(N, 2)1:poly(K, 2)1</td><td>-9,786,715.000<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(1,117,009.000)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">poly(N, 2)2:poly(K, 2)1</td><td>812,320.900<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(277,768.700)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">poly(N, 2)1:poly(K, 2)2</td><td>-759,138.900<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(277,942.400)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td style="text-align:left">poly(N, 2)2:poly(K, 2)2</td><td>205,383.500<sup>***</sup></td></tr>
+<tr><td style="text-align:left"></td><td>(38,389.670)</td></tr>
+<tr><td style="text-align:left"></td><td></td></tr>
+<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>105,926</td></tr>
+<tr><td style="text-align:left">R<sup>2</sup></td><td>0.907</td></tr>
+<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.907</td></tr>
+<tr><td style="text-align:left">Residual Std. Error</td><td>64.011 (df = 105913)</td></tr>
+<tr><td style="text-align:left">F Statistic</td><td>79,303.910<sup>***</sup> (df = 13; 105913)</td></tr>
+<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
+</table>
 
 ## Estimation Results
 
