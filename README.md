@@ -44,7 +44,7 @@
   <li> A property's market share <i>within</i> a certain type is $s_{t} = \frac{B}{\sum_{t}B_t}$. </li>
   <li> Drop month-ids if the market share is zero. 63.04% of the original dataset remain. </li>
   <li> Use GMM to estimate $$\ln(s) - \ln(s_0) = \gamma\frac{\text{expit}(\psi)\exp(\iota) + K}{\exp(\iota) + N} + 1.146\alpha P + \sum b(t) + \xi. $$ </li>
-  <li> The moment conditions are $$ \begin{vector} 1 \\ 2 \\ 3 \end{vector} $$ </li>
+  <li> The moment conditions are $$ \begin{bvector} 1 \\ 2 \\ 3 \end{bvector} $$ </li>
 </ul>
 
 | coef | estimate | std err | sign |
