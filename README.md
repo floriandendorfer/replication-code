@@ -63,9 +63,9 @@
   <li> To address this, define instrument $z$ as the <i>average booking length</i> in days; whether a property tends to be booked short- or long-term should not have a direct effect on the <i>probability</i> that it is booked. However, the marginal cost of providing the Airbnb presumably decreases in the number of days the guest stays at the property (notably the host has to be physically present on the first day). Thus, the reservation length reflects the marginal cost (and, as the marginal cost is partially passed on to guests, is correlated with the rental rate) but does not relate to a property's unobserved quality. </li>
 </ul>
 
-| coef | estimate | mean | std | min | 25% | 50% | 75% | max |
+| count | estimate | mean | std | min | 25% | 50% | 75% | max |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| count | 112595 | 6.9125 |5.9358 |1.0000 | 4.3333 | 5.7321 |7.8519 | 274.0000 |
+| 112595 | 6.9125 |5.9358 | 1.0000 | 4.3333 | 5.7321 |7.8519 | 274.0000 |
 
 <ul>
   <li> Test the relevance of $z$ by regressing $p$ on $z$, type dummies, $N, K, NK, N^2, K^2, N^2K, NK^2$ and $N^2K^2$. We find that <i>ceteris paribus</i> a one day longer average reservation length coincides with a 0.023
