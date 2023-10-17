@@ -92,10 +92,18 @@
   <li> We estimate the two mean entry cost and mean scrap value by maximizing the likelihood of the state distribution in our data sample. </li>
 </ul>
 
-<img src="P_d.png" width="200" height="100">
 
+<img src="s_d.png" width="500" height="500">
+<img src="s_star.png" width="500" height="500">
 
- ![](P_d.png)
+<img src="P_d.png" width="500" height="500">
+<img src="P_star.png" width="500" height="500">
+
+<img src="q_d.png" width="500" height="500">
+<img src="q_star.png" width="500" height="500">
+
+<img src="chi_d.png" width="500" height="500">
+<img src="chi_star.png" width="500" height="500">
 
 ## Summary
 
