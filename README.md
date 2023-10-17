@@ -77,8 +77,8 @@
 
 | coef | estimate | std err | sign | estimate | std err | sign |
 | ---: | ---: | ---------: | ------: | ---: | ---: | ---------: |
-| $\psi$ | -0.263 | (0.1630) |  | 1.990 | (0.073) | *** | 1.688 | (0.0875) | * |
-| $\iota$ | 1.372 | (0.1311) | *** | 2.844 | (0.4628) | ** | 2.245 | (1.5429) |  |
+| $\psi$ | -0.263 | (0.1630) |  | 1.990 | (0.073) | *** | 1.688 | (0.8037) | * |
+| $\iota$ | 1.372 | (0.1311) | *** | 2.844 | (0.4628) | ** | 2.245 | (1.5429) | ** |
 | $\alpha$ | -0.001 | (0.0000) | *** | -0.010 | (0.0008) | *** | -0.011 | (0.0029) | *** |
 | $\beta_1$ | -11.170 | (0.0520) | *** | -14.231 | (1.4509) | *** | -11.817 | (3.4903) | *** |
 | $\beta_2$ | -10.860 | (0.0516) | *** | -13.823 | (1.4501) | *** | -11.414 | (3.4948) | *** |
@@ -92,7 +92,7 @@
   <li> We estimate the two mean entry cost and mean scrap value by maximizing the likelihood of the state distribution in our data sample. </li>
 </ul>
 
-![Alt text](https://github.com/floriandendorfer/replication-code/P_d.png)
+![Alt text](https://github.com/floriandendorfer/replication-code/P_d.png?raw=true)
 
 ## Summary
 
