@@ -89,10 +89,10 @@
 <ul>
   <li> For the supply estimation, we define a booking unit as a week. Hence, we aggregate the data to the weekly level. This is motivated by the fact that average reservation length (in the estimation sample) is close to 7 days.  </li>
   <li> The weekly occupancy rate is $1-exp(-mu\times s)\in[0,1]$. The probability that a booking results in a rating is the $\Delta N / \Delta B$ for the observation period or 22.59%.  </li>
-  <li> The estimated prior is 4.38 stars. The average rating in the data is 4.44 stars. </li>
-  <li> The estimated average own-price elasticity of demand is $-2.04$. </li>
+  <li> We estimate the two mean entry cost and mean scrap value by maximizing the likelihood of the state distribution in our data sample. </li>
 </ul>
 
+![Alt text](https://github.com/floriandendorfer/replication-code/P_d.png)
 
 ## Summary
 
