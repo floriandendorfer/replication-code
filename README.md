@@ -44,7 +44,7 @@
   <li> A property's market share <i>within</i> a certain type is $s_{t} = \frac{B}{\sum_{t}B_t}$. </li>
   <li> Drop month-ids if the market share is zero. 63.04% of the original dataset remain. </li>
   <li> Use GMM to estimate $$\ln(s) - \ln(s_0) = \gamma\frac{\text{expit}(\psi)\exp(\iota) + K}{\exp(\iota) + N} + 1.146\alpha P + \sum b(t) + \xi. $$ </li>
-  <li> The moment conditions are $ \xiZ $, where $Z$ includes $N,K,KN,P,t_1,t_2,t_3,t_4$. </li>
+  <li> The moment conditions are $ \xi Z $, where $Z$ includes $N,K,KN,P,t_1,t_2,t_3,t_4$. </li>
 </ul>
 
 | coef | estimate | std err | sign |
@@ -60,100 +60,57 @@
 
 <ul>
   <li> $\alpha$ is most likely biased because it is correlated with the unobserved quality of a property. </li>
-  <li> To address this, define instrument $z$ as the <i>average booking length</i> in days; whether a property tends to be booked short- or long-term should not have a direct effect on the <i>probability</i> that it is booked. However, the marginal cost of providing the Airbnb presumably decreases in the number of days the guest stays at the property (notably the host has to be physically present on the first day). Thus, the reservation length reflects the marginal cost (and, as the marginal cost is partially passed on to guests, is correlated with the rental rate) but does not relate to a property's unobserved quality. </li>
+  <li> To address this, define instrument $z_p$ as the <i>average booking length</i> in days; whether a property tends to be booked short- or long-term should not have a direct effect on the <i>probability</i> that it is booked. However, the marginal cost of providing the Airbnb presumably decreases in the number of days the guest stays at the property (notably the host has to be physically present on the first day). Thus, the reservation length reflects the marginal cost (and, as the marginal cost is partially passed on to guests, is correlated with the rental rate) but does not relate to a property's unobserved quality. </li>
+  <li> In addition, $\iota$, $\psi$ and $\gamma$ are likely biased because $N$ and $K$ are correlated with a property's unobserved quality. </li>
+  <li> We use the de-meaned occupancy rate 6-month prior ($z_n$) and the star rating of a property to instrument the number of reviews. </li>
 </ul>
 
-| count | mean | std | min | 25% | 50% | 75% | max |
-| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 112595 | 6.9125 |5.9358 | 1.0000 | 4.3333 | 5.7321 |7.8519 | 274.0000 |
-
+| | count | mean | std | min | 25% | 50% | 75% | max |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| $z_p$ | 112595 | 6.9125 |5.9358 | 1.0000 | 4.3333 | 5.7321 |7.8519 | 274.0000 |
+| $z_n$ | 112595 | 6.9125 |5.9358 | 1.0000 | 4.3333 | 5.7321 |7.8519 | 274.0000 |
 <ul>
-  <li> Test the relevance of $z$ by regressing $p$ on $z$, type dummies, $N, K, NK, N^2, K^2, N^2K, NK^2$ and $N^2K^2$. We find that <i>ceteris paribus</i> a one day longer average reservation length coincides with a 0.023 decrease in the daily rental rate.
-</ul>
-
-<table style="text-align:center"><tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"></td><td><em>Dependent variable:</em></td></tr>
-<tr><td></td><td colspan="1" style="border-bottom: 1px solid black"></td></tr>
-<tr><td style="text-align:left"></td><td>p</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">z</td><td>-0.023<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(0.005)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">type.1</td><td>288.723<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(10.367)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">type.2</td><td>305.906<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(10.357)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">type.3</td><td>282.740<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(10.361)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">type.4</td><td>277.917<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(10.362)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">poly(N, 2)1</td><td>-36,044.900<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(2,363.653)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">poly(N, 2)2</td><td>7,619.265<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(857.593)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">poly(K, 2)1</td><td>47,937.280<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(3,519.021)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">poly(K, 2)2</td><td>10,007.650<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(1,238.603)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">poly(N, 2)1:poly(K, 2)1</td><td>-9,786,715.000<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(1,117,009.000)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">poly(N, 2)2:poly(K, 2)1</td><td>812,320.900<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(277,768.700)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">poly(N, 2)1:poly(K, 2)2</td><td>-759,138.900<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(277,942.400)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td style="text-align:left">poly(N, 2)2:poly(K, 2)2</td><td>205,383.500<sup>***</sup></td></tr>
-<tr><td style="text-align:left"></td><td>(38,389.670)</td></tr>
-<tr><td style="text-align:left"></td><td></td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left">Observations</td><td>105,926</td></tr>
-<tr><td style="text-align:left">R<sup>2</sup></td><td>0.907</td></tr>
-<tr><td style="text-align:left">Adjusted R<sup>2</sup></td><td>0.907</td></tr>
-<tr><td style="text-align:left">Residual Std. Error</td><td>64.011 (df = 105913)</td></tr>
-<tr><td style="text-align:left">F Statistic</td><td>79,303.910<sup>***</sup> (df = 13; 105913)</td></tr>
-<tr><td colspan="2" style="border-bottom: 1px solid black"></td></tr><tr><td style="text-align:left"><em>Note:</em></td><td style="text-align:right"><sup>*</sup>p<0.1; <sup>**</sup>p<0.05; <sup>***</sup>p<0.01</td></tr>
-</table>
-
-<ul>
-  <li>  </li>
+  <li> Because of the lagged variable only a third of the original dataset survives. </li>
+  <li> The estimated prior is 4.38 stars. The average rating in the data is 4.44 stars. </li>
+  <li> The estimated average own-price elasticity of demand is $-XXX$. </li>
 </ul>
 
 | coef | estimate | std err | sign | estimate | std err | sign |
 | ---: | ---: | ---------: | ------: | ---: | ---: | ---------: |
-| $\psi$ | -0.263 | (0.1630) |  | -0.263 | (0.1630) |  |
-| $\iota$ | 1.372 | (0.1311) | *** | -0.263 | (0.1630) |  |
-| $\alpha$ | -0.001 | (0.0000) | *** | -0.263 | (0.1630) |  |
-| $\beta_1$ | -11.170 | (0.0520) | *** | -0.263 | (0.1630) |  |
-| $\beta_2$ | -10.860 | (0.0516) | *** | -0.263 | (0.1630) |  |
-| $\beta_3$ | -10.579 | (0.0518) | *** | -0.263 | (0.1630) |  |
-| $\beta_4$ | -10.333 | (0.0044) | *** | -0.263 | (0.1630) |  |
-| $\gamma$ | 0.764 | (0.0610) | *** | -0.263 | (0.1630) |  |
+| $\psi$ | -0.263 | (0.1630) |  | 1.990 | (0.073) | *** | 1.688 | (0.0875) | * |
+| $\iota$ | 1.372 | (0.1311) | *** | 2.844 | (0.4628) | ** | 2.245 | (1.5429) |  |
+| $\alpha$ | -0.001 | (0.0000) | *** | -0.010 | (0.0008) | *** | -0.011 | (0.0029) | *** |
+| $\beta_1$ | -11.170 | (0.0520) | *** | -14.231 | (1.4509) | *** | -11.817 | (3.4903) | *** |
+| $\beta_2$ | -10.860 | (0.0516) | *** | -13.823 | (1.4501) | *** | -11.414 | (3.4948) | *** |
+| $\beta_3$ | -10.579 | (0.0518) | *** | -13.682 | (1.4521) | *** | -11.265 | (3.4870) | *** |
+| $\beta_4$ | -10.333 | (0.0044) | *** | -13.478 | (1.4517) | *** | -11.059 | (3.4892) | *** |
+| $\gamma$ | 0.764 | (0.0610) | *** | 6.383 | (1.6839) | *** | 3.790 | (3.7575) |  |
 
-## Estimation Results
+<ul>
+  <li> For the supply estimation, we define a booking unit as a week. Hence, we aggregate the data to the weekly level. This is motivated by the fact that average reservation length (in the estimation sample) is close to 7 days.  </li>
+  <li> The weekly occupancy rate is $1-exp(-mu\times s)\in[0,1]$. The probability that a booking results in a rating is the $\Delta N / \Delta B$ for the observation period or 22.59%.  </li>
+  <li> The estimated prior is 4.38 stars. The average rating in the data is 4.44 stars. </li>
+  <li> The estimated average own-price elasticity of demand is $-2.04$. </li>
+</ul>
+
+
+## Summary
 
 |  | name |            |  value |
 | ---: | ---: | ---------: | ------: |
-| demand | price | $\alpha$ | -0.0008 |
-|| constant | $\beta_1$ | -14.0368 |
-|| mid-scale | $\beta_2$ | -13.7769 |
-|| up-scale | $\beta_3$ | -13.7284 |
-|| luxury | $\beta_4$ | -13.7971 |
-|| quality | $\gamma$ | 5.9013 |
-|| prior | $a$ | 9.6511 |
-||  | $b$ | 4.664 |
-| supply | mean entry cost | $\bar \kappa$ | ? |
-|| mean scrap value | $\bar \phi$ | ? |
-| other | discount factor | $\delta$ | 0.999 |
+| demand | price | $\alpha$ | -0.010 |
+|| constant | $\beta_1$ | -11.817 |
+|| mid-scale | $\beta_2$ | -11.414 |
+|| up-scale | $\beta_3$ | -11.265 |
+|| luxury | $\beta_4$ | -11.059 |
+|| quality | $\gamma$ | 3.790 |
+|| prior | $a$ | 7.969 |
+||  | $b$ | 1.473 |
+| supply | mean entry cost | $\bar \kappa$ | 64,428 (~22% of avg $PDV) |
+|| mean scrap value | $\bar \phi$ | 373302 (~11706% of avg $PDV) |
+| other | discount factor | $\delta$ | 0.995 |
 |  | revenue fee | $f$ | 0.142 |
-|  | arrival rate | $\mu$ | 23,000 |
-|  | adjustment prob. | $\upsilon_a$ | 0.019 |
-|  | review prob. | $\upsilon_r$ | 0.1817 |
+|  | arrival rate | $\mu$ | 20,000 |
+|  | review prob. | $\upsilon_r$ | 0.2257 |
 |  | max. no. of reviews | $\bar N$ | 20 |
-|  | max. no. of listings | $J$ | 1,800 |
+|  | max. no. of listings | $J$ | 2,000 |
