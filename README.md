@@ -92,8 +92,8 @@
   <li> We estimate the two mean entry cost and mean scrap value by maximizing the likelihood of the state distribution in our data sample. </li>
 </ul>
 
-![Alt text](https://github.com/floriandendorfer/replication-code/P_d.png?raw=true)
-
+ ![](P_d.png)
+  
 ## Summary
 
 |  | name |            |  value |
