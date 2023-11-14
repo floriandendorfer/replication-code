@@ -2,6 +2,7 @@
 
 ## Parameter
 
+<center>
 |  | name |            |  value |
 | ---: | ---: | ---------: | ------: |
 | demand | price | $\alpha$ | -0.0105 |
@@ -26,6 +27,7 @@
 |  | max. no. of reviews | $\bar N$ | 20 |
 |  | arrival rate | $\mu$ | 10,000 |
 |  | max. no. of listings | $J$ | 10,000 |
+</center>
 
 ## Demand
 
