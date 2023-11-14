@@ -29,13 +29,11 @@
 
 ## Demand
 
-Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,type)$.
+Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,j)$, where $j\in\{1,2,3,4\}$ is the property's (observed) **type**.
 
-  $$u_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \sum_j\beta_j\mathbb{1}(type = j) + \alpha ((1+f)p- t) + \epsilon = V(x) + \epsilon$$
+  $$U_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \sum_j\beta_j\mathbb{1}(type = j) + \alpha ((1+f)p- t) + \epsilon = u(p,x) + \epsilon$$
   
-$P(x)$ is the rental rate of the listing; $t$ is the counterfactual subsidy. For the moment, we set $t$ equal to zero.
-
-**Observed quality**: Each listing has observed type 1,2,3 or 4.
+$p$ is the daily rental rate of the listing; $t$ is the counterfactual subsidy. For the moment, we set $t$ equal to zero.
 
 **Unobserved quality**: The unobserved quality $\omega$ is unknown to guests and hosts. However, $\omega$ is known to be iid $Beta(a,b)$ distributed. After observing the number of good reviews $K$ and bad reviews $N-K$ agents form an expectation about the unobserved quality, $E[\omega|N,K]$.</li>
 
@@ -43,7 +41,7 @@ $\epsilon$ is iid T1EV extreme value distributed.
 
 Function <code>ccp_s(p,P,s,theta,t,params)</code> characterizes the probability that a guest ***intends*** to book the property at rate $p$ provided that all remaining hosts set their prices according to $P(x)$.
 
-$$ccp(p,x) = \frac{\exp(V(p,x))}{1+\sum_xs(x)\exp(V(P(x),x))}$$
+$$ccp(p,x) = \frac{\exp(u(p,x))}{1+\sum_xs(x)\exp(u(P(x),x))}$$
 
 **State distribution**: $s(x)$ pins down the number of properties in each state. For later use, we also work out the first-order (<code>dccp_s(p,P,s,theta,t,params)</code>) and second-order (<code>d2ccp_s(p,P,s,theta,t,params)</code>) derivatives of $ccp(p,x)$ with respect to $p$.
 
@@ -60,14 +58,16 @@ Function <code>d2q_s(p,P,s,theta,t,params)</code> and Function <code>d2q_s(p,P,s
   $$q'(p,x) = \mu\exp(-\mu \cdot ccp(p,x))ccp'(p,x)$$
   $$q''(p,x) = \mu\exp(-\mu \cdot ccp(p,x))(ccp''(p,x)-\mu\cdot ccp'(p,x))$$
 
+Strictly speaking, $q_s$ is the ***daily*** booking probability. As a **time period** in the model is a 4-week interval ("month"), we interpret $q_s$ as the monthly **occupancy rate**. 
+
 ## State Transitions
 
-If a property is booked ($q(p,x) = 1$), $x$ changes with probability $\upsilon_r = 70.41%$. Conditional on being booked, it receives a good review ($\Delta N = 1, \Delta K = 1$) with probability $\frac{a+K(x)}{a+b+N(x)}$. Conditional on being booked, it receives a bad review ($\Delta N = 1, \Delta K = 0$) with probability $\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$. The **probability of getting a good review**  and the **probability of getting a bad review** are $\rho^g(p,x)$ and $\rho^b(p,x)$ respectively. States where $N=20$ are **terminal** and the probability of getting a review is zero.
+If a property is booked ($q(p,x) = 1$), $x$ changes with probability $\upsilon_r = 70.41%$ between periods. Conditional on being booked, it receives a good review ($\Delta N = 1, \Delta K = 1$) with probability $\frac{a+K(x)}{a+b+N(x)}$. Conditional on being booked, it receives a bad review ($\Delta N = 1, \Delta K = 0$) with probability $\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$. The **probability of getting a good review**  and the **probability of getting a bad review** are $\rho^g(p,x)$ and $\rho^b(p,x)$ respectively. States where $N=20$ are **terminal** and the probability of getting a review is zero.
 
 $$\rho^g(p,x) = \upsilon_rq(p,x)\frac{a+K(x)}{a+b+N(x)}$$
 $$\rho^b(p,x) = \upsilon_rq(p,x)\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$$
 
-Accordingly, the probability $\rho^0(p,x)$ of getting no review is $1-\rho^g(p,x)-\rho^b(p,x)$. States are arranged in increasing order of $type$ and, for a given type, in increasing order of $N$ and, for a given $N$, in increasing order of $K$. $S$ is the **state space**.
+Accordingly, the probability $\rho^0(p,x)$ of getting no review is $1-\rho^g(p,x)-\rho^b(p,x)$. States are arranged in increasing order of $type$ and, for a given type, in increasing order of $N$ and, for a given $N$, in increasing order of $K$. $S$ is the **state space**. Note: $S$ is in <code>params</code>.
 
 $$ S = \begin{bmatrix} 
 1 & 0 & 0 & 0 & 0 & 0 \\ 
@@ -99,4 +99,16 @@ Function  <code>T_s(q,theta,t,params)</code> stores the **transition matrix** $T
 | $(20,20,1)$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | 1 |
 
 ## Market Entry & Exit
+
+Types are equally distributed in the host population, meaning 2,500 properties have a certain type. If a host is **inactive** and has not yet entered the market, they can do so at the start of the following month at **entry cost** $\kappa$ which is iid drawn from $Exponential(\bar \kappa_j)$, $j=1,2,3,4$. Let $\lambda_j$ denote the entry rate depending on the price $p$ of the property and the type of the property. 
+
+$$ \lambda = 1-\exp(-\delta V((0,0,j))]\bar\kappa_j^{-1} ) $$
+
+The expected, total entry cost in a given month is the number of inactive hosts $(J/4 - \sum_{x}s(x))$ times $\mathbb{E}[\phi_j|\phi_j\geq \delta V(0,0,j)]$.
+
+$$  $$
+
+operating cost
+
+## The Host's Problem
 
