@@ -31,7 +31,7 @@
 
 Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,j)$, where $j\in\{1,2,3,4\}$ is the property's (observed) **type**.
 
-  $$U_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \sum_j\beta_j\mathbb{1}(type = j) + \alpha ((1+f)p- t) + \epsilon = u(p,x) + \epsilon$$
+  $$U_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \sum_{j'}\beta_j\mathbb{1}(j' = j) + \alpha ((1+f)p- t) + \epsilon = u(p,x) + \epsilon$$
   
 $p$ is the daily rental rate of the listing; $t$ is the counterfactual subsidy. For the moment, we set $t$ equal to zero.
 
@@ -100,15 +100,21 @@ Function  <code>T_s(q,theta,t,params)</code> stores the **transition matrix** $T
 
 ## Market Entry & Exit
 
-Types are equally distributed in the host population, meaning 2,500 properties have a certain type. If a host is **inactive** and has not yet entered the market, they can do so at the start of the following month at **entry cost** $\kappa$ which is iid drawn from $Exponential(\bar \kappa_j)$, $j=1,2,3,4$. Let $\lambda_j$ denote the entry rate depending on the price $p$ of the property and the type of the property. 
+Types are equally distributed in the host population, meaning 2,500 properties have a certain type. If a host is **inactive** and has not yet entered the market, they can do so at the start of the following month at **entry cost** $\kappa$ which is iid drawn from $Exponential(\bar \kappa_j)$, $j=1,2,3,4$. Let $\lambda_j$ denote the **entry rate**. 
 
-$$ \lambda = 1-\exp(-\delta V((0,0,j))]\bar\kappa_j^{-1} ) $$
+$$ \lambda_j = 1-\exp(-\delta V((0,0,j))]\bar\kappa_j^{-1} ) $$
 
-The expected, total entry cost in a given month is the number of inactive hosts $(J/4 - \sum_{x}s(x))$ times $\mathbb{E}[\phi_j|\phi_j\geq \delta V(0,0,j)]$.
+The expected, total entry costs in a given month is the number of inactive hosts $(J/4 - \sum_{x}\mathbb{1}(j' = j)s(x))$ times $\mathbb{E}[\phi_j|\phi_j\geq \delta V(0,0,j)]$.
 
-$$  $$
+$$ \text{Total entry costs} = (J/4 - \sum_{x}\mathbb{1}(j' = j)s(x))\left(lambda_j\bar \kappa_j - (1-\lambda_j)\deltaV((0,0,j))\right) $$
 
-operating cost
+If a host is **active** they have entered the market. At the end of each month they have to pay the **operating cost** $\phi_j$ for the following month, regardless of whether the property is booked or not. $\phi_j$ is iid $Exponential(\bar \phi_j)$ distributed. Let $\chi(p,x)$ denote the **exit rate**.
+
+$$ \chi(p,x) = \exp(-\delta \mathbb{E}_{x'}[V(x')|p,x]\bar\phi_j^{-1} ). $$
+
+$x'$ denotes the state in the next month. Note that the host's expectation depends on $p$ because the property is likely to transition to a new state if it is booked.  
+
+F
 
 ## The Host's Problem
 
