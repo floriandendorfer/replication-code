@@ -62,7 +62,7 @@ Strictly speaking, $q_s$ is the ***daily*** booking probability. As a **time per
 
 ## State Transitions
 
-If a property is booked ($q(p,x) = 1$), $x$ changes with probability $\upsilon_r = 70.41%$ between periods. Conditional on being booked, it receives a good review ($\Delta N = 1, \Delta K = 1$) with probability $\frac{a+K(x)}{a+b+N(x)}$. Conditional on being booked, it receives a bad review ($\Delta N = 1, \Delta K = 0$) with probability $\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$. The **probability of getting a good review**  and the **probability of getting a bad review** are $\rho^g(p,x)$ and $\rho^b(p,x)$ respectively. States where $N=20$ are **terminal** and the probability of getting a review is zero.
+If a property is booked ($q(p,x) = 1$), $x$ changes with probability $\upsilon_r = 70.41$% between periods. Conditional on being booked, it receives a good review ($\Delta N = 1, \Delta K = 1$) with probability $\frac{a+K(x)}{a+b+N(x)}$. Conditional on being booked, it receives a bad review ($\Delta N = 1, \Delta K = 0$) with probability $\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$. The **probability of getting a good review**  and the **probability of getting a bad review** are $\rho^g(p,x)$ and $\rho^b(p,x)$ respectively. States where $N=20$ are **terminal** and the probability of getting a review is zero.
 
 $$\rho^g(p,x) = \upsilon_rq(p,x)\frac{a+K(x)}{a+b+N(x)}$$
 $$\rho^b(p,x) = \upsilon_rq(p,x)\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$$
@@ -106,13 +106,15 @@ $$ \lambda_j = 1-\exp(-\delta V((0,0,j))]\bar\kappa_j^{-1} ) $$
 
 The expected, total entry costs in a given month is the number of inactive hosts $(J/4 - \sum_{x}\mathbb{1}(j' = j)s(x))$ times $\mathbb{E}[\phi_j|\phi_j\geq \delta V(0,0,j)]$.
 
-$$ \text{Total entry costs} = (J/4 - \sum_{x}\mathbb{1}(j' = j)s(x))\left(lambda_j\bar \kappa_j - (1-\lambda_j)\deltaV((0,0,j))\right) $$
+$$ \text{Total entry costs} = (J/4 - \sum_{x}\mathbb{1}(j' = j)s(x))\left(lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
 
 If a host is **active** they have entered the market. At the end of each month they have to pay the **operating cost** $\phi_j$ for the following month, regardless of whether the property is booked or not. $\phi_j$ is iid $Exponential(\bar \phi_j)$ distributed. Let $\chi(p,x)$ denote the **exit rate**.
 
 $$ \chi(p,x) = \exp(-\delta \mathbb{E}_{x'}[V(x')|p,x]\bar\phi_j^{-1} ). $$
 
 $x'$ denotes the state in the next month. Note that the host's expectation depends on $p$ because the property is likely to transition to a new state if it is booked.  
+
+The expected, total operating costs in a given month are
 
 F
 
