@@ -29,7 +29,7 @@
 
 ## Demand
 
-Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,type)$. **State space**.
+Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,type)$.
 
   $$u_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \sum_j\beta_j\mathbb{1}(type = j) + \alpha ((1+f)p- t) + \epsilon = V(x) + \epsilon$$
   
@@ -62,9 +62,41 @@ Function <code>d2q_s(p,P,s,theta,t,params)</code> and Function <code>d2q_s(p,P,s
 
 ## State Transitions
 
-If a property is booked ($q(p,x) = 1$), $x$ changes with probability $\upsilon_r = 70.41\%$. Conditional on being booked, it receives a good review ($\Delta N = 1, \Delta K = 1$) with probability $\frac{a+K(x)}{a+b+N(x)}$. Conditional on being booked, it receives a bad review ($\Delta N = 1, \Delta K = 0$) with probability $\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$. The **probability of getting a good review**  and the **probability of getting a bad review** are $\rho_g(p,x)$ and $\rho_b(p,x)$ respectively.
+If a property is booked ($q(p,x) = 1$), $x$ changes with probability $\upsilon_r = 70.41\%$. Conditional on being booked, it receives a good review ($\Delta N = 1, \Delta K = 1$) with probability $\frac{a+K(x)}{a+b+N(x)}$. Conditional on being booked, it receives a bad review ($\Delta N = 1, \Delta K = 0$) with probability $\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$. The **probability of getting a good review**  and the **probability of getting a bad review** are $\rho^g(p,x)$ and $\rho^b(p,x)$ respectively. States where $N=20$ are **terminal** and the probability of getting a review is zero.
 
-$$\rho_g(p,x) = \upsilon_rq(p,x)\frac{a+K(x)}{a+b+N(x)}$$
-$$\rho_b(p,x) = \upsilon_rq(p,x)\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$$
+$$\rho^g(p,x) = \upsilon_rq(p,x)\frac{a+K(x)}{a+b+N(x)}$$
+$$\rho^b(p,x) = \upsilon_rq(p,x)\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$$
 
-Function  <code>T_s(p,P,s,theta,t,params)</code> stores the **transition matrix** $T$.
+Accordingly, the probability $\rho^0(p,x)$ of getting no review is $1-\rho^g(p,x)-\rho^b(p,x)$. States are arranged in increasing order of $type$ and, for a given type, in increasing order of $N$ and, for a given $N$, in increasing order of $K$. $S$ is the **state space**.
+
+$$ S = \begin{bmatrix} 
+1 & 0 & 0 & 0 & 0 & 0 \\ 
+1 & 0 & 1 & 0 & 0 & 0 \\
+2 & 1 & 1 & 0 & 0 & 0 \\
+2 & 0 & 2 & 0 & 0 & 0 \\
+2 & 1 & 2 & 0 & 0 & 0 \\
+3 & 2 & 2 & 0 & 0 & 0 \\
+... & ... & ... & ... & ... & ... \\ 
+11 & 17 & 0 & 0 & 1 & 0 \\
+12 & 17 & 0 & 0 & 1 & 0 \\
+13 & 17 & 0 & 0 & 1 & 0 \\
+... & ... & ... & ... & ... & ... \\ 
+19 & 20 & 0 & 0 & 0 & 1 \\
+20 & 20 & 0 & 0 & 0 & 1
+\end{bmatrix} $$
+
+Function  <code>T_s(q,theta,t,params)</code> stores the **transition matrix** $T(q)$. It turns out that the way states are ordered the number of zeros between $\rho^0(p,x)$ and $\rho^g(p,x)$ is $N$.  
+
+|  | $(0,0,1)$ | $(0,1,1)$ | $(1,1,1)$ | $(0,2,1)$ | $(1,2,1)$ | $(2,2,1)$ | ... | $(20,20,4)$ | 
+| ---: | ---: | :---------: | :------: | :------: | :------: | :------: | :------: | :------: |
+| $(0,0,1)$ | $\rho^0_{(0,0,1)}$ | $\rho^g_{(0,0,1)}$ | $\rho^b_{(0,0,1)}$ | 0 | 0 | 0 | ... | 0 |
+| $(0,1,1)$ | 0 | $\rho^0_{(1,1,1)}$ | 0 | $\rho^g_{(1,1,1)}$ | $\rho^b_{(1,1,1)}$ | 0 | ... | 0 |
+| $(1,1,1)$ | 0 | 0 | $\rho^0_{(2,0,1)}$ | 0 | $\rho^g_{(2,0,1)}$ | $\rho^b_{(2,0,1)}$ | ... | 0 |
+| $(0,2,1)$ | 0 | 0 | 0 | $\rho^0_{(2,1,1)}$ | 0 | 0 | ... | 0 |
+| $(1,2,1)$ | 0 | 0 | 0 | 0 | $\rho^0_{(2,2,1)}$ | 0 | ... | 0 |
+| $(2,2,1)$ | 0 | 0 | 0 | 0 | 0 | $\rho^0_{(3,0,1)}$ | ... | 0 |
+| ... | ... | ... | ... | ... | ... | ... | ... | 0 |
+| $(20,20,1)$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | 1 |
+
+## Market Entry & Exit
+
