@@ -30,8 +30,13 @@
 ## Demand
 
 <ul>
-  <li> Function <code>U_s(p,theta,t,params)</code> characterizes a consumer's indirect utility of renting a property in state $s$ </li>
+  <li> Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect utility of renting a property in state $s$ </li>
   $$ u_{s} = \gamma\frac{a + K(s)}{a + b + N(s)} + \beta(s) + \alpha ((1+f)P(s)- t) + \epsilon $$
-  <li> $P(s)$ is the rental rate of the listing; $t$ is the counterfactual subsidy. For the moment, we set $t$ equal to zero. </li>
-  <li> **Observed quality**: Listings . </li>
+  <ul>
+    <li> $P(s)$ is the rental rate of the listing; $t$ is the counterfactual subsidy. For the moment, we set $t$ equal to zero. </li>
+    <li> **Observed quality**: Each listing has observed type 1,2,3 or 4. </li>
+    <li> **Unobserved quality**: The unobserved quality $\omega$ is unknown to guests and hosts. However, $\omega$ is known to be iid $Beta(a,b)$ distributed. After observing the number of good reviews $K$ and bad reviews $N-K$ agents form an expectation about the unobserved quality, $E[\omega|N,K]$.</li>
+    <li> $\epsilon$ is iid T1EV extreme value distributed.</li>
+  </ul>
+  <li> Function <code>S_s(params)</code> characterizes the state space.  
 </ul>
