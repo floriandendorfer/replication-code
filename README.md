@@ -30,8 +30,8 @@
 ## Demand
 
 <ul>
-  <li> Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect utility of renting a property in state $s$. </li>
-  $u_{s} = \gamma\frac{a + K(s)}{a + b + N(s)} + \beta(s) + \alpha ((1+f)P(s)- t) + \epsilon$
+  <li> Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect utility of renting a property in state $s=(N,K,type)$. </li>
+  $u_{s} = \gamma\frac{a + K(s)}{a + b + N(s)} + \sum_j\beta(s)\mathbb{1}(type = j) + \alpha ((1+f)P(s)- t) + \epsilon$
   <ul>
     <li> $P(s)$ is the rental rate of the listing; $t$ is the counterfactual subsidy. For the moment, we set $t$ equal to zero. </li>
     <li> **Observed quality**: Each listing has observed type 1,2,3 or 4. </li>
