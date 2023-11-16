@@ -33,7 +33,7 @@ Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **
 
   $$U_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \sum_{j'}\beta_j\mathbb{1}(j' = j) + \alpha ((1+f)p- t) + \epsilon = u(p,x) + \epsilon$$
   
-$p$ is the daily rental rate of the listing; $t$ is the counterfactual subsidy. For the moment, we set $t$ equal to zero.
+$p$ is the daily rental rate of the listing; $t$ is the counterfactual per-unit subsidy. For the moment, we set $t$ equal to zero.
 
 **Unobserved quality**: The unobserved quality $\omega$ is unknown to guests and hosts. However, $\omega$ is known to be iid $Beta(a,b)$ distributed. After observing the number of good reviews $K$ and bad reviews $N-K$ agents form an expectation about the unobserved quality, $E[\omega|N,K]$.</li>
 
@@ -53,7 +53,7 @@ $$ccp''(p,x) = ccp(p,x)(ccp(p,x)^2 - ccp(p,x))\alpha^2(1+f)^2 $$
 
 $$q(p,x) = 1 - \exp(-\mu \cdot ccp(p,x))$$
 
-Function <code>d2q_s(p,P,s,theta,t,params)</code> and Function <code>d2q_s(p,P,s,theta,t,params)</code> describe the first- and second-order derivatives of $q(p,x)$ with respect to $p$.
+Function <code>d2q_s(p,P,s,theta,t,params)</code> and function <code>d2q_s(p,P,s,theta,t,params)</code> describe the first- and second-order derivatives of $q(p,x)$ with respect to $p$.
 
   $$q'(p,x) = \mu\exp(-\mu \cdot ccp(p,x))ccp'(p,x)$$
   $$q''(p,x) = \mu\exp(-\mu \cdot ccp(p,x))(ccp''(p,x)-\mu\cdot ccp'(p,x))$$
@@ -67,7 +67,7 @@ If a property is booked ($q(p,x) = 1$), $x$ changes with probability $\upsilon_r
 $$\rho^g(p,x) = \upsilon_rq(p,x)\frac{a+K(x)}{a+b+N(x)}$$
 $$\rho^b(p,x) = \upsilon_rq(p,x)\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$$
 
-Accordingly, the probability $\rho^0(p,x)$ of getting no review is $1-\rho^g(p,x)-\rho^b(p,x)$. States are arranged in increasing order of $type$ and, for a given type, in increasing order of $N$ and, for a given $N$, in increasing order of $K$. $S$ is the **state space**. Note: $S$ is in <code>params</code>.
+Accordingly, the probability $\rho^0(p,x)$ of getting no review is $1-\rho^g(p,x)-\rho^b(p,x)$. States are arranged in increasing order of type $j$ and, for a given type, in increasing order of $N$ and, for a given $N$, in increasing order of $K$. $S$ is the **state space**. Note: $S$ is in <code>params</code>.
 
 $$ S = \begin{bmatrix} 
 1 & 0 & 0 & 0 & 0 & 0 \\ 
@@ -118,5 +118,5 @@ The expected, total operating costs in a given month are
 
 F
 
-## The Host's Problem
+## Pricing
 
