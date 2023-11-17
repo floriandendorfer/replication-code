@@ -151,9 +151,13 @@ $$ \text{Total operating costs} = \sum_{x}s(x)\left((1-chi(p,x))\bar \kappa_j - 
 | $\varnothing_3$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | ... | ... | 0 | $1-\lambda_3$ |
 | $\varnothing_4$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | ... | ... | 0 | $1-\lambda_4$ |
 
-## Pricing
+## Model Solution
 
-A host operating a property in state $x$ maximizes $V(x)$ over $p$.
+<code>solver(theta,c,guess,t,tol,params)</code> finds a oblivious equilibrium of the model. <code>guess</code> contains starting values for the pricing function $P(x')$, the state distribution $s(x')$ and the value function $V(x').
+
+  ### Pricing
+
+Conditional on guess $V(x')$ and assuming s(x') competitors set their prices according to $P(x')$, a host operating a property in state $x$ maximizes $V(x)$ over $p$.
 
 $$ V(p,x) = 30q(p,x)p - (1-\chi(p,x))\phi(x) + \delta T(p,x)V(x') $$
 
@@ -163,4 +167,19 @@ The FOC requires that $V'(p,x) = 0$. The first-order Taylor series approximation
 
 $$ V'(p,x) = 30(q(p,x) + q'(p,x)p) + (1 - \chi(p,x))\delta T'(p,x)V(x') $$
 
-$$ V''(p,x) = 30(2q'(p,x) + q''(p,x)) + (1 - \chi(p,x))\delta T''(p,x)V(x') - \chi(p,x)\frac{\delta T'(p,x)V(x')}{\phi(x)} $$
+$$ V''(p,x) = 30(2q'(p,x) + q''(p,x)) + (1 - \chi(p,x))\delta T''(p,x)V(x') - \chi(p,x)\frac{(\delta T'(p,x)V(x'))^2}{\phi(x)} $$
+
+In code:
+<code>
+while dP>.1:
+  P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)
+  P1 = np.where(np.isnan(P1) == True,P_old,np.where((P1<0),0,np.where((P1>1000),1000,P1)))
+  dP = np.max(np.abs(P1 - P0))
+  P0 = P1
+</code>
+
+  ### Value Function Update
+
+Having found $p$ that solves the host's pricing problem, we compute the new value function. 
+
+<code>dV_s(p,P,s,V,theta,\phi_bar,t,params)</code>
