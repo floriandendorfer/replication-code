@@ -151,9 +151,9 @@ $$ \text{Total operating costs} = \sum_{x}s(x)\left((1-chi(p,x))\bar \kappa_j - 
 | $\varnothing_3$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | ... | ... | 0 | $1-\lambda_3$ |
 | $\varnothing_4$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | ... | ... | 0 | $1-\lambda_4$ |
 
-## Model Solution
+## Solving The Model
 
-<code>solver(theta,c,guess,t,tol,params)</code> finds a oblivious equilibrium of the model. <code>guess</code> contains starting values for the pricing function $P(x')$, the state distribution $s(x')$ and the value function $V(x').
+<code>solver(theta,c,guess,t,tol,params)</code> finds a oblivious equilibrium of the model. <code>guess</code> contains starting values for the pricing function $P(x')$, the state distribution $s(x')$ and the value function $V(x'). What are they?
 
   ### Pricing
 
@@ -170,12 +170,12 @@ $$ V'(p,x) = 30(q(p,x) + q'(p,x)p) + (1 - \chi(p,x))\delta T'(p,x)V(x') $$
 $$ V''(p,x) = 30(2q'(p,x) + q''(p,x)) + (1 - \chi(p,x))\delta T''(p,x)V(x') - \chi(p,x)\frac{(\delta T'(p,x)V(x'))^2}{\phi(x)} $$
 
 In code:
-<code>
-while dP>.1:
-    P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)
-    P1 = np.where(np.isnan(P1) == True,P_old,np.where((P1<0),0,np.where((P1>1000),1000,P1)))
-    dP = np.max(np.abs(P1 - P0))
-    P0 = P1
+
+<code>while dP>.1:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P1 = np.where(np.isnan(P1) == True,P_old,np.where((P1<0),0,np.where((P1>1000),1000,P1)))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  dP = np.max(np.abs(P1 - P0))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P0 = P1
 </code>
 
   ### Value Function Update
@@ -186,11 +186,10 @@ $$ V(x) = 30q(P(x),x)P(x) - (1-\chi(P(x),x))\phi(x) + \delta T(P(x),x)V(x') $$
 
 In code:
 
-<code>
-q_new = q_s(P_new,P_new,s_old,theta,t,params)
+<code>q_new = q_s(P_new,P_new,s_old,theta,t,params)
 T = T_s(P_new,P_new,s_old,q_new,theta,t,params)
 eV = T @ V_old
-V_new = period*(q_new*P_new.T) + delta*eV - (phi_bar - np.exp(-delta*eV/phi_bar)*phi_bar)
+V_new = period*(q_new*P_new.T) + \delta*eV - (phi_bar - np.exp(-delta*eV/phi_bar)*phi_bar)
 </code>
 
   ### Entry & Exit Rate Updates
@@ -199,9 +198,31 @@ We use $V(x)$ to compute $\lambda(x)$, $\chi(P(x),x)$ and, ultimately, $F(P(x),x
 
 In code:
 
-<code>
-eV = T @ V_new
+<code>eV = T @ V_new
 chi = np.exp(-delta*eV/phi_bar).flatten()
 lamb = (1-np.exp(-delta*V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
 F = F_s(q_new,chi,lamb,theta,params)
 </code>
+
+  ### State Distribution Update
+
+We use $F(P(x),x)$ to compute the **stationary state distribution**.
+
+$$ \left[\mathbf{s},J/4-\sum_{j'}\right] = \left[\mathbf{s},J/4-\sum_{j'}\right]F $$
+
+We iterate \mathbf{s} until $|\mathbf{s} - \mathbf{s}_0|\leq 0.01$. 
+
+In code:
+
+<code>while np.max(np.abs(s_new - s_old))>10e-3:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s_old = s_new
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s_new = (np.array([np.append(s_old,np.array([J/4-s_old[0,:231].sum(),J/4-s_old[0,231:462].sum(),J/4-s_old[0,462:693].sum(),J/4-
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s_old[0,693:].sum()]))])@ F)[:1,:-4]
+
+  ### Solution
+
+We update $P(x') = P(x)$, $\mathbf{s}'=\mathbf{s}$ and $V(x')=V(x)$ and repeat the algorithm until convergence, i.e. $max(|V(x)-V(x')|,|\mathbf{s}'=\mathbf{s}|,|V(x)-V(x')|\}<$<code>tol</code> (0.000001). To save time, we compute $p$ only if $\mathbf{V}$ changes substantially, i.e., by more than 10\% since the last time we solved for $p$. The solution to the model is $\mathbf{V}^*, \mathbf{s}^*, \mathbf{P}^*, \mathbf{\chi}^*, \mathbf{\lambda}^*$. We use the solution to compute $q({P}^*(x),x)$.
+
+![MarineGEO circle logo](s_star.png "MarineGEO logo")
+
+        
