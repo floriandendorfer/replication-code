@@ -223,11 +223,35 @@ In code:
 
 We update $P(x') = P(x)$, $\mathbf{s}'=\mathbf{s}$ and $V(x')=V(x)$ and repeat the algorithm until convergence, i.e. $max(|V(x)-V(x')|,|\mathbf{s}'=\mathbf{s}|,|V(x)-V(x')|\}<$<code>tol</code> (0.000001). To save time, we compute $p$ only if $\mathbf{V}$ changes substantially, i.e., by more than 10\% since the last time we solved for $p$. The solution to the model is $\mathbf{V}^*, \mathbf{s}^*, \mathbf{P}^*, \mathbf{\chi}^*, \mathbf{\lambda}^*$. We use the solution to compute $q({P}^*(x),x)$.
 
-<img src="s_star.png" alt="states" width="300"/>
+ /* Three image containers (use 25% for four, and 50% for two, etc) */
+.column {
+  float: left;
+  width: 33.33%;
+  padding: 5px;
+}
 
-<img src="P_star.png" alt="prices" width="300"/>
+/* Clear floats after image containers */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+} 
 
-<img src="chi_star.png" alt="exit rates" width="300"/>
+<div class="row">
+  <div class="column">
+    <img src="s_star.png" alt="states" width="300"/>
+  </div>
+  <div class="column">
+    <img src="P_star.png" alt="prices" width="300"/>
+  </div>
+</div>
 
-<img src="q_star.png" alt="demand" width="300"/>
+
+  <div class="row">
+    <div class="column">
+      <img src="chi_star.png" alt="exit rates" width="300"/>
+  <div class="column">
+    <img src="q_star.png" alt="demand" width="300"/>
+    </div>
+<div class="row">
 
