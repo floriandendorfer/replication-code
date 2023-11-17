@@ -85,7 +85,7 @@ $$ S = \begin{bmatrix}
 20 & 20 & 0 & 0 & 0 & 1
 \end{bmatrix} $$
 
-Function  <code>dT_s(dq,theta,params)</code> stores the **transition matrix** $T(q)$. It turns out that the way states are ordered the number of zeros between $\rho^0(p,x)$ and $\rho^g(p,x)$ is $N$.  
+Function  <code>dT_s(dq,theta,params)</code> stores the **transition matrix** $T(p,x)$. It turns out that the way states are ordered the number of zeros between $\rho^0(p,x)$ and $\rho^g(p,x)$ is $N$.  
 
 |  | $(0,0,1)$ | $(0,1,1)$ | $(1,1,1)$ | $(0,2,1)$ | $(1,2,1)$ | $(2,2,1)$ | ... | $(20,20,4)$ | 
 | :---: | :---: | :---------: | :------: | :------: | :------: | :------: | :------: | :------: |
@@ -108,7 +108,7 @@ $$\rho^{g\prime}(p,x) = \upsilon_rq'(p,x)\left(\frac{a+K(x)}{a+b+N(x)}\right)$$
 
 $$\rho^{g\prime\prime}(p,x) = \upsilon_rq''(p,x)\left(\frac{a+K(x)}{a+b+N(x)}\right)$$
 
-$$\rho^b\prime}(p,x) = \upsilon_rq'(p,x)\left(1-\frac{a+K(x)}{a+b+N(x)}\right)$$
+$$\rho^{b\prime}(p,x) = \upsilon_rq'(p,x)\left(1-\frac{a+K(x)}{a+b+N(x)}\right)$$
 
 $$\rho^{b\prime\prime}(p,x) = \upsilon_rq''(p,x)\left(1-\frac{a+K(x)}{a+b+N(x)}\right)$$
 
@@ -132,7 +132,7 @@ The expected, total operating costs of type-$\tilde j$ hosts in a given month ar
 
 $$ \text{Total operating costs} = \sum_{x}s(x)\left((1-chi(p,x))\bar \kappa_j - chi(p,x)\delta \mathbb{E}_{x'}[V(x')|p,x]\right) $$ 
 
-<code>F_s(p,P,s,q,chi,lamb,theta,t,params)</code> contains the **expanded transition matrix** F(q). It accommodate transitions from and to inactivity by expanding $T$ by an additional state.
+<code>F_s(p,P,s,q,chi,lamb,theta,t,params)</code> contains the **expanded transition matrix** F(p,x). It accommodate transitions from and to inactivity by expanding $T(p,x)$ by an additional state.
 
 |  | $(0,0,1)$ | $(0,1,1)$ | $(1,1,1)$ | $(0,2,1)$ | $(1,2,1)$ | $(2,2,1)$ | ... | $(0,0,2)$ | ... | $(20,20,4)$ | $(20,20,4)$ |  
 | :---: | :---: | :---------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: |
@@ -153,5 +153,14 @@ $$ \text{Total operating costs} = \sum_{x}s(x)\left((1-chi(p,x))\bar \kappa_j - 
 
 ## Pricing
 
-$$ V(x) = \underset{p}{\max}\left(q(p,x)p - \phi(x) + \mathbb{E}\left[\max\left(\phi,\delta \mathbb{E}_{x'}[ V(x_{t+1})|p_t,x_t]\right) \right] \right) $$
+A host operating a property in state $x$ maximizes $V(x)$ over $p$.
 
+$$ V(p,x) = 30q(p,x)p - (1-\chi(p,x))\phi(x) + \delta T(p,x)V(x') $$
+
+The FOC requires that $V'(p,x) = 0$. The first-order Taylor series approximation around $p_0$ is $V'(p,x) = V'(p_0,x) + V''(p_0,x)(p-p_0)$. We find $p$ by iterating $ p = p_0 + \frac{V'(p_0,x)}{V'(p_0,x)}$ until $|p-p_0| \leq 0.1$. 
+
+<code>dV_s(p,P,s,V,theta,\phi_bar,t,params)</code> and <code>d2V_s(p,P,s,V,theta,\phi_bar,t,params)</code> store the first- and second-order derivative of $V(p,x)$ with respect to p respectively.
+
+$$ V'(p,x) = 30(q(p,x) + q'(p,x)p) + (1 - \chi(p,x))\delta T'(p,x)V(x') $$
+
+$$ V''(p,x) = 30(2q'(p,x) + q''(p,x)) + (1 - \chi(p,x))\delta T''(p,x)V(x') - \chi(p,x)\frac{\delta T'(p,x)V(x')}{\phi(x)} $$
