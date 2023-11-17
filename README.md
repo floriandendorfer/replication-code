@@ -223,6 +223,11 @@ In code:
 
 We update $P(x') = P(x)$, $\mathbf{s}'=\mathbf{s}$ and $V(x')=V(x)$ and repeat the algorithm until convergence, i.e. $max(|V(x)-V(x')|,|\mathbf{s}'=\mathbf{s}|,|V(x)-V(x')|\}<$<code>tol</code> (0.000001). To save time, we compute $p$ only if $\mathbf{V}$ changes substantially, i.e., by more than 10\% since the last time we solved for $p$. The solution to the model is $\mathbf{V}^*, \mathbf{s}^*, \mathbf{P}^*, \mathbf{\chi}^*, \mathbf{\lambda}^*$. We use the solution to compute $q({P}^*(x),x)$.
 
-![MarineGEO circle logo](s_star.png "MarineGEO logo")
+<img src="s_star.png" alt="states" width="300"/>
 
-        
+<img src="P_star.png" alt="prices" width="300"/>
+
+<img src="chi_star.png" alt="exit rates" width="300"/>
+
+<img src="q_star.png" alt="demand" width="300"/>
+
