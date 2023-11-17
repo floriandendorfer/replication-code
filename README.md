@@ -29,7 +29,7 @@
 
 ## Demand
 
-Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,j)$, where $j\in\{1,2,3,4\}$ is the property's (observed) **type**.
+Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,j)$, where $j = 1,2,3,4$ is the property's (observed) **type**.
 
   $$U_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \sum_{j'}\beta_j\mathbb{1}(j' = j) + \alpha ((1+f)p- t) + \epsilon = u(p,x) + \epsilon$$
   
@@ -85,18 +85,32 @@ $$ S = \begin{bmatrix}
 20 & 20 & 0 & 0 & 0 & 1
 \end{bmatrix} $$
 
-Function  <code>T_s(q,theta,t,params)</code> stores the **transition matrix** $T(q)$. It turns out that the way states are ordered the number of zeros between $\rho^0(p,x)$ and $\rho^g(p,x)$ is $N$.  
+Function  <code>dT_s(dq,theta,params)</code> stores the **transition matrix** $T(q)$. It turns out that the way states are ordered the number of zeros between $\rho^0(p,x)$ and $\rho^g(p,x)$ is $N$.  
 
 |  | $(0,0,1)$ | $(0,1,1)$ | $(1,1,1)$ | $(0,2,1)$ | $(1,2,1)$ | $(2,2,1)$ | ... | $(20,20,4)$ | 
 | :---: | :---: | :---------: | :------: | :------: | :------: | :------: | :------: | :------: |
 | $(0,0,1)$ | $\rho^0_{(0,0,1)}$ | $\rho^g_{(0,0,1)}$ | $\rho^b_{(0,0,1)}$ | 0 | 0 | 0 | ... | 0 |
-| $(0,1,1)$ | 0 | $\rho^0_{(1,1,1)}$ | 0 | $\rho^g_{(1,1,1)}$ | $\rho^b_{(1,1,1)}$ | 0 | ... | 0 |
-| $(1,1,1)$ | 0 | 0 | $\rho^0_{(2,0,1)}$ | 0 | $\rho^g_{(2,0,1)}$ | $\rho^b_{(2,0,1)}$ | ... | 0 |
-| $(0,2,1)$ | 0 | 0 | 0 | $\rho^0_{(2,1,1)}$ | 0 | 0 | ... | 0 |
-| $(1,2,1)$ | 0 | 0 | 0 | 0 | $\rho^0_{(2,2,1)}$ | 0 | ... | 0 |
-| $(2,2,1)$ | 0 | 0 | 0 | 0 | 0 | $\rho^0_{(3,0,1)}$ | ... | 0 |
+| $(0,1,1)$ | 0 | $\rho^0_{(0,1,1)}$ | 0 | $\rho^g_{(0,1,1)}$ | $\rho^b_{(0,1,1)}$ | 0 | ... | 0 |
+| $(1,1,1)$ | 0 | 0 | $\rho^0_{(1,1,1)}$ | 0 | $\rho^g_{(1,1,1)}$ | $\rho^b_{(1,1,1)}$ | ... | 0 |
+| $(0,2,1)$ | 0 | 0 | 0 | $\rho^0_{(0,2,1)}$ | 0 | 0 | ... | 0 |
+| $(1,2,1)$ | 0 | 0 | 0 | 0 | $\rho^0_{(1,2,1)}$ | 0 | ... | 0 |
+| $(2,2,1)$ | 0 | 0 | 0 | 0 | 0 | $\rho^0_{(2,2,1)}$ | ... | 0 |
 | ... | ... | ... | ... | ... | ... | ... | ... | 0 |
-| $(20,20,1)$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | 1 |
+| $(20,20,4)$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | 1 |
+
+Function <code>dT_s(q,theta,params)</code> and <code>d2T_s(q,theta,params)</code> store the first-order and second-order derivatives of $T(q)$ respectively. Notice:
+
+$$\rho^{0\prime}(p,x) = -\upsilon_rq'(p,x)$$
+
+$$\rho^{0\prime\prime}(p,x) = -\upsilon_rq''(p,x)$$
+
+$$\rho^{g\prime}(p,x) = \upsilon_rq'(p,x)\left(\frac{a+K(x)}{a+b+N(x)}\right)$$
+
+$$\rho^{g\prime\prime}(p,x) = \upsilon_rq''(p,x)\left(\frac{a+K(x)}{a+b+N(x)}\right)$$
+
+$$\rho^b\prime}(p,x) = \upsilon_rq'(p,x)\left(1-\frac{a+K(x)}{a+b+N(x)}\right)$$
+
+$$\rho^{b\prime\prime}(p,x) = \upsilon_rq''(p,x)\left(1-\frac{a+K(x)}{a+b+N(x)}\right)$$
 
 ## Market Entry & Exit
 
@@ -104,9 +118,9 @@ Types are equally distributed in the host population, meaning 2,500 properties h
 
 $$ \lambda_j = 1-\exp(-\delta V((0,0,j))]\bar\kappa_j^{-1} ) $$
 
-The expected, total entry costs in a given month is the number of inactive hosts $(J/4 - \sum_{x}\mathbb{1}(j' = j)s(x))$ times $\mathbb{E}[\phi_j|\phi_j\geq \delta V(0,0,j)]$.
+The expected, total entry costs of type-$\tilde j$ hosts in a given month is the number of inactive hosts $(J/4 - \sum_{x}\mathbb{1}(\tilde j = j)s(x))$ times $\mathbb{E}[\kappa_j|\phi_j\geq \delta V(0,0,j)]$.
 
-$$ \text{Total entry costs} = (J/4 - \sum_{x}\mathbb{1}(j' = j)s(x))\left(lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
+$$ \text{Total entry costs} = \sum_{\tilde j}(J/4 - \sum_{x}\mathbb{1}(\tilde j = j)s(x))\left(\lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
 
 If a host is **active** they have entered the market. At the end of each month they have to pay the **operating cost** $\phi_j$ for the following month, regardless of whether the property is booked or not. $\phi_j$ is iid $Exponential(\bar \phi_j)$ distributed. Let $\chi(p,x)$ denote the **exit rate**.
 
@@ -114,9 +128,30 @@ $$ \chi(p,x) = \exp(-\delta \mathbb{E}_{x'}[V(x')|p,x]\bar\phi_j^{-1} ). $$
 
 $x'$ denotes the state in the next month. Note that the host's expectation depends on $p$ because the property is likely to transition to a new state if it is booked.  
 
-The expected, total operating costs in a given month are
+The expected, total operating costs of type-$\tilde j$ hosts in a given month are the number of active hosts $\sum_{x}\mathbb{1}(\tilde j = j)s(x)$ times $\mathbb{E}[\phi_j|\phi_j\leq \delta \mathbb{E}_{x'}[V(x')|p,x]]$ 
 
-F
+$$ \text{Total operating costs} = \sum_{x}s(x)\left((1-chi(p,x))\bar \kappa_j - chi(p,x)\delta \mathbb{E}_{x'}[V(x')|p,x]\right) $$ 
+
+<code>F_s(p,P,s,q,chi,lamb,theta,t,params)</code> contains the **expanded transition matrix** F(q). It accommodate transitions from and to inactivity by expanding $T$ by an additional state.
+
+|  | $(0,0,1)$ | $(0,1,1)$ | $(1,1,1)$ | $(0,2,1)$ | $(1,2,1)$ | $(2,2,1)$ | ... | $(0,0,2)$ | ... | $(20,20,4)$ | $(20,20,4)$ |  
+| :---: | :---: | :---------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: |
+| $(0,0,1)$ | $(1-\chi_{(0,0,1)})\rho^0_{(0,0,1)}$ | $(1-\chi_{(0,0,1)})\rho^g_{(0,0,1)}$ | $(1-\chi_{(0,0,1)})\rho^b_{(0,0,1)}$ | 0 | 0 | 0 | ... | ... | ... | 0 | $\chi_{(0,0,1)}$ |
+| $(0,1,1)$ | 0 | $(1-\chi_{(0,1,1)})\rho^0_{(0,1,1)}$ | 0 | $(1-\chi_{(0,1,1)})\rho^g_{(0,1,1)}$ | $(1-\chi_{(0,1,1)})\rho^b_{(0,1,1)}$ | 0 | ... | ... | ... | 0 | $\chi_{(0,1,1)}$ |
+| $(1,1,1)$ | 0 | 0 | $(1-\chi_{(1,1,1)})\rho^0_{(1,1,1)}$ | 0 | $(1-\chi_{(1,1,1)})\rho^g_{(1,1,1)}$ | $(1-\chi_{(1,1,1)})\rho^b_{(1,1,1)}$ | ... | ... | ... | 0 | $\chi_{(1,1,1)}$ |
+| $(0,2,1)$ | 0 | 0 | 0 | $(1-\chi_{(1,2,1)})\rho^0_{(1,2,1)}$ | 0 | 0 | ... | ... | ... | 0 | $\chi_{(1,2,1)}$ |
+| $(1,2,1)$ | 0 | 0 | 0 | 0 | $(1-\chi_{(1,2,1)})\rho^0_{(1,2,1)}$ | 0 | ... | ... | ... | 0 | $\chi_{(1,2,1)}$ |
+| $(2,2,1)$ | 0 | 0 | 0 | 0 | 0 | $(1-\chi_{(2,2,1)})\rho^0_{(2,2,1)}$ | ... | ... | ... | 0 | $\chi_{(2,2,1)}$ |
+| ... | ... | ... | ... | ... | ... | ... | ... | ... | ... | ... | ... |
+| $(0,0,2)$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | $(1-\chi_{(0,0,2)})\rho^0_{(0,0,2)}$ | ... | 0 | $\chi_{(0,0,2)}$ |
+| ... | ... | ... | ... | ... | ... | ... | ... | ... | ... | ... | ... |
+| $(20,20,4)$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | ... | ... | $1 - \chi_{(20,20,4)}$ | $\chi_{(20,20,4)}$ |
+| $\varnothing_1$ | $\lambda_1$ | 0 | 0 | 0 | 0 | 0 | ... | ... | ... | 0 | $1-\lambda_1$ |
+| $\varnothing_2$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | $\lambda_2$ | ... | 0 | $1-\lambda_2$ |
+| $\varnothing_3$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | ... | ... | 0 | $1-\lambda_3$ |
+| $\varnothing_4$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | ... | ... | 0 | $1-\lambda_4$ |
 
 ## Pricing
+
+$$ V(x) = \underset{p}{\max}\left(q(p,x)p - \phi(x) + \mathbb{E}\left[\max\left(\phi,\delta \mathbb{E}_{x'}[ V(x_{t+1})|p_t,x_t]\right) \right] \right) $$
 
