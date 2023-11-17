@@ -172,14 +172,36 @@ $$ V''(p,x) = 30(2q'(p,x) + q''(p,x)) + (1 - \chi(p,x))\delta T''(p,x)V(x') - \c
 In code:
 <code>
 while dP>.1:
-  P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)
-  P1 = np.where(np.isnan(P1) == True,P_old,np.where((P1<0),0,np.where((P1>1000),1000,P1)))
-  dP = np.max(np.abs(P1 - P0))
-  P0 = P1
+    P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)
+    P1 = np.where(np.isnan(P1) == True,P_old,np.where((P1<0),0,np.where((P1>1000),1000,P1)))
+    dP = np.max(np.abs(P1 - P0))
+    P0 = P1
 </code>
 
   ### Value Function Update
 
-Having found $p$ that solves the host's pricing problem, we compute the new value function. 
+Having found $p$ that solves the host's pricing problem, we let $P(x)=p$ and update the value function.
 
-<code>dV_s(p,P,s,V,theta,\phi_bar,t,params)</code>
+$$ V(x) = 30q(P(x),x)P(x) - (1-\chi(P(x),x))\phi(x) + \delta T(P(x),x)V(x') $$
+
+In code:
+
+<code>
+q_new = q_s(P_new,P_new,s_old,theta,t,params)
+T = T_s(P_new,P_new,s_old,q_new,theta,t,params)
+eV = T @ V_old
+V_new = period*(q_new*P_new.T) + delta*eV - (phi_bar - np.exp(-delta*eV/phi_bar)*phi_bar)
+</code>
+
+  ### Entry & Exit Rate Updates
+
+We use $V(x)$ to compute $\lambda(x)$, $\chi(P(x),x)$ and, ultimately, $F(P(x),x)$.
+
+In code:
+
+<code>
+eV = T @ V_new
+chi = np.exp(-delta*eV/phi_bar).flatten()
+lamb = (1-np.exp(-delta*V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
+F = F_s(q_new,chi,lamb,theta,params)
+</code>
