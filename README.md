@@ -4,22 +4,22 @@
 
 |  | name |            |  value |
   | ---: | ---: | :---------: | :------: |
-  | demand (<code>theta</code>) | price | $\alpha$ | -0.0105 |
-  || type 1 | $\beta_1$ | -11.1007 |
-  || type 2 | $\beta_2$ | -10.7004 |
-  || type 3 | $\beta_3$ | -10.5486 |
-  || type 4 | $\beta_4$ | -10.3437 |
-  || quality | $\gamma$ | 3.79019 |
-  || prior | $a$ | 7.9686 |
-  ||  | $b$ | 1.4726 |
-  | supply (<code>c</code>) | mean entry cost (type 1) | $\bar \kappa_1$ | 37,130 |
-  |  | mean entry cost (type 2) | $\bar \kappa_2$ | 237,883 |
-  |  | mean entry cost (type 3) | $\bar \kappa_3$ | 182,152 |
-  |  | mean entry cost (type 4) | $\bar \kappa_4$ | 356,233 |
-  || mean fixed cost (type 1) | $\bar \phi_1$ | 2,468 |
-  | | mean fixed cost (type 2) | $\bar \phi_2$ | 3,037 |
-  || mean fixed cost (type 3) | $\bar \phi_3$ | 3,367 |
-  || mean fixed cost (type 4) | $\bar \phi_4$ | 3,839 |
+  | demand (<code>theta</code>) | price | $\alpha$ | -0.0068 |
+  || type 1 | $\beta_1$ | -12.5906 |
+  || type 2 | $\beta_2$ | -12.1095 |
+  || type 3 | $\beta_3$ | -11.7011 |
+  || type 4 | $\beta_4$ | -11.3012 |
+  || quality | $\gamma$ | 4.8860 |
+  || prior | $a$ | 12.2260 |
+  ||  | $b$ | 2.1134 |
+  | supply (<code>c</code>) | mean entry cost (type 1) | $\bar \kappa_1$ | 55,496 |
+  |  | mean entry cost (type 2) | $\bar \kappa_2$ | 96,673 |
+  |  | mean entry cost (type 3) | $\bar \kappa_3$ | 161,946 |
+  |  | mean entry cost (type 4) | $\bar \kappa_4$ | 270,233 |
+  || mean fixed cost (type 1) | $\bar \phi_1$ | 2,580 |
+  | | mean fixed cost (type 2) | $\bar \phi_2$ | 3,577 |
+  || mean fixed cost (type 3) | $\bar \phi_3$ | 4,562 |
+  || mean fixed cost (type 4) | $\bar \phi_4$ | 5,751 |
   | other (<code>params</code>) | discount factor | $\delta$ | 0.995 |
   |  | revenue fee | $f$ | 0.142 |
   |  | review prob. | $\upsilon_r$ | 0.7041 |
@@ -29,33 +29,32 @@
 
 ## Demand
 
-Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,j)$, where $j = 1,2,3,4$ is the property's (observed) **type**.
+Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,j)$, where $j = ${1,2,3,4} is the property's (observed) **type**.
 
-  $$U_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \sum_{j'}\beta_j\mathbb{1}(j' = j) + \alpha ((1+f)p- t) + \epsilon = u(p,x) + \epsilon$$
+  $$U_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \beta(x) + \alpha ((1+f)p- t) + \epsilon = u(p,x) + \epsilon$$
   
 $p$ is the daily rental rate of the listing; $t$ is the counterfactual per-unit subsidy. For the moment, we set $t$ equal to zero.
 
-**Unobserved quality**: The unobserved quality $\omega$ is unknown to guests and hosts. However, $\omega$ is known to be iid $Beta(a,b)$ distributed. After observing the number of good reviews $K$ and bad reviews $N-K$ agents form an expectation about the unobserved quality, $E[\omega|N,K]$.</li>
+The **unobserved quality** $\omega$ is unknown to guests and hosts. However, $\omega$ is known to be iid $Beta(a,b)$ distributed. After observing the number of good reviews $K$ and bad reviews $N-K$ agents form an expectation about the unobserved quality, $E[\omega|N,K]$.</li>
 
 $\epsilon$ is iid T1EV extreme value distributed.
 
-Function <code>ccp_s(p,P,s,theta,t,params)</code> characterizes the probability that a guest ***intends*** to book the property at rate $p$ provided that all remaining hosts set their prices according to $P(x)$.
+$\mathbf{s}$ is the **state distribution**. $s(x)$ pins down the number of properties in each state. Function <code>ccp_s(p,P,s,theta,t,params)</code> characterizes the probability that a guest ***intends*** to book the property at rate $p$ provided that all remaining hosts set their prices according to $P(x)$.
 
-$$ccp(p,x) = \frac{\exp(u(p,x))}{1+\sum_xs(x)\exp(u(P(x),x))}$$
-
-**State distribution**: $s(x)$ pins down the number of properties in each state. For later use, we also work out the first-order (<code>dccp_s(p,P,s,theta,t,params)</code>) and second-order (<code>d2ccp_s(p,P,s,theta,t,params)</code>) derivatives of $ccp(p,x)$ with respect to $p$.
+$$ccp(p,x) = \frac{\exp(u(p,x))}{1+\sum_xs(x)\exp(u(P(x),x))}$$ For later use, we also work out the first-order (<code>dccp_s(p,P,s,theta,t,params)</code>) and second-order (<code>d2ccp_s(p,P,s,theta,t,params)</code>) derivatives of $ccp(p,x)$ with respect to $p$.
 
 $$ccp'(p,x) = ccp(p,x)(1 - ccp(p,x))\alpha(1+f) $$
 
 $$ccp''(p,x) = ccp(p,x)(ccp(p,x)^2 - ccp(p,x))\alpha^2(1+f)^2 $$
 
-**Demand**: The number of arriving guests is $Poisson(\mu)$ distributed. Function <code>q_s(p,P,s,theta,t,params)</code> characterizes the probability that at least one of these consumers books the property, again assuming its rental rate is $p$ while everyone else follows the pricing rule $P(x)$.
+The number of arriving guests is $Poisson(\mu)$ distributed. Function <code>q_s(p,P,s,theta,t,params)</code> characterizes the probability that at least one of these consumers books the property, again assuming its rental rate is $p$ while everyone else follows the pricing rule $P(x)$.
 
 $$q(p,x) = 1 - \exp(-\mu \cdot ccp(p,x))$$
 
-Function <code>d2q_s(p,P,s,theta,t,params)</code> and function <code>d2q_s(p,P,s,theta,t,params)</code> describe the first- and second-order derivatives of $q(p,x)$ with respect to $p$.
+Function <code>dq_s(p,P,s,theta,t,params)</code> and function <code>d2q_s(p,P,s,theta,t,params)</code> describe the first- and second-order derivatives of $q(p,x)$ with respect to $p$.
 
   $$q'(p,x) = \mu\exp(-\mu \cdot ccp(p,x))ccp'(p,x)$$
+  
   $$q''(p,x) = \mu\exp(-\mu \cdot ccp(p,x))(ccp''(p,x)-\mu\cdot ccp'(p,x))$$
 
 Strictly speaking, $q_s$ is the ***daily*** booking probability. As a **time period** in the model is a 4-week interval ("month"), we interpret $q_s$ as the monthly **occupancy rate**. 
@@ -65,6 +64,7 @@ Strictly speaking, $q_s$ is the ***daily*** booking probability. As a **time per
 If a property is booked ($q(p,x) = 1$), $x$ changes with probability $\upsilon_r = 70.41$% between periods. Conditional on being booked, it receives a good review ($\Delta N = 1, \Delta K = 1$) with probability $\frac{a+K(x)}{a+b+N(x)}$. Conditional on being booked, it receives a bad review ($\Delta N = 1, \Delta K = 0$) with probability $\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$. The **probability of getting a good review**  and the **probability of getting a bad review** are $\rho^g(p,x)$ and $\rho^b(p,x)$ respectively. States where $N=20$ are **terminal** and the probability of getting a review is zero.
 
 $$\rho^g(p,x) = \upsilon_rq(p,x)\frac{a+K(x)}{a+b+N(x)}$$
+
 $$\rho^b(p,x) = \upsilon_rq(p,x)\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$$
 
 Accordingly, the probability $\rho^0(p,x)$ of getting no review is $1-\rho^g(p,x)-\rho^b(p,x)$. States are arranged in increasing order of type $j$ and, for a given type, in increasing order of $N$ and, for a given $N$, in increasing order of $K$. $S$ is the **state space**. Note: $S$ is in <code>params</code>.
@@ -85,7 +85,7 @@ $$ S = \begin{bmatrix}
 20 & 20 & 0 & 0 & 0 & 1
 \end{bmatrix} $$
 
-Function  <code>dT_s(dq,theta,params)</code> stores the **transition matrix** $T(p,x)$. It turns out that the way states are ordered the number of zeros between $\rho^0(p,x)$ and $\rho^g(p,x)$ is $N$.  
+Function  <code>dT_s(dq,theta,params)</code> stores the **transition matrix** $\mathbf{T}(p)$. It turns out that the way states are ordered the number of zeros between $\rho^0(p,x)$ and $\rho^g(p,x)$ is $N$.  
 
 |  | $(0,0,1)$ | $(0,1,1)$ | $(1,1,1)$ | $(0,2,1)$ | $(1,2,1)$ | $(2,2,1)$ | ... | $(20,20,4)$ | 
 | :---: | :---: | :---------: | :------: | :------: | :------: | :------: | :------: | :------: |
@@ -98,7 +98,7 @@ Function  <code>dT_s(dq,theta,params)</code> stores the **transition matrix** $T
 | ... | ... | ... | ... | ... | ... | ... | ... | 0 |
 | $(20,20,4)$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | 1 |
 
-Function <code>dT_s(q,theta,params)</code> and <code>d2T_s(q,theta,params)</code> store the first-order and second-order derivatives of $T(q)$ respectively. Notice:
+Function <code>dT_s(q,theta,params)</code> and <code>d2T_s(q,theta,params)</code> store the first-order and second-order derivatives of $\mathbf{T}(p)$ respectively. Notice:
 
 $$\rho^{0\prime}(p,x) = -\upsilon_rq'(p,x)$$
 
@@ -114,25 +114,25 @@ $$\rho^{b\prime\prime}(p,x) = \upsilon_rq''(p,x)\left(1-\frac{a+K(x)}{a+b+N(x)}\
 
 ## Market Entry & Exit
 
-Types are equally distributed in the host population, meaning 2,500 properties have a certain type. If a host is **inactive** and has not yet entered the market, they can do so at the start of the following month at **entry cost** $\kappa$ which is iid drawn from $Exponential(\bar \kappa_j)$, $j=1,2,3,4$. Let $\lambda_j$ denote the **entry rate**. 
+Types are equally distributed in the host population, meaning 2,500 properties have a certain type. If a host is **inactive** and has not yet entered the market, they can do so at the start of the following month at **entry cost** $\kappa$ which is iid drawn from $Exponential(\bar \kappa_j)$, $j=${1,2,3,4}. Let $\lambda_j$ denote the **entry rate**. 
 
 $$ \lambda_j = 1-\exp(-\delta V((0,0,j))]\bar\kappa_j^{-1} ) $$
 
-The expected, total entry costs of type-$\tilde j$ hosts in a given month is the number of inactive hosts $(J/4 - \sum_{x}\mathbb{1}(\tilde j = j)s(x))$ times $\mathbb{E}[\kappa_j|\phi_j\geq \delta V(0,0,j)]$.
+Denote the number of properties of type $j$ by $s_j$. The expected, total entry costs of type-$j$ hosts in a given month is the number of inactive hosts $(J/4 - s_j)$ times $\mathbb{E}[\kappa_j|\phi_j\geq \delta V(0,0,j)]$.
 
-$$ \text{Total entry costs} = \sum_{\tilde j}(J/4 - \sum_{x}\mathbb{1}(\tilde j = j)s(x))\left(\lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
+$$ \text{Total entry costs} = \sum_{j}(J/4 - s_j)\left(\lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
 
 If a host is **active** they have entered the market. At the end of each month they have to pay the **operating cost** $\phi_j$ for the following month, regardless of whether the property is booked or not. $\phi_j$ is iid $Exponential(\bar \phi_j)$ distributed. Let $\chi(p,x)$ denote the **exit rate**.
 
-$$ \chi(p,x) = \exp(-\delta \mathbb{E}_{x'}[V(x')|p,x]\bar\phi_j^{-1} ). $$
+$$ \chi(p,x) = \exp(-\delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]\bar\phi_j^{-1} ). $$
 
-$x'$ denotes the state in the next month. Note that the host's expectation depends on $p$ because the property is likely to transition to a new state if it is booked.  
+$\tilde x$ denotes the state in the next month. Note that the host's expectation depends on $p$ because the property is likely to transition to a new state if it is booked.  
 
-The expected, total operating costs of type-$\tilde j$ hosts in a given month are the number of active hosts $\sum_{x}\mathbb{1}(\tilde j = j)s(x)$ times $\mathbb{E}[\phi_j|\phi_j\leq \delta \mathbb{E}_{x'}[V(x')|p,x]]$ 
+The expected, total operating costs of properties in a certain state in a given month are the number of active hosts $s(x)$ times $\mathbb{E}[\phi(x)|\phi(x)\leq \delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]]$ 
 
-$$ \text{Total operating costs} = \sum_{x}s(x)\left((1-chi(p,x))\bar \kappa_j - chi(p,x)\delta \mathbb{E}_{x'}[V(x')|p,x]\right) $$ 
+$$ \text{Total operating costs} = \sum_{x}s(x)\left((1-\chi(p,x))\bar \kappa(x) - \chi(p,x)\delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]\right) $$ 
 
-<code>F_s(p,P,s,q,chi,lamb,theta,t,params)</code> contains the **expanded transition matrix** F(p,x). It accommodate transitions from and to inactivity by expanding $T(p,x)$ by an additional state.
+<code>F_s(p,P,s,q,chi,lamb,theta,t,params)</code> contains the **expanded transition matrix** $\mathbf{F}(p)$. It accommodate transitions from and to inactivity by expanding $\mathbf{T}(p)$ by an additional state.
 
 |  | $(0,0,1)$ | $(0,1,1)$ | $(1,1,1)$ | $(0,2,1)$ | $(1,2,1)$ | $(2,2,1)$ | ... | $(0,0,2)$ | ... | $(20,20,4)$ | $(20,20,4)$ |  
 | :---: | :---: | :---------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: |
@@ -153,21 +153,21 @@ $$ \text{Total operating costs} = \sum_{x}s(x)\left((1-chi(p,x))\bar \kappa_j - 
 
 ## Solving The Model
 
-<code>solver(theta,c,guess,t,tol,params)</code> finds a oblivious equilibrium of the model. <code>guess</code> contains starting values for the pricing function $P(x')$, the state distribution $s(x')$ and the value function $V(x'). What are they?
+<code>solver(theta,c,guess,t,tol,params)</code> finds a oblivious equilibrium of the model. <code>guess</code> contains starting values for the prices $\mathbf{\hat P}$, the state distribution $\mathbf{\hat s}$ and the value function $\mathbf{\hat V}$.
 
   ### Pricing
 
-Conditional on guess $V(x')$ and assuming s(x') competitors set their prices according to $P(x')$, a host operating a property in state $x$ maximizes $V(x)$ over $p$.
+Conditional on guess $\mathbf{\hat V}$ and assuming that there are \hat s(x) competitors in state $x$ set their prices according to $\hat P(x)$, a host operating a property in state $x$ maximizes $V(x)$ over $p$.
 
-$$ V(p,x) = 30q(p,x)p - (1-\chi(p,x))\phi(x) + \delta T(p,x)V(x') $$
+$$ V(p,x) = 30q(p,x)p - (1-\chi(p,x))\phi(x) + \delta \mathbf{T}\mathbf{\hat V} $$
 
 The FOC requires that $V'(p,x) = 0$. The first-order Taylor series approximation around $p_0$ is $V'(p,x) = V'(p_0,x) + V''(p_0,x)(p-p_0)$. We find $p$ by iterating $ p = p_0 + \frac{V'(p_0,x)}{V'(p_0,x)}$ until $|p-p_0| \leq 0.1$. 
 
 <code>dV_s(p,P,s,V,theta,\phi_bar,t,params)</code> and <code>d2V_s(p,P,s,V,theta,\phi_bar,t,params)</code> store the first- and second-order derivative of $V(p,x)$ with respect to p respectively.
 
-$$ V'(p,x) = 30(q(p,x) + q'(p,x)p) + (1 - \chi(p,x))\delta T'(p,x)V(x') $$
+$$ V'(p,x) = 30(q(p,x) + q'(p,x)p) + (1 - \chi(p,x))\delta \mathbf{T}'(p)\mathbf{\hat V} $$
 
-$$ V''(p,x) = 30(2q'(p,x) + q''(p,x)) + (1 - \chi(p,x))\delta T''(p,x)V(x') - \chi(p,x)\frac{(\delta T'(p,x)V(x'))^2}{\phi(x)} $$
+$$ V''(p,x) = 30(2q'(p,x) + q''(p,x)) + (1 - \chi(p,x))\delta mathbf{T}''(p)\mathbf{\hat V} - \chi(p,x)\frac{(\delta \mathbf{T}(p)\mathbf{\hat V})^2}{\phi(x)} $$
 
 In code:
 
@@ -180,9 +180,9 @@ In code:
 
   ### Value Function Update
 
-Having found $p$ that solves the host's pricing problem, we let $P(x)=p$ and update the value function.
+Having found $p$ that solves the host's pricing problem, we let $\mathbf{P}=p$ and update the value function.
 
-$$ V(x) = 30q(P(x),x)P(x) - (1-\chi(P(x),x))\phi(x) + \delta T(P(x),x)V(x') $$
+$$ V(x) = 30q(P(x),x)P(x) - (1-\chi(P(x),x))\phi(x) + \delta \mathbf{T}(p)\mathbf{\hat V} $$
 
 In code:
 
@@ -194,7 +194,7 @@ V_new = period*(q_new*P_new.T) + \delta*eV - (phi_bar - np.exp(-delta*eV/phi_bar
 
   ### Entry & Exit Rate Updates
 
-We use $V(x)$ to compute $\lambda(x)$, $\chi(P(x),x)$ and, ultimately, $F(P(x),x)$.
+We use $\mathbf{V}$ and $\mathbf{P}$ to compute $\lambda(x)$, $\chi(P(x),x)$ and, ultimately, $\mathbf{F}(P)$.
 
 In code:
 
@@ -206,11 +206,9 @@ F = F_s(q_new,chi,lamb,theta,params)
 
   ### State Distribution Update
 
-We use $F(P(x),x)$ to compute the **stationary state distribution**.
+We use $\mathbf{F}(P)$ to compute the **stationary state distribution**. Specifically, we iterate \mathbf{s} until $|\mathbf{s} - \mathbf{s}_0|\leq 0.01$.
 
-$$ \left[\mathbf{s},J/4-\sum_{j'}\right] = \left[\mathbf{s},J/4-\sum_{j'}\right]F $$
-
-We iterate \mathbf{s} until $|\mathbf{s} - \mathbf{s}_0|\leq 0.01$. 
+$$ \left[\mathbf{s},J/4-s_1,J/4-s_2,J/4-s_3,J/4-s_4\right] = \left[\mathbf{s}_0,J/4-s_1,J/4-s_2,J/4-s_3,J/4-s_4\right]\mathbf{F}(P) $$
 
 In code:
 
@@ -221,37 +219,42 @@ In code:
 
   ### Solution
 
-We update $P(x') = P(x)$, $\mathbf{s}'=\mathbf{s}$ and $V(x')=V(x)$ and repeat the algorithm until convergence, i.e. $max(|V(x)-V(x')|,|\mathbf{s}'=\mathbf{s}|,|V(x)-V(x')|\}<$<code>tol</code> (0.000001). To save time, we compute $p$ only if $\mathbf{V}$ changes substantially, i.e., by more than 10\% since the last time we solved for $p$. The solution to the model is $\mathbf{V}^*, \mathbf{s}^*, \mathbf{P}^*, \mathbf{\chi}^*, \mathbf{\lambda}^*$. We use the solution to compute $q({P}^*(x),x)$.
+We update $\mathbf{\hat P} = \mathbf{P}$, $\mathbf{\hat s}=\mathbf{s}$ and $\mathbf{\hat V}=\mathbf{V}$ and repeat the algorithm until convergence, i.e. $max(|\mathbf{V}-\mathbf{\hat V}|,|\mathbf{s}-\mathbf{\hat s}|,|\mathbf{V}-\mathbf{\hat V}|\}<$<code>tol</code> (0.000001). To save time, we solve the host's pricing problem only if $\mathbf{V}$ changes substantially, i.e., by more than 10\% since the last time we solved for $p$.
 
- /* Three image containers (use 25% for four, and 50% for two, etc) */
-.column {
-  float: left;
-  width: 33.33%;
-  padding: 5px;
-}
+Our initial guess of $P(x)$ is \$300 for all $x$. The initial guess of the state distribution is that half of the properties are in the market, while half are not. Those that are in the market are uniformely distributed across states. The initial guess for the value function is the PDV of the revenue earned by the host if they as well as all competitors set a price of \$300.
 
-/* Clear floats after image containers */
-.row::after {
-  content: "";
-  clear: both;
-  display: table;
-} 
+In code:
 
-<div class="row">
-  <div class="column">
-    <img src="s_star.png" alt="states" width="300"/>
-  </div>
-  <div class="column">
-    <img src="P_star.png" alt="prices" width="300"/>
-  </div>
-</div>
+<code>
+P_init = np.array([[300]*len(S)])
+s_init = np.array([[J/(2*len(S))]*len(S)])
+V_init = (30*q_s(300,P_init,s_init,theta,0,params)*P_init.T)/(1-delta)
+<\code>
 
+The solution to the model is $\mathbf{V}^*, \mathbf{s}^*, \mathbf{P}^*, \mathbf{\chi}^*, \mathbf{\lambda}^*$. We use the solution to compute $q({P}^*(x),x)$.
 
-  <div class="row">
-    <div class="column">
-      <img src="chi_star.png" alt="exit rates" width="300"/>
-  <div class="column">
-    <img src="q_star.png" alt="demand" width="300"/>
-    </div>
-<div class="row">
+In code:
 
+<code>
+V_star,s_star,P_star,chi_star,lamb_star = solver(theta,c,[P_init,s_init,V_init],tol,params)
+s_star = np.where(s_star<0,0,s_star)
+<\code>
+
+parameter | estimate
+ ---: | :---------: 
+<img src="P_star.png" alt="states" width="300"/> | <img src="s_star.png" alt="states" width="300"/>
+<img src="chi_star.png" alt="prices" width="300"/> | <img src="q_star.png" alt="demand" width="300"/>
+
+## Demand Estimation
+
+| parameter | estimate | standard error |
+| ---: | :---------: | :------: |
+  | $\phi$ | 1.72536 | (0.0004) |
+  | $\iota$ | 2.33886 | (0.0005) |
+  | $\alpha$ | -0.0066 | (0.0000) |
+  | $\beta_1$ | -12.1324 | (0.0017) |
+  | $\beta_2$ | -11.6413 | (0.0017) |
+  | $\beta_3$ | -11.2396 | (0.0017) |
+  | $\beta_4$ | -10.8926 | (0.0017) |
+  | $\gamma$ | 4.2798 | (0.0018) |
+  
