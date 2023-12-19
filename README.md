@@ -243,9 +243,9 @@ In code:
 <code>V_star,s_star,P_star,chi_star,lamb_star = solver(theta,c,[P_init,s_init,V_init],tol,params)
 </code>
 
-<img src="P_star.png" alt="states" width="300"/> | <img src="s_star.png" alt="states" width="300"/>
+<img src="graphs/P_star.png" alt="states" width="300"/> | <img src="graphs/s_star.png" alt="states" width="300"/>
 
-<img src="chi_star.png" alt="prices" width="300"/> | <img src="q_star.png" alt="demand" width="300"/>
+<img src="graphs/chi_star.png" alt="prices" width="300"/> | <img src="graphs/q_star.png" alt="demand" width="300"/>
 
 ## Data Generating Process
 
