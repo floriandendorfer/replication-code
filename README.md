@@ -114,7 +114,7 @@ $$\rho^{b\prime\prime}(p,x) = \upsilon_rq''(p,x)\left(1-\frac{a+K(x)}{a+b+N(x)}\
 
 ## Market Entry & Exit
 
-Types are equally distributed in the host population, meaning 2,500 properties have a certain type. If a host is **inactive** and has not yet entered the market, they can do so at the start of the following month at **entry cost** $\kappa$ which is iid drawn from $Exponential(\bar \kappa_j)$, $j=${1,2,3,4}. Let $\lambda_j$ denote the **entry rate**. 
+Types are equally distributed in the host population, meaning 2,500 properties have a certain type. If a host is **inactive** and has not yet entered the market, they can do so at the start of the following month at **entry cost** $\kappa_j$ which is iid drawn from $Exponential(\bar \kappa_j)$, $j=${1,2,3,4}. Let $\lambda_j$ denote the **entry rate**. 
 
 $$ \lambda_j = 1-\exp(-\delta V((0,0,j))]\bar\kappa_j^{-1} ) $$
 
@@ -155,7 +155,7 @@ $$ \text{Total operating costs} = \sum_{x}s(x)\left((1-\chi(p,x))\bar \kappa(x) 
 
 <code>solver(theta,c,guess,t,tol,params)</code> finds an oblivious equilibrium of the model. <code>guess</code> contains starting values for the prices $\mathbf{\hat P}$, the state distribution $\mathbf{\hat s}$ and the value function $\mathbf{\hat V}$.
 
-  ### Pricing
+  ### Price Update
 
 Conditional on guess $\mathbf{\hat V}$ and assuming that there are $\hat s(x)$ competitors in state $x$ who set their prices according to $\hat P(x)$, a host operating a property in state $x$ maximizes $V(x)$ over $p$.
 
@@ -178,7 +178,7 @@ In code:
 <code>while dP>.1:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P1 = np.where(np.isnan(P1) == True,P_old,np.where((P1<0),0,np.where((P1>1000),1000,P1)))
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  dP = np.max(np.abs(P1 - P0))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dP = np.max(np.abs(P1 - P0))
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P0 = P1</code>
 
   ### Value Function Update
@@ -192,7 +192,7 @@ In code:
 <code>q_new = q_s(P_new,P_new,s_old,theta,t,params)
 T = T_s(P_new,P_new,s_old,q_new,theta,t,params)
 eV = T @ V_old
-V_new = period*(q_new*P_new.T) + delta*eV - (phi_bar - np.exp(-delta*eV/phi_bar)*phi_bar)</code>
+V_new = 30 * (q_new * P_new.T) + delta * eV - (1 - np.exp(-delta * eV/phi_bar)) * phi_bar</code>
 
   ### Entry & Exit Rate Updates
 
@@ -201,13 +201,13 @@ We use $\mathbf{V}$ and $\mathbf{P}$ to compute $\lambda(x)$, $\chi(P(x),x)$ and
 In code:
 
 <code>eV = T @ V_new
-chi = np.exp(-delta*eV/phi_bar).flatten()
-lamb = (1-np.exp(-delta*V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
+chi = np.exp(-delta * eV/phi_bar).flatten()
+lamb = (1-np.exp(-delta * V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
 F = F_s(q_new,chi,lamb,theta,params)</code>
 
   ### State Distribution Update
 
-We use $\mathbf{F}(P)$ to compute the **stationary state distribution**. Specifically, we iterate \mathbf{s} until $|\mathbf{s} - \mathbf{s}_0|\leq 0.01$.
+We use $\mathbf{F}(P)$ to compute the **stationary state distribution**. Specifically, we iterate $\mathbf{s}$ until $|\mathbf{s} - \mathbf{s}_0|\leq 0.01$.
 
 $$ \left[\mathbf{s},J/4-s_1,J/4-s_2,J/4-s_3,J/4-s_4\right] = \left[\mathbf{s}_0,J/4-s_1,J/4-s_2,J/4-s_3,J/4-s_4\right]\mathbf{F}(P) $$
 
@@ -220,22 +220,28 @@ In code:
 
   ### Solution
 
-We update $\mathbf{\hat P} = \mathbf{P}$, $\mathbf{\hat s}=\mathbf{s}$ and $\mathbf{\hat V}=\mathbf{V}$ and repeat the algorithm until convergence, i.e., $max${$|\mathbf{V}-\mathbf{\hat V}|,|\mathbf{s}-\mathbf{\hat s}|,|\mathbf{V}-\mathbf{\hat V}|$}<code>tol</code> (0.000001). To save time, we solve the host's pricing problem only if $\mathbf{V}$ changes substantially, i.e., by more than 10\% since the last time we solved for $p$.
+We update $\mathbf{\hat P} = \mathbf{P}$, $\mathbf{\hat s}=\mathbf{s}$ and $\mathbf{\hat V}=\mathbf{V}$ and repeat the algorithm until convergence, i.e., 
+
+$$|\mathbf{V}-\mathbf{\hat V}|\leq \text{tol} \ \text{ and } \ |\mathbf{s}-\mathbf{\hat s}|\leq \text{tol} \ \text{ and } \ |\mathbf{V}-\mathbf{\hat V}|\leq \text{tol}.$$
+
+<code>tol</code> is set to 0.000001. To save time, we solve the host's pricing problem only if $\mathbf{V}$ changes substantially, i.e., by more than 10\% since the last time we solved for $p$.
 
 Our initial guess of $P(x)$ is \$300 for all $x$. The initial guess of the state distribution is that half of the properties are in the market, while half are not. Those that are in the market are uniformely distributed across states. The initial guess for the value function is the PDV of the revenue earned by the host if they as well as all competitors set a price of \$300.
 
 In code:
 
-<code>P_init = np.array([[300]*len(S)])
-s_init = np.array([[J/(2*len(S))]*len(S)])
-V_init = (30*q_s(300,P_init,s_init,theta,0,params)*P_init.T)/(1-delta)</code>
+<code>P_init = np.array([[300] * len(S)])
+s_init = np.array([[J/(2 * len(S))] * len(S)])
+V_init = (30 * q_s(300,P_init,s_init,theta,0,params) * P_init.T)/(1-delta)
+s_star = np.where(s_star<0,0,s_star) 
+</code>
 
-The solution to the model is $\mathbf{V}^*, \mathbf{s}^*, \mathbf{P}^*, \mathbf{\chi}^*, \mathbf{\lambda}^*$. We use the solution to compute $q({P}^*(x),x)$.
+The solution to the model is $\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast, \mathbf{\chi}^\ast, \mathbf{\lambda}^\ast$. We use the solution to compute $q({P}^*(x),x)$.
 
 In code:
 
 <code>V_star,s_star,P_star,chi_star,lamb_star = solver(theta,c,[P_init,s_init,V_init],tol,params)
-s_star = np.where(s_star<0,0,s_star)</code>
+</code>
 
 <img src="P_star.png" alt="states" width="300"/> | <img src="s_star.png" alt="states" width="300"/>
 
@@ -243,37 +249,49 @@ s_star = np.where(s_star<0,0,s_star)</code>
 
 ## Data Generating Process
 
-We generate 4 years worth of fake data. We draw the average number of properties from the equilibrium state distribution. We associate each property with the number of reviews, equilibrium price, and demand (after adding some noise) of the corresponding state. We repeat this for $13\times 4$ times.
+We generate 4 years worth of mock data. We draw the average number of properties from the equilibrium state distribution. We associate each property with the number of reviews, equilibrium price (after adding some noise), and demand (after adding some noise) of the corresponding state. We repeat this for $13\times 4$ times.
 
 In code:
 
-<code>for t in range(1,13*4+1):
-    if t == 1:
-        index = np.repeat(range(0,924),np.random.multinomial(s_star.sum().astype(int),(s_star/s_star.sum()).flatten(),size=(13*4,))[t-1,:])
-        p = (P_star.T + np.random.normal(loc = 0, scale = 25.0, size = (P_star.T).shape))
-        q = q_s(p,p,s_star,theta,0,params)
-        data = np.hstack((np.zeros((len(index),1)) + t, S[index,:], p[index,:], q[index,:] + np.random.normal(loc = 0, scale = 0.15, size = q[index,:].shape)))
-    else:
-        p = (P_star.T + np.random.normal(loc = 0, scale = 25.0, size = (P_star.T).shape))
-        q = q_s(p,p,s_star,theta,0,params)
-        data = np.vstack((data, np.hstack((np.zeros((len(index),1)) + t, S[index,:], p[index,:], q[index,:] + np.random.normal(loc = 0, scale = 0.15, size = q[index,:].shape)))))
-data = np.where(data<0,0,data)
+
+<code>for t in range(1,13 * 4+1):
+</code>
+<code>   if (t==1): 
+</code>
+<code>      index = np.repeat(range(0,924),states
+</code>
+<code>            p = (P_star.T + np.random.normal(loc = 0, scale = 25.0, size = (P_star.T).shape))
+</code>
+<code>            q = q_s(p,p,s_star,theta,0,params)
+</code>
+<code>            data = np.hstack((np.zeros((len(index),1)) + t, S[index,:], p[index,:], q[index,:]+ np.random.normal(loc = 0, scale = 0.15, size = q[index,:].shape)))
+</code>
+<code>    else: 
+</code>
+<code>      p = (P_star.T + np.random.normal(loc = 0, scale = 25.0, size = (P_star.T).shape))
+</code>
+<code>      q = q_s(p,p,s_star,theta,0,params) 
+</code>
+<code>      data = np.vstack((data, np.hstack((np.zeros((len(index),1)) + t, S[index,:], p[index,:], q[index,:] + np.random.normal(loc = 0, scale = 0.15, size = q[index,:].shape))))) 
+</code>
+<code>data = np.where(data<0,0,data)
 data = pd.DataFrame(data,columns=['period','K','N','type 1','type 2','type 3','type 4','p','q'])
-data.to_pickle('data.pkl')</code>
+data.to_pickle('data.pkl')
+</code>
 
 ## Demand Estimation
 
-We estimate the demand parameters using GMM. <code>xi(omicron,adata,params)<\code> stores the **structural error term** $\xi_{it}$ of property $i$ at time $\tau$.
+We estimate the demand parameters using GMM. <code>xi(omicron,adata,params)</code> stores the **structural error term** $\xi_{it}$ of property $i$ at time $\tau$.
 
-$$\xi_{it}}(\omicron) = \ln(\hat ccp_{i\tau}) - \ln(\hat ccp_{0\tau}) - u_{i\tau}(\omicron)$$
+$$\xi_{i\tau}(\omicron) = \ln(ccp_{i\tau}) - \ln(ccp_{0\tau}) - u_{i\tau}(\omicron)$$
 
   ### Inversion
 
-We retrieve $\hat ccp_{it}$ from the data by inverting $q_{it}$.
+We retrieve $ccp_{it}$ from the data by inverting $q_{i\tau}$.
 
-$$ \hat ccp_{it} = -\ln(1 - q_{it})/\mu $$
+$$ ccp_{i\tau} = -\ln(1 - q_{i\tau})/\mu $$
 
-$\hat s_{0\tau}$ is then $1-\sum_i^{I_\tau}s_{i\tau}. Notice that, order to arrive at the regression equation, we must take the logarithm *twice*. This introduces additional bias from measurement error and complicates the estimation.
+$ccp_{0\tau}$ is then $1-\sum_i ccp_{i\tau}$. Notice that, order to arrive at the regression equation, we must take the logarithm *twice*. This introduces additional bias from measurement error and complicates the estimation.
 
 Rather than estimating $\theta = (a,b,\alpha,\boldsymbol{\beta},\gamma)$ directly, we estimate $\omicron = (\psi,\iota,\alpha,\boldsymbol{\beta},\gamma)$ to facilitate the estimation.
 
@@ -283,58 +301,79 @@ $$ (a+b) = \exp(\iota) $$
 
   ### Objective Function
 
-The **objective function** O(omicron,adata,W,params) is stored in <code>O(omicron,adata,W,params)<\code>. 
+The **objective function** is stored in <code>O(omicron,adata,W,params)</code>. Let $I$ denote the total number of observations of the dataset.
 
-$$\left(\frac{1}{N}\mathbf{Z}^T\boldsymbol{\xi}(\omicron)\right)^TW\left(\frac{1}{N}\mathbf{Z}^T\boldsymbol{\xi}(\omicron)\right)$$
+$$\left(\frac{1}{I}\mathbf{Z}^T\boldsymbol{\xi}(\omicron)\right)^TW\left(\frac{1}{I}\mathbf{Z}^T\boldsymbol{\xi}(\omicron)\right)$$
 
-$\mathbf{Z}$ is the set of **instruments**. Here, we simply use the rental rate $p$, number of reviews $N$ and $K$ and the average rating $r=1+4(K/N)$, as the fake data does not account for endogeneity.
+$\mathbf{Z}$ is the set of **instruments**. Here, we simply use the rental rate $p$, number of reviews $N$ and $K$ and the average rating $r=1+4(K/N)$, as the prices in the mock data are simply a function of $s$.
 
 We minimize $O(\omicron)$ using the analytical gradient.
 
-$$ \nabla O(\omicron) = 2\left(-\frac{1}{N}\mathbf{Z}^T\nabla u(\omicron)\right)^T W\left(\frac{1}{N}\mathbf{Z}^T\boldsymbol{\xi}(\omicron)\right)$$
+$$ \nabla O(\omicron) = 2\left(-\frac{1}{I}\mathbf{Z}^T\nabla u(\omicron)\right)^T W\left(\frac{1}{I}\mathbf{Z}^T\boldsymbol{\xi}(\omicron)\right) $$
 
-<code>dO(omicron,adata,W,params)<\code> contains $\boldsymbol{\xi}'(\omicron)$. It requires $\nabla u(\omicron) (<code>dU(omicron,adata,params)<\code>).
+<code>dO(omicron,adata,W,params)</code> contains $\boldsymbol{\xi}'(\omicron)$. It requires $\nabla u(\omicron)$ (<code>dU(omicron,adata,params)</code>).
 
   ### Minimization
 
 To initiate the minimization, we choose appropriate starting values. For the first step of two-step GMM we set the weighting matrix equal to the inverse of the variance-covariance matrix of the instruments.
 
-$$ W_1 = (\mathbf{Z}^T\mathbf{Z})^{-1} $$
+$$ W_1 = I\left(\mathbf{Z}^T\mathbf{Z}\right)^{-1} $$
 
 In code:
 
 <code>start_values = [0,0,0,-10,-10,-10,-10,0]
 W1 = np.linalg.inv( ((Z(start_values,data,params)).T @ (Z(start_values,data,params)))/len(data))
-res_demand = minimize(O, start_values, args=(data,W1,params), method='BFGS',jac=dO)<\code>
+res_demand = minimize(O, start_values, args=(data,W1,params), method='BFGS',jac=dO)</code>
 
 In the second step, we choose the efficient weighting matrix.
 
-$$ W_2 = \left(\left(-\frac{1}{N}\mathbf{Z}^T\nabla u(\omicron)\right)\left(-\frac{1}{N}\mathbf{Z}^T\nabla u(\omicron)\right)^T\right)^{-1} $$
+$$ W_2 = \left(\left(-\frac{1}{I}\mathbf{Z}^T\nabla u(\omicron)\right)\left(-\frac{1}{I}\mathbf{Z}^T\nabla u(\omicron)\right)^T\right)^{-1} $$
 
 In code:
 
 <code>xi_hat = xi(res_demand.x,data,params)
-W2 = np.linalg.inv( ((xi_hat*Z(res_demand.x,data,params)).T @ (xi_hat*Z(res_demand.x,data,params)))/len(data) )
-res_demand = minimize(O, start_values, args=(data,W2,params), method='BFGS',jac=dO)<\code>
+W2 = np.linalg.inv( ((xi_hat * Z(res_demand.x,data,params)).T @ (xi_hat * Z(res_demand.x,data,params)))/len(data) )
+res_demand = minimize(O, start_values, args=(data,W2,params), method='BFGS',jac=dO)
+</code>
 
   ### Standard Errors
 
-$$ \text{Standard Errors} = (\left(\frac{1}{N}\mathbf{Z}^T\boldsymbol{\xi}(\omicron^*)\right)W_2(\mathbf)\left(\frac{1}{N}\mathbf{Z}^T\boldsymbol{\xi}(\omicron^*)\right)) $$
+As we have chosen the efficient weighting matrix in the second step, the (heteroscedasticity robust) **standard errors** simplify to
 
-Do I update W2 again?
+$$ \frac{1}{I}\left( diag\left( \left( \left(\frac{1}{N}\mathbf{Z}^T\nabla u(\omicron)\right)^TW_2\left(\frac{1}{I}\mathbf{Z}^T\nabla u(\omicron)\right) \right)^{-1} \right) \right)^\frac{1}{2} $$
+
+In code:
+
+<code>G_bar = ( (Z(res_demand.x,data,params).T @ (-dU(res_demand.x,data,params))) )/len(data)
+W2 = np.linalg.inv( ((xi_hat * Z(res_demand.x,data,params)).T @ (xi_hat * Z(res_demand.x,data,params)))/len(data) )
+S_hat = np.diag(np.linalg.inv((G_bar.T @ W2) @ G_bar))**.5/len(data)
+</code>
 
   ### Estimation Results
 
 | parameter | estimate | standard error |
 | ---: | :---------: | :------: |
-  | $\phi$ | 1.72536 | (0.0004) |
-  | $\iota$ | 2.33886 | (0.0005) |
-  | $\alpha$ | -0.0066 | (0.0000) |
-  | $\beta_1$ | -12.1324 | (0.0017) |
-  | $\beta_2$ | -11.6413 | (0.0017) |
-  | $\beta_3$ | -11.2396 | (0.0017) |
-  | $\beta_4$ | -10.8926 | (0.0017) |
-  | $\gamma$ | 4.2798 | (0.0018) |
+  | $\phi$ | 1.8744 | (0.0002) |
+  | $\iota$ | 2.6532 | (0.0004) |
+  | $\alpha$ | -0.0068 | (0.0000) |
+  | $\beta_1$ | -13.1073 | (0.0018) |
+  | $\beta_2$ | -12.6102 | (0.0018) |
+  | $\beta_3$ | -12.1929 | (0.0018) |
+  | $\beta_4$ | -11.8070 | (0.0018) |
+  | $\gamma$ | 5.3882 | (0.0019) |
 
-Our estimates of $\phi$ and $\iota$ correspond to $a=8.7959$ and $b=1.5748$ -- the fact that we do not *exactly* recover the parameter values shows the difficulty of identifying the non-linear parameters governing the prior distribution. 
+Our estimates of $\phi$ and $\iota$ correspond to $a=12.3102$ and $b=1.8890$. Notice that our estimates are slightly biased as the demand inversion is non-linear and the measurement error is not fully captured by the structural error term.
+
+## Supply Estimation
+
+We estimate $\mathbf{c} = (\phi_1,\phi_2\phi_3,\phi_4,\kappa_1,\kappa_2\kappa_3,\kappa_4)$ by maximizing the logarithm of the likelihood of the equilibrium state distribution $\mathbf{s}$ over $\mathbf{c}$. This requires that we infer the average number of listings $\mathbf{s}^d$ from the (mock) data.
+
+In code:
+
+<code>s_d = np.array([(data.groupby(['x'])['period'].count()/data.groupby(['period']).mean().shape[0]).reindex(np.arange(0,len(S)), fill_value=0)])</code>
+
+<code>l(k,theta,guess,tol,s_d,params)<\code> stores the **log-likelihood** function. 
+
+$$ \sum_{x\in X} s^\text{d}(x) \ln \left(s^\ast(x|\mathbf{c}) \right) + \sum_j\left(\frac{J}{4}-\sum_{x\in X}s_j^d(x)\right)\ln\left(\frac{J}{4}-\sum_{x\in X}s_j^\ast(x|\mathbf{c})\right) $$
+    
   
