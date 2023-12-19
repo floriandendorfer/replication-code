@@ -325,9 +325,9 @@ In code:
 W1 = np.linalg.inv( ((Z(start_values,data,params)).T @ (Z(start_values,data,params)))/len(data))
 res_demand = minimize(O, start_values, args=(data,W1,params), method='BFGS',jac=dO)</code>
 
-In the second step, we choose the efficient weighting matrix.
+In the second step, we choose the efficient weighting matrix. Let $\hat \omicron$ be our estimation result from the first stage.
 
-$$ W_2 = \left(\left(-\frac{1}{I}\mathbf{Z}^T\nabla u(\omicron)\right)\left(-\frac{1}{I}\mathbf{Z}^T\nabla u(\omicron)\right)^T\right)^{-1} $$
+$$ W_2 = \left(\left(-\frac{1}{I}\mathbf{Z}^T\nabla u(\hat \omicron)\right)\left(-\frac{1}{I}\mathbf{Z}^T\nabla u(\hat \omicron)\right)^T\right)^{-1} $$
 
 In code:
 
@@ -340,7 +340,7 @@ res_demand = minimize(O, start_values, args=(data,W2,params), method='BFGS',jac=
 
 As we have chosen the efficient weighting matrix in the second step, the (heteroscedasticity robust) **standard errors** simplify to
 
-$$ \frac{1}{I}\left( diag\left( \left( \left(\frac{1}{N}\mathbf{Z}^T\nabla u(\omicron)\right)^TW_2\left(\frac{1}{I}\mathbf{Z}^T\nabla u(\omicron)\right) \right)^{-1} \right) \right)^\frac{1}{2} $$
+$$ \frac{1}{I}\left( diag\left( \left( \left(\frac{1}{N}\mathbf{Z}^T\nabla u(\hat \omicron)\right)^TW_2\left(\frac{1}{I}\mathbf{Z}^T\nabla u(\hat \omicron)\right) \right)^{-1} \right) \right)^\frac{1}{2} $$
 
 In code:
 
@@ -362,6 +362,16 @@ S_hat = np.diag(np.linalg.inv((G_bar.T @ W2) @ G_bar))**.5/len(data)
   | $\beta_4$ | -11.8070 | (0.0018) |
   | $\gamma$ | 5.3882 | (0.0019) |
 
+We convert $\hat omicron$ to $\hat \theta$. 
+
+In code:
+
+<code>theta_hat = [expit(res_demand.x[0])*np.exp(res_demand.x[1]),
+(1-expit(res_demand.x[0]))*np.exp(res_demand.x[1]),
+res_demand.x[2],
+res_demand.x[3:7],
+res_demand.x[7]]</code>
+
 Our estimates of $\phi$ and $\iota$ correspond to $a=12.3102$ and $b=1.8890$. Notice that our estimates are slightly biased as the demand inversion is non-linear and the measurement error is not fully captured by the structural error term.
 
 ## Supply Estimation
@@ -372,8 +382,15 @@ In code:
 
 <code>s_d = np.array([(data.groupby(['x'])['period'].count()/data.groupby(['period']).mean().shape[0]).reindex(np.arange(0,len(S)), fill_value=0)])</code>
 
-<code>l(k,theta,guess,tol,s_d,params)<\code> stores the **log-likelihood** function. 
+<code>l(k,theta,guess,tol,s_d,params)</code> stores the **log-likelihood** function (times -1). 
 
-$$ \sum_{x\in X} s^\text{d}(x) \ln \left(s^\ast(x|\mathbf{c}) \right) + \sum_j\left(\frac{J}{4}-\sum_{x\in X}s_j^d(x)\right)\ln\left(\frac{J}{4}-\sum_{x\in X}s_j^\ast(x|\mathbf{c})\right) $$
+$$ \sum_{x} s^d(x) \ln \left(s^\ast(x|\mathbf{c}) \right) + \sum_j\left(\frac{J}{4}-\sum_{x}s_j^d(x)\right)\ln\left(\frac{J}{4}-\sum_{x}s_j^\ast(x|\mathbf{c})\right) $$
     
-  
+We exclude states for which we do not observe any observations as other wise the log-likelihood is undefined. We <code>tol</code> is set to 0.001. Each candidate for $\mathbf{c}$ requires us to solve the model. We use the same <code>guess</code> as in the 'Solving the Model' section to initiate the solution algorithm. Furthermore, we use the demand estimates $\hat \theta$. To facilitate the search of a maximum, we search over $\exp(\mathbf{c})$, thereby excluding negative values. For the purpose of this replication code, we set the start values <code>k0</code> close to the solution to reduce computation time.
+
+In code:
+
+<code>k0 = np.log([50000,100000,150000,200000,2500,3500,4500,5500])
+res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params), method='BFGS')
+</code>
+ 
