@@ -153,15 +153,19 @@ $$ \text{Total operating costs} = \sum_{x}s(x)\left((1-\chi(p,x))\bar \kappa(x) 
 
 ## Solving The Model
 
-<code>solver(theta,c,guess,t,tol,params)</code> finds a oblivious equilibrium of the model. <code>guess</code> contains starting values for the prices $\mathbf{\hat P}$, the state distribution $\mathbf{\hat s}$ and the value function $\mathbf{\hat V}$.
+<code>solver(theta,c,guess,t,tol,params)</code> finds an oblivious equilibrium of the model. <code>guess</code> contains starting values for the prices $\mathbf{\hat P}$, the state distribution $\mathbf{\hat s}$ and the value function $\mathbf{\hat V}$.
 
   ### Pricing
 
-Conditional on guess $\mathbf{\hat V}$ and assuming that there are \hat s(x) competitors in state $x$ set their prices according to $\hat P(x)$, a host operating a property in state $x$ maximizes $V(x)$ over $p$.
+Conditional on guess $\mathbf{\hat V}$ and assuming that there are $\hat s(x)$ competitors in state $x$ who set their prices according to $\hat P(x)$, a host operating a property in state $x$ maximizes $V(x)$ over $p$.
 
 $$ V(p,x) = 30q(p,x)p - (1-\chi(p,x))\phi(x) + \delta \mathbf{T}\mathbf{\hat V} $$
 
-The FOC requires that $V'(p,x) = 0$. The first-order Taylor series approximation around $p_0$ is $V'(p,x) = V'(p_0,x) + V''(p_0,x)(p-p_0)$. We find $p$ by iterating $ p = p_0 + \frac{V'(p_0,x)}{V'(p_0,x)}$ until $|p-p_0| \leq 0.1$. 
+The FOC requires that $V'(p,x) = 0$. The first-order Taylor series approximation around $p_0$ is $V'(p,x) = V'(p_0,x) + V''(p_0,x)(p-p_0)$. We find $p$ by iterating 
+
+$$p = p_0 + \frac{V'(p_0,x)}{V''(p_0,x)}$$
+
+until $|p-p_0| \leq 0.1$. 
 
 <code>dV_s(p,P,s,V,theta,\phi_bar,t,params)</code> and <code>d2V_s(p,P,s,V,theta,\phi_bar,t,params)</code> store the first- and second-order derivative of $V(p,x)$ with respect to p respectively.
 
