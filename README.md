@@ -120,7 +120,7 @@ $$ \lambda_j = 1-\exp(-\delta V((0,0,j))]\bar\kappa_j^{-1} ) $$
 
 Denote the number of properties of type $j$ by $s_j$. The expected, total entry costs of type-$j$ hosts in a given month is the number of inactive hosts $(J/4 - s_j)$ times $\mathbb{E}[\kappa_j|\phi_j\geq \delta V(0,0,j)]$.
 
-$$ \text{Total entry costs} = \sum_{j}(J/4 - s_j)\left(\lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
+$$ \text{Total entry costs} = \sum_{j}\left(J/4 - \sum_xs_j(x)\right)\left(\lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
 
 If a host is **active** they have entered the market. At the end of each month they have to pay the **operating cost** $\phi_j$ for the following month, regardless of whether the property is booked or not. $\phi_j$ is iid $Exponential(\bar \phi_j)$ distributed. Let $\chi(p,x)$ denote the **exit rate**.
 
@@ -385,13 +385,13 @@ In code:
 
 <code>l(k,theta,guess,tol,s_d,params)</code> stores the **log-likelihood** function (times -1). 
 
-$$ \sum_{x} s^d(x) \ln \left(s^\ast(x|\mathbf{c}) \right) + \sum_j\left(\frac{J}{4}-\sum_{x}s_j^d(x)\right)\ln\left(\frac{J}{4}-\sum_{x}s_j^\ast(x|\mathbf{c})\right) $$
+$$ \text{Log-likelihood} = \sum_{x} s^d(x) \ln \left(s^\ast(x|\mathbf{c}) \right) + \sum_j\left(\frac{J}{4}-\sum_{x}s_j^d(x)\right)\ln\left(\frac{J}{4}-\sum_{x}s_j^\ast(x|\mathbf{c})\right) $$
     
 We exclude states for which we do not observe any observations in the mock data or for which the model predicts that there are no observations as otherwise the log-likelihood is undefined.
 
   ### Maximization
 
-<code>tol</code> is set to 1. Each candidate for $\mathbf{c}$ requires us to solve the model. We use the same <code>guess</code> as in the 'Solving the Model' section to initiate the solution algorithm. After that, we use the model solution for the previous set of candidates as the starting values to find the model solution for the next set of candidates. Furthermore, we use the demand estimates $\hat \theta$. To facilitate the search of a maximum, we search over $\exp(\mathbf{c})$, thereby excluding negative values. For the purpose of this replication code, we set the start values <code>k0</code> close to the solution to reduce computation time.
+<code>tol</code> is set to 1. Each candidate for $\mathbf{c}$ requires us to solve the model. We use the same <code>guess</code> as in the 'Solving the Model' section to initiate the solution algorithm. After that, we use the model solution for the previous set of candidates as the starting values to find the model solution for the next set of candidates. Furthermore, we use the demand estimates $\hat \theta$. To facilitate the search of a maximum, we search over $\ln(\mathbf{c})$, thereby excluding negative values. For the purpose of this replication code, we set the start values <code>k0</code> close to the solution to reduce computation time.
 
 In code:
 
@@ -401,9 +401,9 @@ res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params),
 
   ### Standard Errors
 
-We use the the numerical approximation of the inverse Hessian $(H(\hat \mathbf{c}))^{-1}$ (<code>res_supply.hess_inv</code>) to compute the standard errors of the estimates.
+We use the the numerical approximation of the inverse Hessian $(H(\mathbf{\hat c}))^{-1}$ (<code>res_supply.hess_inv</code>) to compute the standard errors of the estimates.
 
-$$ \sqrt{\frac{diag\left((H(\hat \mathbf{c}))^{-1}\right)}{I}} $$
+$$ \sqrt{\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
 
   ### Estimation Results
 
@@ -420,21 +420,52 @@ $$ \sqrt{\frac{diag\left((H(\hat \mathbf{c}))^{-1}\right)}{I}} $$
  
 ## Counterfactual Analysis
 
-In the first set of counterfactuals, we simulate the model forward for 10 years -- starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) -- if every host in the market receives a lump-sum subsidy of \$<code>Sub</code>.
+We simulate the model forward for 10 years - starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) - (1) if every host in the market receives a monthly lump-sum subsidy of \$<code>Sub</code> and/or (2) if consumers receive a \$<code>t</code> subsidy for each day they book a property that has not been reviewed before. The corresponding function is stored in <code>simulation(theta,c,sol,t,Sub,params)</code>.
 
-First round:
+We calculate the sum of host profits, the consumer surplus and the cost of the subsidy per month.
 
-$$ -\frac{30}{\alpha}\sum_x q(x)\ln\left(1 + \sum_{x} s(x)\exp(u(x))\right) $$
+### Subsidy Cost
+
+The expected cost of the lump-sum subsidy is $Sub\sum_xs(x)$ per month. The cost of the per-unit subsidy is $30t\sum_xs(x)q(x)$.
 
 In code:
 
-<code>CS_1 = -(s_new @ q_new) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha</code>
+<code> \text{Subsidy cost} = ((30 * s_new * q_new.T) @ t) + (s_new @ Sub)</code>
 
-Second round:
+### Consumer Surplus
 
-$$ -\frac{30}{\alpha}\left(\mu - q(x)\right)\mathbb{E}_q\left[\sum_x q(x)\ln\left(1 + \sum_{x} (s(x) - \hat q(x))\exp(u(x))\right)\right] $$
+We calculate the expected consumer surplus per month. As each property can only be booked once, we assume the following rationing rule. Guests choose the state $x$ of the property they want to stay at (if any). If there are more guests than properties, the excess number of guests gets nothing.
 
-<code>-((mu - (s_new @ B))*30*np.log( 1 + (B @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T))).mean()/alpha</code>
-        
+$$ \text{Consumer surplus} = -\frac{30}{\alpha}\left(\mu - \sum_x \left(ccp(x) - q(x)\right)\right)\ln\left(1 + \sum_{x} s(x)\exp(u(x))\right) $$
 
-        
+In code:
+
+<code>-(s_new @ (q_new - ccp_new)) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha</code>
+
+### Aggregate Profit
+
+We distinguish hosts who are in the market and hosts who are outside the market. Hosts in the market receive the expected monthly revenue of renting out the property as well as the lump-sum subsidy. They also pay the operating cost. See the 'Market Entry & Exit' section for the total expected operation costs per month.  
+
+$$ \text{Profit (outside)} = \sum_{x}s(x)\left(30q(x)P(x) + Sub - \left((1-\chi(p,x))\bar \kappa(x) - \chi(p,x)\delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]\right)\right) $$
+
+In code:
+
+<code>s_new @ (np.array([np.diagonal(30 * q_s(P_new,P_new,s_new,theta,t,params)*P_new)]).T + Sub - (np.array([np.repeat(c[4:],231)]).T - np.array([chi_new]).T * (delta * eV_in + np.array([np.repeat(c[4:],231)]).T)))</code>
+
+Hosts who are currently outside the market do not earn revenue but pay the entry cost if they decide to enter that month.
+
+$$ -\sum_{j} (J/4 - \sum_{x}s_j(x))\left(\lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
+
+<code>-(J/4-s_new[0,:231].sum()) * (c[0] - (1-lamb_new[0]) * (delta * eV_out[0] + c[0]))</code>
+
+<code>-(J/4-s_new[0,231:462].sum()) * (c[1] - (1-lamb_new[231])*(delta * eV_out[1] + c[1]))</code>
+
+<code>-(J/4-s_new[0,462:693].sum()) * (c[2] - (1-lamb_new[462])*(delta * eV_out[2] + c[2]))</code>
+
+<code>-(J/4-s_new[0,693:].sum()) * (c[3] - (1-lamb_new[693])*(delta * eV_out[3] + c[3]))</code>
+
+### Social Welfare
+
+We calculate social welfare as the present discounted value of the sum of host profits and the consumer surplus less the cost of the subsidy over the 10 year time horizon.
+
+$$ \text{Welfare} = \sum_{\tau=1}^{130} \delta^{\tau-1}(\text{Consumer Surplus} + \text{Profit (inside)} + \text{Profit (outside)} - \text{Subsidy cost}) $$
