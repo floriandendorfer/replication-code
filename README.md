@@ -387,15 +387,15 @@ In code:
 
 $$ \sum_{x} s^d(x) \ln \left(s^\ast(x|\mathbf{c}) \right) + \sum_j\left(\frac{J}{4}-\sum_{x}s_j^d(x)\right)\ln\left(\frac{J}{4}-\sum_{x}s_j^\ast(x|\mathbf{c})\right) $$
     
-We exclude states for which we do not observe any observations as other wise the log-likelihood is undefined.
+We exclude states for which we do not observe any observations in the mock data or for which the model predicts that there are no observations as otherwise the log-likelihood is undefined.
 
   ### Maximization
 
-<code>tol</code> is set to 0.001. Each candidate for $\mathbf{c}$ requires us to solve the model. We use the same <code>guess</code> as in the 'Solving the Model' section to initiate the solution algorithm. Furthermore, we use the demand estimates $\hat \theta$. To facilitate the search of a maximum, we search over $\exp(\mathbf{c})$, thereby excluding negative values. For the purpose of this replication code, we set the start values <code>k0</code> close to the solution to reduce computation time.
+<code>tol</code> is set to 1. Each candidate for $\mathbf{c}$ requires us to solve the model. We use the same <code>guess</code> as in the 'Solving the Model' section to initiate the solution algorithm. After that, we use the model solution for the previous set of candidates as the starting values to find the model solution for the next set of candidates. Furthermore, we use the demand estimates $\hat \theta$. To facilitate the search of a maximum, we search over $\exp(\mathbf{c})$, thereby excluding negative values. For the purpose of this replication code, we set the start values <code>k0</code> close to the solution to reduce computation time.
 
 In code:
 
-<code>k0 = np.log([50000,100000,150000,200000,2500,3500,4500,5500])
+<code>k0 = np.log([50000,100000,150000,250000,2500,3500,4500,5500])
 res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params), method='BFGS')
 </code>
 
@@ -404,8 +404,6 @@ res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params),
 We use the the numerical approximation of the inverse Hessian $(H(\hat \mathbf{c}))^{-1}$ (<code>res_supply.hess_inv</code>) to compute the standard errors of the estimates.
 
 $$ \sqrt{\frac{diag\left((H(\hat \mathbf{c}))^{-1}\right)}{I}} $$
-
-
 
   ### Estimation Results
 
