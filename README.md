@@ -274,8 +274,7 @@ In code:
 </code>
 <code>      data = np.vstack((data, np.hstack((np.zeros((len(index),1)) + t, S[index,:], p[index,:], q[index,:] + np.random.normal(loc = 0, scale = 0.15, size = q[index,:].shape))))) 
 </code>
-<code>data = np.where(data<0,0,data)
-data = pd.DataFrame(data,columns=['period','K','N','type 1','type 2','type 3','type 4','p','q'])
+<code>data = pd.DataFrame(data,columns=['period','K','N','type 1','type 2','type 3','type 4','p','q'])
 data.to_pickle('data.pkl')
 </code>
 
@@ -353,14 +352,14 @@ S_hat = np.diag(np.linalg.inv((G_bar.T @ W2) @ G_bar))**.5/len(data)
 
 | parameter | estimate | standard error |
 | ---: | :---------: | :------: |
-  | $\phi$ | 1.8744 | (0.0002) |
-  | $\iota$ | 2.6532 | (0.0004) |
+  | $\phi$ | 1.8388 | (0.0002) |
+  | $\iota$ | 2.6677 | (0.0004) |
   | $\alpha$ | -0.0068 | (0.0000) |
-  | $\beta_1$ | -13.1073 | (0.0018) |
-  | $\beta_2$ | -12.6102 | (0.0018) |
-  | $\beta_3$ | -12.1929 | (0.0018) |
-  | $\beta_4$ | -11.8070 | (0.0018) |
-  | $\gamma$ | 5.3882 | (0.0019) |
+  | $\beta_1$ | -12.9853 | (0.0019) |
+  | $\beta_2$ | -12.4921 | (0.0019) |
+  | $\beta_3$ | -12.0770 | (0.0019) |
+  | $\beta_4$ | -11.6858 | (0.0019) |
+  | $\gamma$ | 5.2759 | (0.0020) |
 
 We convert $\hat omicron$ to $\hat \theta$. 
 
@@ -376,6 +375,8 @@ Our estimates of $\phi$ and $\iota$ correspond to $a=12.3102$ and $b=1.8890$. No
 
 ## Supply Estimation
 
+  ### Objective Function
+
 We estimate $\mathbf{c} = (\phi_1,\phi_2\phi_3,\phi_4,\kappa_1,\kappa_2\kappa_3,\kappa_4)$ by maximizing the logarithm of the likelihood of the equilibrium state distribution $\mathbf{s}$ over $\mathbf{c}$. This requires that we infer the average number of listings $\mathbf{s}^d$ from the (mock) data.
 
 In code:
@@ -386,11 +387,56 @@ In code:
 
 $$ \sum_{x} s^d(x) \ln \left(s^\ast(x|\mathbf{c}) \right) + \sum_j\left(\frac{J}{4}-\sum_{x}s_j^d(x)\right)\ln\left(\frac{J}{4}-\sum_{x}s_j^\ast(x|\mathbf{c})\right) $$
     
-We exclude states for which we do not observe any observations as other wise the log-likelihood is undefined. We <code>tol</code> is set to 0.001. Each candidate for $\mathbf{c}$ requires us to solve the model. We use the same <code>guess</code> as in the 'Solving the Model' section to initiate the solution algorithm. Furthermore, we use the demand estimates $\hat \theta$. To facilitate the search of a maximum, we search over $\exp(\mathbf{c})$, thereby excluding negative values. For the purpose of this replication code, we set the start values <code>k0</code> close to the solution to reduce computation time.
+We exclude states for which we do not observe any observations as other wise the log-likelihood is undefined.
+
+  ### Maximization
+
+<code>tol</code> is set to 0.001. Each candidate for $\mathbf{c}$ requires us to solve the model. We use the same <code>guess</code> as in the 'Solving the Model' section to initiate the solution algorithm. Furthermore, we use the demand estimates $\hat \theta$. To facilitate the search of a maximum, we search over $\exp(\mathbf{c})$, thereby excluding negative values. For the purpose of this replication code, we set the start values <code>k0</code> close to the solution to reduce computation time.
 
 In code:
 
 <code>k0 = np.log([50000,100000,150000,200000,2500,3500,4500,5500])
 res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params), method='BFGS')
 </code>
+
+  ### Standard Errors
+
+We use the the numerical approximation of the inverse Hessian $(H(\hat \mathbf{c}))^{-1}$ (<code>res_supply.hess_inv</code>) to compute the standard errors of the estimates.
+
+$$ \sqrt{\frac{diag\left((H(\hat \mathbf{c}))^{-1}\right)}{I}} $$
+
+
+
+  ### Estimation Results
+
+| parameter | estimate | standard error |
+| ---: | :---------: | :------: |
+  | $\bar \kappa_1$ | ... | (0.0000) |
+  | $\bar \kappa_2$ | ... | (0.0000) |
+  | $\bar \kappa_3$ | ... | (0.0000) |
+  | $\bar \kappa_4$ | ... | (0.0000) |
+  | $\bar \phi_1$ | ... | (0.0000) |
+  | $\bar \phi_2$ | ... | (0.0000) |
+  | $\bar \phi_3$ | ... | (0.0000) |
+  | $\bar \phi_4$ | ... | (0.0000) |
  
+## Counterfactual Analysis
+
+In the first set of counterfactuals, we simulate the model forward for 10 years -- starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) -- if every host in the market receives a lump-sum subsidy of \$<code>Sub</code>.
+
+First round:
+
+$$ -\frac{30}{\alpha}\sum_x q(x)\ln\left(1 + \sum_{x} s(x)\exp(u(x))\right) $$
+
+In code:
+
+<code>CS_1 = -(s_new @ q_new) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha</code>
+
+Second round:
+
+$$ -\frac{30}{\alpha}\left(\mu - q(x)\right)\mathbb{E}_q\left[\sum_x q(x)\ln\left(1 + \sum_{x} (s(x) - \hat q(x))\exp(u(x))\right)\right] $$
+
+<code>-((mu - (s_new @ B))*30*np.log( 1 + (B @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T))).mean()/alpha</code>
+        
+
+        
