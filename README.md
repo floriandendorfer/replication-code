@@ -130,7 +130,7 @@ $\tilde x$ denotes the state in the next month. Note that the host's expectation
 
 The expected, total operating costs of properties in a certain state in a given month are the number of active hosts $s(x)$ times $\mathbb{E}[\phi(x)|\phi(x)\leq \delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]]$ 
 
-$$ \text{Total operating costs} = \sum_{x}s(x)\left((1-\chi(p,x))\bar \kappa(x) - \chi(p,x)\delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]\right) $$ 
+$$ \text{Total operating costs} = \sum_{x}s(x)\left((1-\chi(p,x))\bar \phi(x) - \chi(p,x)\delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]\right) $$ 
 
 <code>F_s(p,P,s,q,chi,lamb,theta,t,params)</code> contains the **expanded transition matrix** $\mathbf{F}(p)$. It accommodate transitions from and to inactivity by expanding $\mathbf{T}(p)$ by an additional state.
 
@@ -396,7 +396,7 @@ We exclude states for which we do not observe any observations in the mock data 
 In code:
 
 <code>k0 = np.log([50000,100000,150000,250000,2500,3500,4500,5500])
-res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params), method='BFGS')
+res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params), method='Nelder-Mead')
 </code>
 
   ### Standard Errors
@@ -420,19 +420,21 @@ $$ \sqrt{\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
  
 ## Counterfactual Analysis
 
-We simulate the model forward for 10 years - starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) - (1) if every host in the market receives a monthly lump-sum subsidy of \$<code>Sub</code> and/or (2) if consumers receive a \$<code>t</code> subsidy for each day they book a property that has not been reviewed before. The corresponding function is stored in <code>simulation(theta,c,sol,t,Sub,params)</code>.
+We simulate the model forward for 10 years - starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) - (1) if every type-$j$ host in the market receives a monthly lump-sum subsidy of $\$Sub_j$ (<code>Sub</code>) and/or (2) if consumers receive a $\$t$ (<code>t</code>) subsidy for each day they book a property that has not been reviewed before. The corresponding function is stored in <code>simulation(theta,c,sol,t,Sub,params)</code>.
 
 We calculate the sum of host profits, the consumer surplus and the cost of the subsidy per month.
 
-### Subsidy Cost
+  ### Subsidy Cost
 
 The expected cost of the lump-sum subsidy is $Sub\sum_xs(x)$ per month. The cost of the per-unit subsidy is $30t\sum_xs(x)q(x)$.
 
+$$ \text{Subsidy cost} = \sum_jSub_j\sum_xs(x) + 30t\sum_xs(x)q(x) $$
+
 In code:
 
-<code> \text{Subsidy cost} = ((30 * s_new * q_new.T) @ t) + (s_new @ Sub)</code>
+<code> ((30 * s_new * q_new.T) @ t) + (s_new @ Sub)</code>
 
-### Consumer Surplus
+  ### Consumer Surplus
 
 We calculate the expected consumer surplus per month. As each property can only be booked once, we assume the following rationing rule. Guests choose the state $x$ of the property they want to stay at (if any). If there are more guests than properties, the excess number of guests gets nothing.
 
@@ -442,11 +444,11 @@ In code:
 
 <code>-(s_new @ (q_new - ccp_new)) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha</code>
 
-### Aggregate Profit
+  ### Aggregate Profit
 
 We distinguish hosts who are in the market and hosts who are outside the market. Hosts in the market receive the expected monthly revenue of renting out the property as well as the lump-sum subsidy. They also pay the operating cost. See the 'Market Entry & Exit' section for the total expected operation costs per month.  
 
-$$ \text{Profit (outside)} = \sum_{x}s(x)\left(30q(x)P(x) + Sub - \left((1-\chi(p,x))\bar \kappa(x) - \chi(p,x)\delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]\right)\right) $$
+$$ \text{Profit (inside)} = \sum_{x}s(x)\left(30q(x)P(x) + Sub_j - \left((1-\chi(p,x))\bar \phi(x) - \chi(p,x)\delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]\right)\right) $$
 
 In code:
 
@@ -454,7 +456,7 @@ In code:
 
 Hosts who are currently outside the market do not earn revenue but pay the entry cost if they decide to enter that month.
 
-$$ -\sum_{j} (J/4 - \sum_{x}s_j(x))\left(\lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
+$$ \text{Profit (outside)} = -\sum_{j} (J/4 - \sum_{x}s_j(x))\left(\lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
 
 <code>-(J/4-s_new[0,:231].sum()) * (c[0] - (1-lamb_new[0]) * (delta * eV_out[0] + c[0]))</code>
 
@@ -464,8 +466,24 @@ $$ -\sum_{j} (J/4 - \sum_{x}s_j(x))\left(\lambda_j\bar \kappa_j - (1-\lambda_j)\
 
 <code>-(J/4-s_new[0,693:].sum()) * (c[3] - (1-lamb_new[693])*(delta * eV_out[3] + c[3]))</code>
 
-### Social Welfare
+  ### Social Welfare
 
 We calculate social welfare as the present discounted value of the sum of host profits and the consumer surplus less the cost of the subsidy over the 10 year time horizon.
 
-$$ \text{Welfare} = \sum_{\tau=1}^{130} \delta^{\tau-1}(\text{Consumer Surplus} + \text{Profit (inside)} + \text{Profit (outside)} - \text{Subsidy cost}) $$
+$$ \text{Welfare} = \sum_{\tau=1}^{130} \delta^{\tau-1}(\text{Consumer surplus} + \text{Profit (inside)} + \text{Profit (outside)} - \text{Subsidy cost}) $$
+
+  ## Welfare Maximization
+
+First, we maximize social welfare over $Sub_j, j=1,2,3,4,$ by repeatedly simulating the model forward. Initially, we set the the lump-sum subsidy to zero. 
+
+In code:
+
+<code>minimize(simulation, [0,0,0,0], args=(theta,c,[P_star,s_star,V_star,lamb_star,chi_star],0,params), method='Nelder-Mead')</code>
+
+We find that a lump-sum subsidy <code>[698.66,932.75,937.54,1070.99]</code> corresponding to **30-35%** (depending on type) of producer surplus (i.e., revenue) maximizes welfare. Second, we search for the welfare-maximizing subsidy $t$ at the optimal amount of the lump-sum subsidy.
+
+In code:
+
+<code>minimize(simulation, [0,0,0,0], args=(theta,c,[P_star,s_star,V_star,lamb_star,chi_star],[698.66,932.75,937.54,1070.99],params), method='Nelder-Mead')</code>
+
+We find that a per-day subsidy <code>[698.66,932.75,937.54,1070.99]</code> maximizes welfare. From a welfare perspective, Rental rates are ** **% too high as neither consumers nor hosts fully internalize. Expressed per booking, the ... . 
