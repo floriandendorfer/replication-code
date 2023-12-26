@@ -409,14 +409,14 @@ $$ \sqrt{\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
 
 | parameter | estimate | standard error |
 | ---: | :---------: | :------: |
-  | $\bar \kappa_1$ | ... | (0.0000) |
-  | $\bar \kappa_2$ | ... | (0.0000) |
-  | $\bar \kappa_3$ | ... | (0.0000) |
-  | $\bar \kappa_4$ | ... | (0.0000) |
-  | $\bar \phi_1$ | ... | (0.0000) |
-  | $\bar \phi_2$ | ... | (0.0000) |
-  | $\bar \phi_3$ | ... | (0.0000) |
-  | $\bar \phi_4$ | ... | (0.0000) |
+  | $\bar \kappa_1$ | 52183 | (0.0000) |
+  | $\bar \kappa_2$ | 92888 | (0.0000) |
+  | $\bar \kappa_3$ | 157812 | (0.0000) |
+  | $\bar \kappa_4$ | 265529 | (0.0000) |
+  | $\bar \phi_1$ | 2541 | (0.0000) |
+  | $\bar \phi_2$ | 3565 | (0.0000) |
+  | $\bar \phi_3$ | 4569 | (0.0000) |
+  | $\bar \phi_4$ | 5777 | (0.0000) |
  
 ## Counterfactual Analysis
 
