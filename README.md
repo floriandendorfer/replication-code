@@ -407,11 +407,11 @@ $$ \sqrt{\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
 
   ### Estimation Results
 
-| parameter | estimate | standard error |
-| ---: | :---------: | :------: |
+| parameter | estimate | standard error | parameter | estimate | standard error |
+| ---: | :---------: | :------: | ---: | :---------: | :------: |
   | $\ln(\bar \kappa_1)$ | 10.8625 | (0.0000) | $\bar \kappa_1$ | 52183 | (0.0000) |
   | $\ln(\bar \kappa_2)$ | 11.4392 | (0.0000) | $\bar \kappa_2$ | 92888 | (0.0000) |
-  | $\ln(\bar \kappa_3v$ | 11.9692 | (0.0000) | $\bar \kappa_3$ | 157812 | (0.0000) |
+  | $\ln(\bar \kappa_3)$ | 11.9692 | (0.0000) | $\bar \kappa_3$ | 157812 | (0.0000) |
   | $\ln(\bar \kappa_4)$ | 12.4895 | (0.0000) | $\bar \kappa_4$ | 265529 | (0.0000) |
   | $\ln(\bar \phi_1)$ | 7.84021 | (0.0000) | $\bar \phi_1$ | 2541 | (0.0000) |
   | $\ln(\bar \phi_2)$ | 8.17893 | (0.0000) | $\bar \phi_2$ | 3565 | (0.0000) |
