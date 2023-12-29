@@ -480,16 +480,16 @@ In code:
 
 <code>minimize(simulation, [0,0,0,0], args=(theta,c,[P_star,s_star,V_star,lamb_star,chi_star],0,params), method='Nelder-Mead')</code>
 
-We find that a lump-sum subsidycorresponding to **30-35%** (depending on type) of producer surplus (i.e., revenue) maximizes welfare. Second, we search for the welfare-maximizing subsidy $t$ at the optimal amount of the lump-sum subsidy.
+We find that a lump-sum subsidy corresponding to more or less **50%** of producer surplus (i.e., revenue) maximizes welfare. Second, we search for the welfare-maximizing subsidy $t$ at the optimal amount of the lump-sum subsidy.
 
 | type | subsidy (in $) | subsidy (in %) | $\Delta#properties |
 | ---: | :---------: | :------: | ---: |
-| 1 | 893.39 |  | |
-| 2 | 1299.58 | | |
-| 3 | 1823.79 | | |
-| 4 | 2340.10 | | |
+| 1 | 893.39 | 48.17% | 241.65 |
+| 2 | 1299.58 | 49.41% | 183.18 |
+| 3 | 1823.79 | 53.42% | 146.30 |
+| 4 | 2340.10 | 54.06% | 159.86 |
 
-Additional entry welfare
+The wider variety of booking options raises social welfare by a bit below $20,000 per day. Each consumer is better off by about $4 per day. Each host gains about $16 per day. 
 
 In code:
 
