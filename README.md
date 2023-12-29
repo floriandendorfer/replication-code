@@ -474,13 +474,22 @@ $$ \text{Welfare} = \sum_{\tau=1}^{130} \delta^{\tau-1}(\text{Consumer surplus} 
 
   ## Welfare Maximization
 
-First, we maximize social welfare over $Sub_j, j=1,2,3,4,$ by repeatedly simulating the model forward. Initially, we set the the lump-sum subsidy to zero. 
+First, we maximize social welfare over $Sub_j, j=1,2,3,4$ by repeatedly simulating the model forward. Initially, we set the the lump-sum subsidy to zero. 
 
 In code:
 
 <code>minimize(simulation, [0,0,0,0], args=(theta,c,[P_star,s_star,V_star,lamb_star,chi_star],0,params), method='Nelder-Mead')</code>
 
-We find that a lump-sum subsidy <code>[698.66,932.75,937.54,1070.99]</code> corresponding to **30-35%** (depending on type) of producer surplus (i.e., revenue) maximizes welfare. Second, we search for the welfare-maximizing subsidy $t$ at the optimal amount of the lump-sum subsidy.
+We find that a lump-sum subsidycorresponding to **30-35%** (depending on type) of producer surplus (i.e., revenue) maximizes welfare. Second, we search for the welfare-maximizing subsidy $t$ at the optimal amount of the lump-sum subsidy.
+
+| type | subsidy (in $) | subsidy (in %) | $\Delta#properties |
+| ---: | :---------: | :------: | ---: |
+| 1 | 893.39 |  | |
+| 2 | 1299.58 | | |
+| 3 | 1823.79 | | |
+| 4 | 2340.10 | | |
+
+Additional entry welfare
 
 In code:
 
