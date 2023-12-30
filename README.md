@@ -452,7 +452,7 @@ $$ \text{Profit (inside)} = \sum_{x}s(x)\left(30q(x)P(x) + Sub_j - \left((1-\chi
 
 In code:
 
-<code>s_new @ (np.array([np.diagonal(30 * q_s(P_new,P_new,s_new,theta,t,params)*P_new)]).T + Sub - (np.array([np.repeat(c[4:],231)]).T - np.array([chi_new]).T * (delta * eV_in + np.array([np.repeat(c[4:],231)]).T)))</code>
+<code>s_new @ ((1+f)*np.array([np.diagonal(30 * q_s(P_new,P_new,s_new,theta,t,params)*P_new)]).T + Sub - (np.array([np.repeat(c[4:],231)]).T - np.array([chi_new]).T * (delta * eV_in + np.array([np.repeat(c[4:],231)]).T)))</code>
 
 Hosts who are currently outside the market do not earn revenue but pay the entry cost if they decide to enter that month.
 
@@ -482,12 +482,12 @@ In code:
 
 We find that a lump-sum subsidy corresponding to more or less **50%** of producer surplus (i.e., revenue) maximizes welfare. Second, we search for the welfare-maximizing subsidy $t$ at the optimal amount of the lump-sum subsidy.
 
-| type | subsidy (in $) | subsidy (in %) | $\Delta#properties |
-| ---: | :---------: | :------: | ---: |
-| 1 | 893.39 | 48.17% | 241.65 |
-| 2 | 1299.58 | 49.41% | 183.18 |
-| 3 | 1823.79 | 53.42% | 146.30 |
-| 4 | 2340.10 | 54.06% | 159.86 |
+| type | $Sub^*$ in $ | $Sub^*$ in % of revenue | $\Delta$ # properties |
+| :---: | :---------: | :------: | ---: |
+| 1 | $893.39 | 48.17% | $241.65 |
+| 2 | $1299.58 | 49.41% | $183.18 |
+| 3 | $1823.79 | 53.42% | $146.30 |
+| 4 | $2340.10 | 54.06% | $159.86 |
 
 The wider variety of booking options raises social welfare by a bit below $20,000 per day. Each consumer is better off by about $4 per day. Each host gains about $16 per day. 
 
@@ -495,4 +495,13 @@ In code:
 
 <code>minimize(simulation, [0,0,0,0], args=(theta,c,[P_star,s_star,V_star,lamb_star,chi_star],[698.66,932.75,937.54,1070.99],params), method='Nelder-Mead')</code>
 
-We find that a per-day subsidy <code>[698.66,932.75,937.54,1070.99]</code> maximizes welfare. From a welfare perspective, Rental rates are ** **% too high as neither consumers nor hosts fully internalize. Expressed per booking, the ... . 
+We find that a per-day subsidy corresponding to about **50-60%** of host revenue (depending on type) maximizes welfare. From a welfare perspective, rental rates should be **11-13%** lower. 
+
+| type | $t^\ast$ | $t^\ast$ in % of revenue | price (in $) | $\Delta$ price in $ | $\Delta$ price in % | pass-through rate | $\Delta$ demand | $\Delta$ # properties |
+| :---: | :---------: | :---------: | :------: | :---: | :---: | :---: | :---: |
+| 1 | $114.80 | 47.79% | $198.45 | -$30.55 | -13.34% | 26.61% | 10.98% | 252.71 | 
+| 2 | $162.32 | 54.76% | $224.29 | -$32.05 | -12.50% | 19.75% | 11.02% | 227.79 |
+| 3 | $213.02 | 59.19% | $256.34 | -$32.10 | -11.13% | 15.07% | 10.36% | 194.39 |
+| 4 | $277.37 | 64.45% | $283.91 | -$34.37 | -10.80% | 12.39% | 10.63% | 205.55 |
+
+raises social welfare by $38,361 per day. Each consumer is better off by about $10 per day. Each host gains about $35 per day.
