@@ -4,7 +4,7 @@
 
 |  | name |            |  value |
   | ---: | ---: | :---------: | :------: |
-  | demand (<code>theta<\code>) | price | $\alpha$ | -0.0068 |
+  | demand (<code>theta</code>) | price | $\alpha$ | -0.0068 |
   || type 1 | $\beta_1$ | -12.5906 |
   || type 2 | $\beta_2$ | -12.1095 |
   || type 3 | $\beta_3$ | -11.7011 |
@@ -12,7 +12,7 @@
   || quality | $\gamma$ | 4.8860 |
   || prior | $a$ | 12.2260 |
   ||  | $b$ | 2.1134 |
-  | supply (<code>c<\code>) | mean entry cost (type 1) | $\bar \kappa_1$ | 55,496 |
+  | supply (<code>c</code>) | mean entry cost (type 1) | $\bar \kappa_1$ | 55,496 |
   |  | mean entry cost (type 2) | $\bar \kappa_2$ | 96,673 |
   |  | mean entry cost (type 3) | $\bar \kappa_3$ | 161,946 |
   |  | mean entry cost (type 4) | $\bar \kappa_4$ | 270,233 |
@@ -20,7 +20,7 @@
   | | mean fixed cost (type 2) | $\bar \phi_2$ | 3,577 |
   || mean fixed cost (type 3) | $\bar \phi_3$ | 4,562 |
   || mean fixed cost (type 4) | $\bar \phi_4$ | 5,751 |
-  | other (<code>params<\code>) | discount factor | $\delta$ | 0.995 |
+  | other (<code>params</code>) | discount factor | $\delta$ | 0.995 |
   |  | revenue fee | $f$ | 0.142 |
   |  | review prob. | $\upsilon_r$ | 0.7041 |
   |  | max. no. of reviews | $\bar N$ | 20 |
@@ -29,7 +29,7 @@
 
 ## Demand
 
-Function <code>U_s(p,theta,t,params)<\code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,j)$, where $j = ${1,2,3,4} is the property's (observed) **type**.
+Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,j)$, where $j = ${1,2,3,4} is the property's (observed) **type**.
 
   $$U_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \beta(x) + \alpha ((1+f)p- t) + \epsilon = u(p,x) + \epsilon$$
   
@@ -39,19 +39,19 @@ The **unobserved quality** $\omega$ is unknown to guests and hosts. However, $\o
 
 $\epsilon$ is iid T1EV extreme value distributed.
 
-$\mathbf{s}$ is the **state distribution**. $s(x)$ pins down the number of properties in each state. Function <code>ccp_s(p,P,s,theta,t,params)<\code> characterizes the probability that a guest ***intends*** to book the property at rate $p$ provided that all remaining hosts set their prices according to $P(x)$.
+$\mathbf{s}$ is the **state distribution**. $s(x)$ pins down the number of properties in each state. Function <code>ccp_s(p,P,s,theta,t,params)</code> characterizes the probability that a guest ***intends*** to book the property at rate $p$ provided that all remaining hosts set their prices according to $P(x)$.
 
-$$ccp(p,x) = \frac{\exp(u(p,x))}{1+\sum_xs(x)\exp(u(P(x),x))}$$ For later use, we also work out the first-order (<code>dccp_s(p,P,s,theta,t,params)<\code>) and second-order (<code>d2ccp_s(p,P,s,theta,t,params)<\code>) derivatives of $ccp(p,x)$ with respect to $p$.
+$$ccp(p,x) = \frac{\exp(u(p,x))}{1+\sum_xs(x)\exp(u(P(x),x))}$$ For later use, we also work out the first-order (<code>dccp_s(p,P,s,theta,t,params)</code>) and second-order (<code>d2ccp_s(p,P,s,theta,t,params)</code>) derivatives of $ccp(p,x)$ with respect to $p$.
 
 $$ccp'(p,x) = ccp(p,x)(1 - ccp(p,x))\alpha(1+f) $$
 
 $$ccp''(p,x) = ccp(p,x)(ccp(p,x)^2 - ccp(p,x))\alpha^2(1+f)^2 $$
 
-The number of arriving guests is $Poisson(\mu)$ distributed. Function <code>q_s(p,P,s,theta,t,params)<\code> characterizes the probability that at least one of these consumers books the property, again assuming its rental rate is $p$ while everyone else follows the pricing rule $P(x)$.
+The number of arriving guests is $Poisson(\mu)$ distributed. Function <code>q_s(p,P,s,theta,t,params)</code> characterizes the probability that at least one of these consumers books the property, again assuming its rental rate is $p$ while everyone else follows the pricing rule $P(x)$.
 
 $$q(p,x) = 1 - \exp(-\mu \cdot ccp(p,x))$$
 
-Function <code>dq_s(p,P,s,theta,t,params)<\code> and function <code>d2q_s(p,P,s,theta,t,params)<\code> describe the first- and second-order derivatives of $q(p,x)$ with respect to $p$.
+Function <code>dq_s(p,P,s,theta,t,params)</code> and function <code>d2q_s(p,P,s,theta,t,params)</code> describe the first- and second-order derivatives of $q(p,x)$ with respect to $p$.
 
   $$q'(p,x) = \mu\exp(-\mu \cdot ccp(p,x))ccp'(p,x)$$
   
@@ -67,7 +67,7 @@ $$\rho^g(p,x) = \upsilon_rq(p,x)\frac{a+K(x)}{a+b+N(x)}$$
 
 $$\rho^b(p,x) = \upsilon_rq(p,x)\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$$
 
-Accordingly, the probability $\rho^0(p,x)$ of getting no review is $1-\rho^g(p,x)-\rho^b(p,x)$. States are arranged in increasing order of type $j$ and, for a given type, in increasing order of $N$ and, for a given $N$, in increasing order of $K$. $S$ is the **state space**. Note: $S$ is in <code>params<\code>.
+Accordingly, the probability $\rho^0(p,x)$ of getting no review is $1-\rho^g(p,x)-\rho^b(p,x)$. States are arranged in increasing order of type $j$ and, for a given type, in increasing order of $N$ and, for a given $N$, in increasing order of $K$. $S$ is the **state space**. Note: $S$ is in <code>params</code>.
 
 $$ S = \begin{bmatrix} 
 1 & 0 & 0 & 0 & 0 & 0 \\ 
@@ -85,7 +85,7 @@ $$ S = \begin{bmatrix}
 20 & 20 & 0 & 0 & 0 & 1
 \end{bmatrix} $$
 
-Function  <code>dT_s(dq,theta,params)<\code> stores the **transition matrix** $\mathbf{T}(p)$. It turns out that the way states are ordered the number of zeros between $\rho^0(p,x)$ and $\rho^g(p,x)$ is $N$.  
+Function  <code>dT_s(dq,theta,params)</code> stores the **transition matrix** $\mathbf{T}(p)$. It turns out that the way states are ordered the number of zeros between $\rho^0(p,x)$ and $\rho^g(p,x)$ is $N$.  
 
 |  | $(0,0,1)$ | $(0,1,1)$ | $(1,1,1)$ | $(0,2,1)$ | $(1,2,1)$ | $(2,2,1)$ | ... | $(20,20,4)$ | 
 | :---: | :---: | :---------: | :------: | :------: | :------: | :------: | :------: | :------: |
@@ -98,7 +98,7 @@ Function  <code>dT_s(dq,theta,params)<\code> stores the **transition matrix** $\
 | ... | ... | ... | ... | ... | ... | ... | ... | 0 |
 | $(20,20,4)$ | 0 | 0 | 0 | 0 | 0 | 0 | ... | 1 |
 
-Function <code>dT_s(q,theta,params)<\code> and <code>d2T_s(q,theta,params)<\code> store the first-order and second-order derivatives of $\mathbf{T}(p)$ respectively. Notice:
+Function <code>dT_s(q,theta,params)</code> and <code>d2T_s(q,theta,params)</code> store the first-order and second-order derivatives of $\mathbf{T}(p)$ respectively. Notice:
 
 $$\rho^{0\prime}(p,x) = -\upsilon_rq'(p,x)$$
 
@@ -132,7 +132,7 @@ The expected, total operating costs of properties in a certain state in a given 
 
 $$ \text{Total operating costs} = \sum_{x}s(x)\left((1-\chi(p,x))\bar \phi(x) - \chi(p,x)\delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]\right) $$ 
 
-<code>F_s(p,P,s,q,chi,lamb,theta,t,params)<\code> contains the **expanded transition matrix** $\mathbf{F}(p)$. It accommodate transitions from and to inactivity by expanding $\mathbf{T}(p)$ by an additional state.
+<code>F_s(p,P,s,q,chi,lamb,theta,t,params)</code> contains the **expanded transition matrix** $\mathbf{F}(p)$. It accommodate transitions from and to inactivity by expanding $\mathbf{T}(p)$ by an additional state.
 
 |  | $(0,0,1)$ | $(0,1,1)$ | $(1,1,1)$ | $(0,2,1)$ | $(1,2,1)$ | $(2,2,1)$ | ... | $(0,0,2)$ | ... | $(20,20,4)$ | $(20,20,4)$ |  
 | :---: | :---: | :---------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: |
@@ -153,7 +153,7 @@ $$ \text{Total operating costs} = \sum_{x}s(x)\left((1-\chi(p,x))\bar \phi(x) - 
 
 ## Solving The Model
 
-<code>solver(theta,c,guess,t,tol,params)<\code> finds an oblivious equilibrium of the model. <code>guess<\code> contains starting values for the prices $\mathbf{\hat P}$, the state distribution $\mathbf{\hat s}$ and the value function $\mathbf{\hat V}$.
+<code>solver(theta,c,guess,t,tol,params)</code> finds an oblivious equilibrium of the model. <code>guess</code> contains starting values for the prices $\mathbf{\hat P}$, the state distribution $\mathbf{\hat s}$ and the value function $\mathbf{\hat V}$.
 
   ### Price Update
 
@@ -167,7 +167,7 @@ $$p = p_0 + \frac{V'(p_0,x)}{V''(p_0,x)}$$
 
 until $|p-p_0| \leq 0.1$. 
 
-<code>dV_s(p,P,s,V,theta,\phi_bar,t,params)<\code> and <code>d2V_s(p,P,s,V,theta,\phi_bar,t,params)<\code> store the first- and second-order derivative of $V(p,x)$ with respect to p respectively.
+<code>dV_s(p,P,s,V,theta,\phi_bar,t,params)</code> and <code>d2V_s(p,P,s,V,theta,\phi_bar,t,params)</code> store the first- and second-order derivative of $V(p,x)$ with respect to p respectively.
 
 $$ V'(p,x) = 30(q(p,x) + q'(p,x)p) + (1 - \chi(p,x))\delta \mathbf{T}'(p)\mathbf{\hat V} $$
 
@@ -179,7 +179,7 @@ In code:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P1 = np.where(np.isnan(P1) == True,P_old,np.where((P1<0),0,np.where((P1>1000),1000,P1)))
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dP = np.max(np.abs(P1 - P0))
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P0 = P1<\code>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P0 = P1</code>
 
   ### Value Function Update
 
@@ -192,7 +192,7 @@ In code:
 <code>q_new = q_s(P_new,P_new,s_old,theta,t,params)
 T = T_s(P_new,P_new,s_old,q_new,theta,t,params)
 eV = T @ V_old
-V_new = 30 * (q_new * P_new.T) + delta * eV - (1 - np.exp(-delta * eV/phi_bar)) * phi_bar<\code>
+V_new = 30 * (q_new * P_new.T) + delta * eV - (1 - np.exp(-delta * eV/phi_bar)) * phi_bar</code>
 
   ### Entry & Exit Rate Updates
 
@@ -203,7 +203,7 @@ In code:
 <code>eV = T @ V_new
 chi = np.exp(-delta * eV/phi_bar).flatten()
 lamb = (1-np.exp(-delta * V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
-F = F_s(q_new,chi,lamb,theta,params)<\code>
+F = F_s(q_new,chi,lamb,theta,params)</code>
 
   ### State Distribution Update
 
@@ -216,7 +216,7 @@ In code:
 <code>while np.max(np.abs(s_new - s_old))>10e-3:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s_old = s_new
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s_new = (np.array([np.append(s_old,np.array([J/4-s_old[0,:231].sum(),J/4-s_old[0,231:462].sum(),J/4-s_old[0,462:693].sum(),J/4-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s_old[0,693:].sum()]))])@ F)[:1,:-4]<\code>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s_old[0,693:].sum()]))])@ F)[:1,:-4]</code>
 
   ### Solution
 
@@ -224,7 +224,7 @@ We update $\mathbf{\hat P} = \mathbf{P}$, $\mathbf{\hat s}=\mathbf{s}$ and $\mat
 
 $$|\mathbf{V}-\mathbf{\hat V}|\leq \text{tol} \ \text{ and } \ |\mathbf{s}-\mathbf{\hat s}|\leq \text{tol} \ \text{ and } \ |\mathbf{V}-\mathbf{\hat V}|\leq \text{tol}.$$
 
-<code>tol<\code> is set to 0.000001. To save time, we solve the host's pricing problem only if $\mathbf{V}$ changes substantially, i.e., by more than 10\% since the last time we solved for $p$.
+<code>tol</code> is set to 0.000001. To save time, we solve the host's pricing problem only if $\mathbf{V}$ changes substantially, i.e., by more than 10\% since the last time we solved for $p$.
 
 Our initial guess of $P(x)$ is \$300 for all $x$. The initial guess of the state distribution is that half of the properties are in the market, while half are not. Those that are in the market are uniformely distributed across states. The initial guess for the value function is the PDV of the revenue earned by the host if they as well as all competitors set a price of \$300.
 
@@ -234,14 +234,14 @@ In code:
 s_init = np.array([[J/(2 * len(S))] * len(S)])
 V_init = (30 * q_s(300,P_init,s_init,theta,0,params) * P_init.T)/(1-delta)
 s_star = np.where(s_star<0,0,s_star) 
-<\code>
+</code>
 
 The solution to the model is $\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast, \mathbf{\chi}^\ast, \mathbf{\lambda}^\ast$. We use the solution to compute $q({P}^*(x),x)$.
 
 In code:
 
 <code>V_star,s_star,P_star,chi_star,lamb_star = solver(theta,c,[P_init,s_init,V_init],tol,params)
-<\code>
+</code>
 
 <img src="graphs/P_star.png" alt="states" width="300"/> | <img src="graphs/s_star.png" alt="states" width="300"/>
 
@@ -255,32 +255,32 @@ In code:
 
 
 <code>for t in range(1,13 * 4+1):
-<\code>
+</code>
 <code>   if (t==1): 
-<\code>
+</code>
 <code>      index = np.repeat(range(0,924),states
-<\code>
+</code>
 <code>            p = (P_star.T + np.random.normal(loc = 0, scale = 25.0, size = (P_star.T).shape))
-<\code>
+</code>
 <code>            q = q_s(p,p,s_star,theta,0,params)
-<\code>
+</code>
 <code>            data = np.hstack((np.zeros((len(index),1)) + t, S[index,:], p[index,:], q[index,:]+ np.random.normal(loc = 0, scale = 0.15, size = q[index,:].shape)))
-<\code>
+</code>
 <code>    else: 
-<\code>
+</code>
 <code>      p = (P_star.T + np.random.normal(loc = 0, scale = 25.0, size = (P_star.T).shape))
-<\code>
+</code>
 <code>      q = q_s(p,p,s_star,theta,0,params) 
-<\code>
+</code>
 <code>      data = np.vstack((data, np.hstack((np.zeros((len(index),1)) + t, S[index,:], p[index,:], q[index,:] + np.random.normal(loc = 0, scale = 0.15, size = q[index,:].shape))))) 
-<\code>
+</code>
 <code>data = pd.DataFrame(data,columns=['period','K','N','type 1','type 2','type 3','type 4','p','q'])
 data.to_pickle('data.pkl')
-<\code>
+</code>
 
 ## Demand Estimation
 
-We estimate the demand parameters using GMM. <code>xi(omicron,adata,params)<\code> stores the **structural error term** $\xi_{it}$ of property $i$ at time $\tau$.
+We estimate the demand parameters using GMM. <code>xi(omicron,adata,params)</code> stores the **structural error term** $\xi_{it}$ of property $i$ at time $\tau$.
 
 $$\xi_{i\tau}(\omicron) = \ln(ccp_{i\tau}) - \ln(ccp_{0\tau}) - u_{i\tau}(\omicron)$$
 
@@ -300,7 +300,7 @@ $$ (a+b) = \exp(\iota) $$
 
   ### Objective Function
 
-The **objective function** is stored in <code>O(omicron,adata,W,params)<\code>. Let $I$ denote the total number of observations of the dataset.
+The **objective function** is stored in <code>O(omicron,adata,W,params)</code>. Let $I$ denote the total number of observations of the dataset.
 
 $$\left(\frac{1}{I}\mathbf{Z}^T\boldsymbol{\xi}(\omicron)\right)^TW\left(\frac{1}{I}\mathbf{Z}^T\boldsymbol{\xi}(\omicron)\right)$$
 
@@ -310,7 +310,7 @@ We minimize $O(\omicron)$ using the analytical gradient.
 
 $$ \nabla O(\omicron) = 2\left(-\frac{1}{I}\mathbf{Z}^T\nabla u(\omicron)\right)^T W\left(\frac{1}{I}\mathbf{Z}^T\boldsymbol{\xi}(\omicron)\right) $$
 
-<code>dO(omicron,adata,W,params)<\code> contains $\boldsymbol{\xi}'(\omicron)$. It requires $\nabla u(\omicron)$ (<code>dU(omicron,adata,params)<\code>).
+<code>dO(omicron,adata,W,params)</code> contains $\boldsymbol{\xi}'(\omicron)$. It requires $\nabla u(\omicron)$ (<code>dU(omicron,adata,params)</code>).
 
   ### Minimization
 
@@ -322,7 +322,7 @@ In code:
 
 <code>start_values = [0,0,0,-10,-10,-10,-10,0]
 W1 = np.linalg.inv( ((Z(start_values,data,params)).T @ (Z(start_values,data,params)))/len(data))
-res_demand = minimize(O, start_values, args=(data,W1,params), method='BFGS',jac=dO)<\code>
+res_demand = minimize(O, start_values, args=(data,W1,params), method='BFGS',jac=dO)</code>
 
 In the second step, we choose the efficient weighting matrix. Let $\hat \omicron$ be our estimation result from the first stage.
 
@@ -333,7 +333,7 @@ In code:
 <code>xi_hat = xi(res_demand.x,data,params)
 W2 = np.linalg.inv( ((xi_hat * Z(res_demand.x,data,params)).T @ (xi_hat * Z(res_demand.x,data,params)))/len(data) )
 res_demand = minimize(O, start_values, args=(data,W2,params), method='BFGS',jac=dO)
-<\code>
+</code>
 
   ### Standard Errors
 
@@ -346,7 +346,7 @@ In code:
 <code>G_bar = ( (Z(res_demand.x,data,params).T @ (-dU(res_demand.x,data,params))) )/len(data)
 W2 = np.linalg.inv( ((xi_hat * Z(res_demand.x,data,params)).T @ (xi_hat * Z(res_demand.x,data,params)))/len(data) )
 S_hat = np.diag(np.linalg.inv((G_bar.T @ W2) @ G_bar))**.5/len(data)
-<\code>
+</code>
 
   ### Estimation Results
 
@@ -369,7 +369,7 @@ In code:
 (1-expit(res_demand.x[0]))*np.exp(res_demand.x[1]),
 res_demand.x[2],
 res_demand.x[3:7],
-res_demand.x[7]]<\code>
+res_demand.x[7]]</code>
 
 Our estimates of $\phi$ and $\iota$ correspond to $a=12.3102$ and $b=1.8890$. Notice that our estimates are slightly biased as the demand inversion is non-linear and the measurement error is not fully captured by the structural error term.
 
@@ -381,9 +381,9 @@ We estimate $\mathbf{c} = (\phi_1,\phi_2\phi_3,\phi_4,\kappa_1,\kappa_2\kappa_3,
 
 In code:
 
-<code>s_d = np.array([(data.groupby(['x'])['period'].count()/data.groupby(['period']).mean().shape[0]).reindex(np.arange(0,len(S)), fill_value=0)])<\code>
+<code>s_d = np.array([(data.groupby(['x'])['period'].count()/data.groupby(['period']).mean().shape[0]).reindex(np.arange(0,len(S)), fill_value=0)])</code>
 
-<code>l(k,theta,guess,tol,s_d,params)<\code> stores the **log-likelihood** function (times -1). 
+<code>l(k,theta,guess,tol,s_d,params)</code> stores the **log-likelihood** function (times -1). 
 
 $$ \text{Log-likelihood} = \sum_{x} s^d(x) \ln \left(s^\ast(x|\mathbf{c}) \right) + \sum_j\left(\frac{J}{4}-\sum_{x}s_j^d(x)\right)\ln\left(\frac{J}{4}-\sum_{x}s_j^\ast(x|\mathbf{c})\right) $$
     
@@ -391,22 +391,22 @@ We exclude states for which we do not observe any observations in the mock data 
 
   ### Maximization
 
-<code>tol<\code> is set to 1. Each candidate for $\mathbf{c}$ requires us to solve the model. We use the same <code>guess<\code> as in the 'Solving the Model' section to initiate the solution algorithm. After that, we use the model solution for the previous set of candidates as the starting values to find the model solution for the next set of candidates. Furthermore, we use the demand estimates $\hat \theta$. To facilitate the search of a maximum, we search over $\ln(\mathbf{c})$, thereby excluding negative values. <code>k0<\code> contains the starting values.
+<code>tol</code> is set to 1. Each candidate for $\mathbf{c}$ requires us to solve the model. We use the same <code>guess</code> as in the 'Solving the Model' section to initiate the solution algorithm. After that, we use the model solution for the previous set of candidates as the starting values to find the model solution for the next set of candidates. Furthermore, we use the demand estimates $\hat \theta$. To facilitate the search of a maximum, we search over $\ln(\mathbf{c})$, thereby excluding negative values. <code>k0</code> contains the starting values.
 
 In code:
 
 <code>k0 = np.log([100000,100000,100000,100000,3000,3000,3000,3000])
 res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params), method='BFGS')
-<\code>
+</code>
 
   ### Standard Errors
 
-We use the the numerical approximation of the inverse Hessian $(H(\mathbf{\hat c}))^{-1}$ (<code>res_supply.hess_inv<\code>) to compute the standard errors of the estimates.
+We use the the numerical approximation of the inverse Hessian $(H(\mathbf{\hat c}))^{-1}$ (<code>res_supply.hess_inv</code>) to compute the standard errors of the estimates.
 
 $$ \sqrt{\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
 
 <code>(np.diag(res_supply.hess_inv   )/len(data))**0.5
-<\code>
+</code>
 
 We use the delta method to compute the standard errors of $c$.
 
@@ -415,7 +415,7 @@ $$ \sqrt{\left(\frac{\partial f(\mathbf{c})}{\partial \mathbf{c}}\right)^2\frac{
 In code:
 
 <code>((np.exp(res_supply.x) * np.diag(res_supply.hess_inv) * np.exp(res_supply.x))/len(data))**0.5
-<\code>
+</code>
 
   ### Estimation Results
 
@@ -432,7 +432,7 @@ In code:
  
 ## Counterfactual Analysis
 
-We simulate the model forward for 10 years - starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) - (1) if every $j$ type host in the market receives a monthly lump-sum subsidy of $ $Sub_j$ (<code>Sub<\code>) and/or (2) if consumers receive a $ $t$ (<code>t<\code>) subsidy for each day they book a property that has not been reviewed before. The corresponding function is stored in <code>simulation1(theta,c,sol,t,Sub,capacity,It,params)<\code>.
+We simulate the model forward for 10 years - starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) - (1) if every $j$ type host in the market receives a monthly lump-sum subsidy of $ $Sub_j$ (<code>Sub</code>) and/or (2) if consumers receive a $ $t$ (<code>t</code>) subsidy for each day they book a property that has not been reviewed before. The corresponding function is stored in <code>simulation1(theta,c,sol,t,Sub,capacity,It,params)</code>.
 
 We calculate the sum of host profits, the consumer surplus and the cost of the subsidy per month.
 
@@ -444,7 +444,7 @@ $$ \text{Subsidy cost} = \sum_jSub_j\sum_xs(x) + 30t\sum_xs(x)q(x) $$
 
 In code:
 
-<code> ((30 * s_new * q_new.T) @ t) + (s_new @ Sub)<\code>
+<code> ((30 * s_new * q_new.T) @ t) + (s_new @ Sub)</code>
 
   ### Consumer Surplus
 
@@ -454,7 +454,7 @@ $$ \text{Consumer surplus} = -\frac{30}{\alpha}\sum_x q(x)\ln\left(1 + \sum_{x} 
 
 In code:
 
-<code>-s_new @ q_new) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha<\code>
+<code>-s_new @ q_new) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha</code>
 
 Note that our consumer surplus measure likely understates the true consumer surplus.
 
@@ -466,19 +466,19 @@ $$ \text{Profit (inside)} = \sum_{x}s(x)\left(30q(x)P(x) + Sub_j - \left((1-\chi
 
 In code:
 
-<code>s_new @ ((1+f)*np.array([np.diagonal(30 * q_s(P_new,P_new,s_new,theta,t,params)*P_new)]).T + Sub - (np.array([np.repeat(c[4:],231)]).T - np.array([chi_new]).T * (delta * eV_in + np.array([np.repeat(c[4:],231)]).T)))<\code>
+<code>s_new @ ((1+f)*np.array([np.diagonal(30 * q_s(P_new,P_new,s_new,theta,t,params)*P_new)]).T + Sub - (np.array([np.repeat(c[4:],231)]).T - np.array([chi_new]).T * (delta * eV_in + np.array([np.repeat(c[4:],231)]).T)))</code>
 
 Hosts who are currently outside the market do not earn revenue but pay the entry cost if they decide to enter that month.
 
 $$ \text{Profit (outside)} = -\sum_{j} (J/4 - \sum_{x}s_j(x))\left(\lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
 
-<code>-(J/4-s_new[0,:231].sum()) * (c[0] - (1-lamb_new[0]) * (delta * eV_out[0] + c[0]))<\code>
+<code>-(J/4-s_new[0,:231].sum()) * (c[0] - (1-lamb_new[0]) * (delta * eV_out[0] + c[0]))</code>
 
-<code>-(J/4-s_new[0,231:462].sum()) * (c[1] - (1-lamb_new[231])*(delta * eV_out[1] + c[1]))<\code>
+<code>-(J/4-s_new[0,231:462].sum()) * (c[1] - (1-lamb_new[231])*(delta * eV_out[1] + c[1]))</code>
 
-<code>-(J/4-s_new[0,462:693].sum()) * (c[2] - (1-lamb_new[462])*(delta * eV_out[2] + c[2]))<\code>
+<code>-(J/4-s_new[0,462:693].sum()) * (c[2] - (1-lamb_new[462])*(delta * eV_out[2] + c[2]))</code>
 
-<code>-(J/4-s_new[0,693:].sum()) * (c[3] - (1-lamb_new[693])*(delta * eV_out[3] + c[3]))<\code>
+<code>-(J/4-s_new[0,693:].sum()) * (c[3] - (1-lamb_new[693])*(delta * eV_out[3] + c[3]))</code>
 
   ### Social Welfare
 
@@ -488,11 +488,11 @@ $$ \text{Welfare} = \sum_{\tau=1}^{130} \delta^{\tau-1}(\text{Consumer surplus} 
 
   ## Welfare Maximization
 
-For **counterfactual 1**, we maximize social welfare over $Sub_j, j=1,2,3,4$ by repeatedly simulating the model forward. The function that maximizes welfare over $Sub_j$ is <code>Sub_prim(Sub,theta,c,sol,capacity,It,params)<\code>. Initially, we set the the lump-sum subsidy to zero. 
+For **counterfactual 1**, we maximize social welfare over $Sub_j, j=1,2,3,4$ by repeatedly simulating the model forward. The function that maximizes welfare over $Sub_j$ is <code>Sub_prim(Sub,theta,c,sol,capacity,It,params)</code>. Initially, we set the the lump-sum subsidy to zero. 
 
 In code:
 
-<code>minimize(Sub_prim, [0,0,0,0], args=(theta_hat,c_hat,[P_star,s_star,V_star],'constrained',130,params), method='BFGS')<\code>
+<code>minimize(Sub_prim, [0,0,0,0], args=(theta_hat,c_hat,[P_star,s_star,V_star],'constrained',130,params), method='BFGS')</code>
 
 We find that a lump-sum subsidy corresponding to more or less **20-30%** (depending on property type) of producer surplus (i.e., revenue) maximizes welfare. 
 
@@ -505,13 +505,13 @@ We find that a lump-sum subsidy corresponding to more or less **20-30%** (depend
 
 Subsidizing market entry raises social welfare by a bit below $2,000 per day. Each consumer is better off by about $0.53 per day. Each host gains about $8.38 per day. 
 
-For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ **if entry/exit is efficient** (lest we conflate two distinct effects of $t$, on consumer booking decisions and hosts' decisions to enter or exit the market). As hosts raise their prices in response to $t$ being paid to consumers, they will enter the market more frequently and exit the market less often. We adjust the lump-sum subsidy downward to keep the revenues of hosts at their efficient level. The function that maximizes welfare over $t$ is <code>t_prim(t,theta,c,sol,Sub,capacity,It,params)<\code>. The forward simulation that keeps host revenues at their optimal level is <code>simulation2(theta,c,sol,t,Sub,capacity,It,params)<\code>.
+For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ **if entry/exit is efficient** (lest we conflate two distinct effects of $t$, on consumer booking decisions and hosts' decisions to enter or exit the market). As hosts raise their prices in response to $t$ being paid to consumers, they will enter the market more frequently and exit the market less often. We adjust the lump-sum subsidy downward to keep the revenues of hosts at their efficient level. The function that maximizes welfare over $t$ is <code>t_prim(t,theta,c,sol,Sub,capacity,It,params)</code>. The forward simulation that keeps host revenues at their optimal level is <code>simulation2(theta,c,sol,t,Sub,capacity,It,params)</code>.
 
 In code:
 
 <code>W1_c,CS1_c,PS1_c,GS1_c,n1_c,P1_c,s1_c,V1_c = simulation1(theta_hat,c_hat,[P_star,s_star,V_star],np.zeros((S.shape[0],1)),Sub_c,'constrained',1000,params)
 minimize(t_prim, [0,0,0,0], args=(theta_hat,c_hat,[P1_c,s1_c,V1_c],[409.51, 646.95, 945.56, 1309.57],'constrained',130,params), method='BFGS')
-<\code>
+</code>
 
 We find that a per-day subsidy corresponding to about **20-21%** of the rental rate maximizes welfare. From a welfare perspective, rental rates should be **11-16%** lower. All changes are relative to counterfactual 1.
 
