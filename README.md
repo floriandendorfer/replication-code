@@ -493,8 +493,7 @@ We find that a lump-sum subsidy corresponding to more or less **20-30%** (depend
 
 Subsidizing market entry raises social welfare by a bit below $2,000 per day. Each consumer is better off by about $0.53 per day. Each host gains about $8.38 per day. 
 
-For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ at the optimal amount of the lump-sum subsidy.
-
+For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ **if entry/exit is efficient** (lest we conflate two distinct effects of $t$, on consumer booking decisions and hosts' decisions to enter or exit the market). As hosts raise their prices in response to $t$ being paid to consumers, they will enter the market more frequently and exit the market less often. We adjust the lump-sum subsidy downward to keep the revenues of hosts at their efficient level. The function that maximizes welfare over $t$ is <code>t_prim(t,theta,c,sol,Sub,capacity,It,params)</code>. The forward simulation that keeps host revenues at their optimal level is <code>simulation2(theta,c,sol,t,Sub,capacity,It,params)</code>.
 
 In code:
 
