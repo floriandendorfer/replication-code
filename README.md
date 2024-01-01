@@ -420,7 +420,7 @@ $$ \sqrt{\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
  
 ## Counterfactual Analysis
 
-We simulate the model forward for 10 years - starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) - (1) if every $j$ type host in the market receives a monthly lump-sum subsidy of $ $Sub_j$ (<code>Sub</code>) and/or (2) if consumers receive a $ $t$ (<code>t</code>) subsidy for each day they book a property that has not been reviewed before. The corresponding function is stored in <code>simulation(theta,c,sol,t,Sub,params)</code>.
+We simulate the model forward for 10 years - starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) - (1) if every $j$ type host in the market receives a monthly lump-sum subsidy of $ $Sub_j$ (<code>Sub</code>) and/or (2) if consumers receive a $ $t$ (<code>t</code>) subsidy for each day they book a property that has not been reviewed before. The corresponding function is stored in <code>simulation1(theta,c,sol,t,Sub,capacity,It,params)</code>.
 
 We calculate the sum of host profits, the consumer surplus and the cost of the subsidy per month.
 
@@ -436,13 +436,15 @@ In code:
 
   ### Consumer Surplus
 
-We calculate the expected consumer surplus per month. As each property can only be booked once, we assume the following rationing rule. Guests choose the state $x$ of the property they want to stay at (if any). If there are more guests than properties, the excess number of guests gets nothing.
+We calculate the expected consumer surplus per month. As each property can only be booked once, we focus on the **consumer surplus from the inside good**, i.e., the consumer surplus from Airbnb bookings.
 
-$$ \text{Consumer surplus} = -\frac{30}{\alpha}\left(\mu - \sum_x \left(ccp(x) - q(x)\right)\right)\ln\left(1 + \sum_{x} s(x)\exp(u(x))\right) $$
+$$ \text{Consumer surplus} = -\frac{30}{\alpha}\sum_x q(x)\ln\left(1 + \sum_{x} s(x)\exp(u(x))\right) $$
 
 In code:
 
-<code>-(s_new @ (q_new - ccp_new)) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha</code>
+<code>-s_new @ q_new) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha</code>
+
+Note that our consumer surplus measure likely understates the true consumer surplus.
 
   ### Aggregate Profit
 
@@ -474,13 +476,13 @@ $$ \text{Welfare} = \sum_{\tau=1}^{130} \delta^{\tau-1}(\text{Consumer surplus} 
 
   ## Welfare Maximization
 
-First, we maximize social welfare over $Sub_j, j=1,2,3,4$ by repeatedly simulating the model forward. Initially, we set the the lump-sum subsidy to zero. 
+For **counterfactual 1**, we maximize social welfare over $Sub_j, j=1,2,3,4$ by repeatedly simulating the model forward. The function that maximizes welfare over $Sub_j$ is <code>Sub_prim(Sub,theta,c,sol,capacity,It,params)<\code>. Initially, we set the the lump-sum subsidy to zero. 
 
 In code:
 
 <code>minimize(simulation, [0,0,0,0], args=(theta,c,[P_star,s_star,V_star,lamb_star,chi_star],0,params), method='Nelder-Mead')</code>
 
-We find that a lump-sum subsidy corresponding to more or less **50%** of producer surplus (i.e., revenue) maximizes welfare. Second, we search for the welfare-maximizing subsidy $t$ at the optimal amount of the lump-sum subsidy.
+We find that a lump-sum subsidy corresponding to more or less **20-30%** (depending on property type) of producer surplus (i.e., revenue) maximizes welfare. 
 
 | type | $Sub^*$ in $ | $Sub^*$ in % of revenue | $\Delta$ # properties |
 | :---: | :---------: | :------: | :---: |
@@ -490,6 +492,9 @@ We find that a lump-sum subsidy corresponding to more or less **50%** of produce
 | 4 | $1309.57 | 28.99% | 86.71 |
 
 Subsidizing market entry raises social welfare by a bit below $2,000 per day. Each consumer is better off by about $0.53 per day. Each host gains about $8.38 per day. 
+
+For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ at the optimal amount of the lump-sum subsidy.
+
 
 In code:
 
