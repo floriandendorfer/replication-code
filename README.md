@@ -391,12 +391,12 @@ We exclude states for which we do not observe any observations in the mock data 
 
   ### Maximization
 
-<code>tol</code> is set to 1. Each candidate for $\mathbf{c}$ requires us to solve the model. We use the same <code>guess</code> as in the 'Solving the Model' section to initiate the solution algorithm. After that, we use the model solution for the previous set of candidates as the starting values to find the model solution for the next set of candidates. Furthermore, we use the demand estimates $\hat \theta$. To facilitate the search of a maximum, we search over $\ln(\mathbf{c})$, thereby excluding negative values. For the purpose of this replication code, we set the start values <code>k0</code> close to the solution to reduce computation time.
+<code>tol</code> is set to 1. Each candidate for $\mathbf{c}$ requires us to solve the model. We use the same <code>guess</code> as in the 'Solving the Model' section to initiate the solution algorithm. After that, we use the model solution for the previous set of candidates as the starting values to find the model solution for the next set of candidates. Furthermore, we use the demand estimates $\hat \theta$. To facilitate the search of a maximum, we search over $\ln(\mathbf{c})$, thereby excluding negative values. <code>k0</code> contains the starting values.
 
 In code:
 
-<code>k0 = np.log([50000,100000,150000,250000,2500,3500,4500,5500])
-res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params), method='Nelder-Mead')
+<code>k0 = np.log([100000,100000,100000,100000,3000,3000,3000,3000])
+res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params), method='BFGS')
 </code>
 
   ### Standard Errors
@@ -404,6 +404,18 @@ res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params),
 We use the the numerical approximation of the inverse Hessian $(H(\mathbf{\hat c}))^{-1}$ (<code>res_supply.hess_inv</code>) to compute the standard errors of the estimates.
 
 $$ \sqrt{\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
+
+<code>(np.diag(res_supply.hess_inv   )/len(data))**0.5
+</code>
+
+We use the delta method to compute the standard errors of $c$.
+
+$$ \sqrt{\left(\frac{\partial f(\mathbf{c})}{\partial \mathbf{c}}\right)^2\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
+
+In code:
+
+<code>((np.exp(res_supply.x) * np.diag(res_supply.hess_inv) * np.exp(res_supply.x))/len(data))**0.5
+</code>
 
   ### Estimation Results
 
@@ -480,7 +492,7 @@ For **counterfactual 1**, we maximize social welfare over $Sub_j, j=1,2,3,4$ by 
 
 In code:
 
-<code>minimize(simulation, [0,0,0,0], args=(theta,c,[P_star,s_star,V_star,lamb_star,chi_star],0,params), method='Nelder-Mead')</code>
+<code>minimize(Sub_prim, [0,0,0,0], args=(theta_hat,c_hat,[P_star,s_star,V_star],'constrained',130,params), method='BFGS')</code>
 
 We find that a lump-sum subsidy corresponding to more or less **20-30%** (depending on property type) of producer surplus (i.e., revenue) maximizes welfare. 
 
@@ -497,9 +509,11 @@ For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ **if 
 
 In code:
 
-<code>minimize(simulation, [0,0,0,0], args=(theta,c,[P_star,s_star,V_star,lamb_star,chi_star],[698.66,932.75,937.54,1070.99],params), method='Nelder-Mead')</code>
+<code>W1_c,CS1_c,PS1_c,GS1_c,n1_c,P1_c,s1_c,V1_c = simulation1(theta_hat,c_hat,[P_star,s_star,V_star],np.zeros((S.shape[0],1)),Sub_c,'constrained',1000,params)
+minimize(t_prim, [0,0,0,0], args=(theta_hat,c_hat,[P1_c,s1_c,V1_c],[409.51, 646.95, 945.56, 1309.57],'constrained',130,params), method='BFGS')
+</code>
 
-We find that a per-day subsidy corresponding to about **20-21%** of the rental rate maximizes welfare. From a welfare perspective, rental rates should be **11-16%** lower. 
+We find that a per-day subsidy corresponding to about **20-21%** of the rental rate maximizes welfare. From a welfare perspective, rental rates should be **11-16%** lower. All changes are relative to counterfactual 1.
 
 | type | $t^\ast$ | $t^\ast$ in % of price | price | $\Delta$ price in $ | $\Delta$ price in % | pass-through rate | $\Delta$ demand | $\Delta$ # properties |
 | :---: | :---------: | :---------: | :------: | :---: | :---: | :---: | :---: | :---: |
@@ -508,4 +522,4 @@ We find that a per-day subsidy corresponding to about **20-21%** of the rental r
 | 3 | $53.98 | 20.96% | $277.82 | -$33.66 | -13.07% | 62.36% | 14.90% | -13.92 |
 | 4 | $59.47 | 20.57% | $316.06 | -$32.59 | -11.27% | 54.80% | 12.97% | -11.33 |
 
-Subsidizing social learning raises social welfare by $38,361 per day. Each consumer is better off by about $10 per day. Each host gains about $35 per day.
+Subsidizing social learning raises social welfare by a bit less than $2,000 per day. Each guest is better off by about $0.34 per day. Host profit does not change in any meaningful way.
