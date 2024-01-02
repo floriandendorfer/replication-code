@@ -405,7 +405,7 @@ We use the the numerical approximation of the inverse Hessian $(H(\mathbf{\hat c
 
 $$ \sqrt{\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
 
-<code>(np.diag(res_supply.hess_inv   )/len(data))**0.5
+<code>(np.diag(res_supply.hess_inv)/len(data))**0.5
 </code>
 
 We use the delta method to compute the standard errors of $c$.
@@ -432,7 +432,7 @@ In code:
  
 ## Counterfactual Analysis
 
-We simulate the model forward for 10 years - starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) - (1) if every $j$ type host in the market receives a monthly lump-sum subsidy of $ $Sub_j$ (<code>Sub</code>) and/or (2) if consumers receive a $ $t$ (<code>t</code>) subsidy for each day they book a property that has not been reviewed before. The corresponding function is stored in <code>simulation1(theta,c,sol,t,Sub,capacity,It,params)</code>.
+We simulate the model forward for 10 years - starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) - (1) if every $j$ type host in the market receives a monthly lump-sum subsidy of $ $Sub_j$ (<code>Sub</code>) and/or (2) if consumers receive a $ $t$ (<code>t</code>) subsidy for each day they book a property that has not been reviewed before. The corresponding function is stored in <code>simulation1(theta,c,sol,t,Sub,It,params)</code>.
 
 We calculate the sum of host profits, the consumer surplus and the cost of the subsidy per month.
 
@@ -488,7 +488,7 @@ $$ \text{Welfare} = \sum_{\tau=1}^{130} \delta^{\tau-1}(\text{Consumer surplus} 
 
   ## Welfare Maximization
 
-For **counterfactual 1**, we maximize social welfare over $Sub_j, j=1,2,3,4$ by repeatedly simulating the model forward. The function that maximizes welfare over $Sub_j$ is <code>Sub_prim(Sub,theta,c,sol,capacity,It,params)</code>. Initially, we set the the lump-sum subsidy to zero. 
+For **counterfactual 1**, we maximize social welfare over $Sub_j, j=1,2,3,4$ by repeatedly simulating the model forward. The function that maximizes welfare over $Sub_j$ is <code>Sub_prim(Sub,theta,c,sol,It,params)</code>. Initially, we set the the lump-sum subsidy to zero. 
 
 In code:
 
@@ -505,7 +505,7 @@ We find that a lump-sum subsidy corresponding to more or less **20-30%** (depend
 
 Subsidizing market entry raises social welfare by a bit below $2,000 per day. Each consumer is better off by about $0.53 per day. Each host gains about $8.38 per day. 
 
-For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ **if entry/exit is efficient** (lest we conflate two distinct effects of $t$, on consumer booking decisions and hosts' decisions to enter or exit the market). As hosts raise their prices in response to $t$ being paid to consumers, they will enter the market more frequently and exit the market less often. We adjust the lump-sum subsidy downward to keep the revenues of hosts at their efficient level. The function that maximizes welfare over $t$ is <code>t_prim(t,theta,c,sol,Sub,capacity,It,params)</code>. The forward simulation that keeps host revenues at their optimal level is <code>simulation2(theta,c,sol,t,Sub,capacity,It,params)</code>.
+For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ **if entry/exit is efficient** (lest we conflate two distinct effects of $t$, on consumer booking decisions and hosts' decisions to enter or exit the market). As hosts raise their prices in response to $t$ being paid to consumers, they will enter the market more frequently and exit the market less often. We adjust the lump-sum subsidy downward to keep the revenues of hosts at their efficient level. The function that maximizes welfare over $t$ is <code>t_prim(t,theta,c,sol,Sub,It,params)</code>. The forward simulation that keeps host revenues at their optimal level is <code>simulation2(theta,c,sol,t,Sub,It,params)</code>.
 
 In code:
 
