@@ -361,7 +361,7 @@ S_hat = np.diag(np.linalg.inv((G_bar.T @ W2) @ G_bar))**.5/len(data)
   | $\beta_4$ | -11.6858 | (0.0019) |
   | $\gamma$ | 5.2759 | (0.0020) |
 
-We convert $\hat omicron$ to $\hat \theta$. 
+We convert $\hat \omicron$ to $\hat \theta$. 
 
 In code:
 
@@ -371,13 +371,13 @@ res_demand.x[2],
 res_demand.x[3:7],
 res_demand.x[7]]</code>
 
-Our estimates of $\phi$ and $\iota$ correspond to $a=12.3102$ and $b=1.8890$. Notice that our estimates are slightly biased as the demand inversion is non-linear and the measurement error is not fully captured by the structural error term.
+Our estimates of $\psi$ and $\iota$ correspond to $a=12.3102$ and $b=1.8890$. Notice that our estimates are slightly biased as the demand inversion is non-linear and the measurement error is not fully captured by the structural error term.
 
 ## Supply Estimation
 
   ### Objective Function
 
-We estimate $\mathbf{c} = (\phi_1,\phi_2\phi_3,\phi_4,\kappa_1,\kappa_2\kappa_3,\kappa_4)$ by maximizing the logarithm of the likelihood of the equilibrium state distribution $\mathbf{s}$ over $\mathbf{c}$. This requires that we infer the average number of listings $\mathbf{s}^d$ from the (mock) data.
+We estimate $\mathbf{c} = (\phi_1,\phi_2\phi_3,\phi_4,\kappa_1,\kappa_2,\kappa_3,\kappa_4)$ by maximizing the logarithm of the likelihood of the equilibrium state distribution $\mathbf{s}$ over $\mathbf{c}$. This requires that we infer the average number of listings $\mathbf{s}^d$ from the (mock) data.
 
 In code:
 
