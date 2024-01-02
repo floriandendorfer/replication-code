@@ -11,7 +11,6 @@ import os
 from scipy.optimize import minimize
 from scipy.special import expit
 import shelve
-import matplotlib.pyplot as plt
 
 os.chdir(os.path.dirname(os.path.abspath('__file__')))
 

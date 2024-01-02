@@ -219,7 +219,6 @@ def solver(theta,c,guess,tol,params):
         V_old = V_new
         P_old = P_new
         s_old = s_new
-        
     return [V_new,s_new,P_new,chi,lamb]
 
 def xi(omicron,adata,params):
