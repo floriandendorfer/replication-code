@@ -1,6 +1,6 @@
 # Replication code
 
-## Parameter
+## Parameters
 
 |  | name |            |  value |
   | ---: | ---: | :---------: | :------: |
@@ -29,7 +29,7 @@
 
 ## Demand
 
-Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,j)$, where $j = ${1,2,3,4} is the property's (observed) **type**.
+Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **utility** of renting a property in state $x=(N,K,j)$, where $j = 1,2,3,4$ is the property's (observed) **type**.
 
   $$U_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \beta(x) + \alpha ((1+f)p- t) + \epsilon = u(p,x) + \epsilon$$
   
@@ -114,7 +114,7 @@ $$\rho^{b\prime\prime}(p,x) = \upsilon_rq''(p,x)\left(1-\frac{a+K(x)}{a+b+N(x)}\
 
 ## Market Entry & Exit
 
-Types are equally distributed in the host population, meaning 2,500 properties have a certain type. If a host is **inactive** and has not yet entered the market, they can do so at the start of the following month at **entry cost** $\kappa_j$ which is iid drawn from $Exponential(\bar \kappa_j)$, $j=${1,2,3,4}. Let $\lambda_j$ denote the **entry rate**. 
+Types are equally distributed in the host population, meaning 2,500 properties have a certain type. If a host is **inactive** and has not yet entered the market, they can do so at the start of the following month at **entry cost** $\kappa_j$ which is iid drawn from $Exponential(\bar \kappa_j)$, $j=1,2,3,4$. Let $\lambda_j$ denote the **entry rate**. 
 
 $$ \lambda_j = 1-\exp(-\delta V((0,0,j))]\bar\kappa_j^{-1} ) $$
 
@@ -361,7 +361,7 @@ S_hat = np.diag(np.linalg.inv((G_bar.T @ W2) @ G_bar))**.5/len(data)
   | $\beta_4$ | -11.6858 | (0.0019) |
   | $\gamma$ | 5.2759 | (0.0020) |
 
-We convert $\hat omicron$ to $\hat \theta$. 
+We convert $\hat \omicron$ to $\hat \theta$. 
 
 In code:
 
@@ -371,13 +371,13 @@ res_demand.x[2],
 res_demand.x[3:7],
 res_demand.x[7]]</code>
 
-Our estimates of $\phi$ and $\iota$ correspond to $a=12.3102$ and $b=1.8890$. Notice that our estimates are slightly biased as the demand inversion is non-linear and the measurement error is not fully captured by the structural error term.
+Our estimates of $\psi$ and $\iota$ correspond to $a=12.3102$ and $b=1.8890$. Notice that our estimates are slightly biased as the demand inversion is non-linear and the measurement error is not fully captured by the structural error term.
 
 ## Supply Estimation
 
   ### Objective Function
 
-We estimate $\mathbf{c} = (\phi_1,\phi_2\phi_3,\phi_4,\kappa_1,\kappa_2\kappa_3,\kappa_4)$ by maximizing the logarithm of the likelihood of the equilibrium state distribution $\mathbf{s}$ over $\mathbf{c}$. This requires that we infer the average number of listings $\mathbf{s}^d$ from the (mock) data.
+We estimate $\mathbf{c} = (\phi_1,\phi_2\phi_3,\phi_4,\kappa_1,\kappa_2,\kappa_3,\kappa_4)$ by maximizing the logarithm of the likelihood of the equilibrium state distribution $\mathbf{s}$ over $\mathbf{c}$. This requires that we infer the average number of listings $\mathbf{s}^d$ from the (mock) data.
 
 In code:
 
@@ -405,7 +405,7 @@ We use the the numerical approximation of the inverse Hessian $(H(\mathbf{\hat c
 
 $$ \sqrt{\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
 
-<code>(np.diag(res_supply.hess_inv   )/len(data))**0.5
+<code>(np.diag(res_supply.hess_inv)/len(data))**0.5
 </code>
 
 We use the delta method to compute the standard errors of $c$.
@@ -432,7 +432,7 @@ In code:
  
 ## Counterfactual Analysis
 
-We simulate the model forward for 10 years - starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) - (1) if every $j$ type host in the market receives a monthly lump-sum subsidy of $ $Sub_j$ (<code>Sub</code>) and/or (2) if consumers receive a $ $t$ (<code>t</code>) subsidy for each day they book a property that has not been reviewed before. The corresponding function is stored in <code>simulation1(theta,c,sol,t,Sub,capacity,It,params)</code>.
+We simulate the model forward for 10 years - starting at the stationary equilibrium ($\mathbf{V}^\ast, \mathbf{s}^\ast, \mathbf{P}^\ast$) - (1) if every $j$ type host in the market receives a monthly lump-sum subsidy of $ $Sub_j$ (<code>Sub</code>) and/or (2) if consumers receive a $ $t$ (<code>t</code>) subsidy for each day they book a property that has not been reviewed before. The corresponding function is stored in <code>simulation1(theta,c,sol,t,Sub,It,params)</code>.
 
 We calculate the sum of host profits, the consumer surplus and the cost of the subsidy per month.
 
@@ -454,7 +454,7 @@ $$ \text{Consumer surplus} = -\frac{30}{\alpha}\sum_x q(x)\ln\left(1 + \sum_{x} 
 
 In code:
 
-<code>-s_new @ q_new) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha</code>
+<code>-(s_new @ q_new) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T))/alpha</code>
 
 Note that our consumer surplus measure likely understates the true consumer surplus.
 
@@ -488,7 +488,7 @@ $$ \text{Welfare} = \sum_{\tau=1}^{130} \delta^{\tau-1}(\text{Consumer surplus} 
 
   ## Welfare Maximization
 
-For **counterfactual 1**, we maximize social welfare over $Sub_j, j=1,2,3,4$ by repeatedly simulating the model forward. The function that maximizes welfare over $Sub_j$ is <code>Sub_prim(Sub,theta,c,sol,capacity,It,params)</code>. Initially, we set the the lump-sum subsidy to zero. 
+For **counterfactual 1**, we maximize social welfare over $Sub_j, j=1,2,3,4$ by repeatedly simulating the model forward. The function that maximizes welfare over $Sub_j$ is <code>Sub_prim(Sub,theta,c,sol,It,params)</code>. Initially, we set the the lump-sum subsidy to zero. 
 
 In code:
 
@@ -505,12 +505,12 @@ We find that a lump-sum subsidy corresponding to more or less **20-30%** (depend
 
 Subsidizing market entry raises social welfare by a bit below $2,000 per day. Each consumer is better off by about $0.53 per day. Each host gains about $8.38 per day. 
 
-For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ **if entry/exit is efficient** (lest we conflate two distinct effects of $t$, on consumer booking decisions and hosts' decisions to enter or exit the market). As hosts raise their prices in response to $t$ being paid to consumers, they will enter the market more frequently and exit the market less often. We adjust the lump-sum subsidy downward to keep the revenues of hosts at their efficient level. The function that maximizes welfare over $t$ is <code>t_prim(t,theta,c,sol,Sub,capacity,It,params)</code>. The forward simulation that keeps host revenues at their optimal level is <code>simulation2(theta,c,sol,t,Sub,capacity,It,params)</code>.
+For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ **if entry/exit is efficient** (lest we conflate two distinct effects of $t$, on consumer booking decisions and hosts' decisions to enter or exit the market). As hosts raise their prices in response to $t$ being paid to consumers, they will enter the market more frequently and exit the market less often. We adjust the lump-sum subsidy downward to keep the revenues of hosts at their efficient level. The function that maximizes welfare over $t$ is <code>t_prim(t,theta,c,sol,Sub,It,params)</code>. The forward simulation that keeps host revenues at their optimal level is <code>simulation2(theta,c,sol,t,Sub,It,params)</code>.
 
 In code:
 
-<code>W1_c,CS1_c,PS1_c,GS1_c,n1_c,P1_c,s1_c,V1_c = simulation1(theta_hat,c_hat,[P_star,s_star,V_star],np.zeros((S.shape[0],1)),Sub_c,'constrained',1000,params)
-minimize(t_prim, [0,0,0,0], args=(theta_hat,c_hat,[P1_c,s1_c,V1_c],[409.51, 646.95, 945.56, 1309.57],'constrained',130,params), method='BFGS')
+<code>W1_c,CS1_c,PS1_c,GS1_c,P1_c,s1_c,V1_c = simulation1(theta_hat,c_hat,[P_star,s_star,V_star],np.zeros((S.shape[0],1)),Sub_c,1000,params)
+minimize(t_prim, [0,0,0,0], args=(theta_hat,c_hat,[P1_c,s1_c,V1_c],[409.51, 646.95, 945.56, 1309.57],130,params), method='BFGS')
 </code>
 
 We find that a per-day subsidy corresponding to about **20-21%** of the rental rate maximizes welfare. From a welfare perspective, rental rates should be **11-16%** lower. All changes are relative to counterfactual 1.
