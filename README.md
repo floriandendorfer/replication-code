@@ -509,8 +509,8 @@ For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ **if 
 
 In code:
 
-<code>W1_c,CS1_c,PS1_c,GS1_c,n1_c,P1_c,s1_c,V1_c = simulation1(theta_hat,c_hat,[P_star,s_star,V_star],np.zeros((S.shape[0],1)),Sub_c,'constrained',1000,params)
-minimize(t_prim, [0,0,0,0], args=(theta_hat,c_hat,[P1_c,s1_c,V1_c],[409.51, 646.95, 945.56, 1309.57],'constrained',130,params), method='BFGS')
+<code>W1_c,CS1_c,PS1_c,GS1_c,P1_c,s1_c,V1_c = simulation1(theta_hat,c_hat,[P_star,s_star,V_star],np.zeros((S.shape[0],1)),Sub_c,1000,params)
+minimize(t_prim, [0,0,0,0], args=(theta_hat,c_hat,[P1_c,s1_c,V1_c],[409.51, 646.95, 945.56, 1309.57],130,params), method='BFGS')
 </code>
 
 We find that a per-day subsidy corresponding to about **20-21%** of the rental rate maximizes welfare. From a welfare perspective, rental rates should be **11-16%** lower. All changes are relative to counterfactual 1.
