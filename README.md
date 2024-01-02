@@ -1,6 +1,6 @@
 # Replication code
 
-## Parameter
+## Parameters
 
 |  | name |            |  value |
   | ---: | ---: | :---------: | :------: |
@@ -454,7 +454,7 @@ $$ \text{Consumer surplus} = -\frac{30}{\alpha}\sum_x q(x)\ln\left(1 + \sum_{x} 
 
 In code:
 
-<code>-s_new @ q_new) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha</code>
+<code>-(s_new @ q_new) * 30 * np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T))/alpha</code>
 
 Note that our consumer surplus measure likely understates the true consumer surplus.
 
