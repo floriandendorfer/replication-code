@@ -503,7 +503,7 @@ We find that a lump-sum subsidy corresponding to more or less **20-30%** (depend
 | 3 | $945.56 | 26.47% | 65.74 |
 | 4 | $1309.57 | 28.99% | 86.71 |
 
-Subsidizing market entry raises social welfare by a bit below $2,000 per day. Each consumer is better off by about $0.53 per day. Each host gains about $8.38 per day. 
+Subsidizing market entry raises social welfare by a bit below $2,000 per day. The cost of the subsidy amount to roughly $25,000 per day. Each Airbnb guest is on average better off by about $15.29 per day. Each host gains about $8.38 per day. 
 
 For **counterfactual 2**, we search for the welfare-maximizing subsidy $t$ **if entry/exit is efficient** (lest we conflate two distinct effects of $t$, on consumer booking decisions and hosts' decisions to enter or exit the market). As hosts raise their prices in response to $t$ being paid to consumers, they will enter the market more frequently and exit the market less often. We adjust the lump-sum subsidy downward to keep the revenues of hosts at their efficient level. The function that maximizes welfare over $t$ is <code>t_prim(t,theta,c,sol,Sub,It,params)</code>. The forward simulation that keeps host revenues at their optimal level is <code>simulation2(theta,c,sol,t,Sub,It,params)</code>.
 
@@ -515,11 +515,11 @@ minimize(t_prim, [0,0,0,0], args=(theta_hat,c_hat,[P1_c,s1_c,V1_c],[409.51, 646.
 
 We find that a per-day subsidy corresponding to about **20-21%** of the rental rate maximizes welfare. From a welfare perspective, rental rates should be **11-16%** lower. All changes are relative to counterfactual 1.
 
-| type | $t^\ast$ | $t^\ast$ in % of price | price | $\Delta$ price in $ | $\Delta$ price in % | pass-through rate | $\Delta$ demand | $\Delta$ # properties |
+| type | $t^\ast$ | $t^\ast$ in % of price | price | $\Delta$ price in $ | $\Delta$ price in % | $\Delta$ demand | $\Delta$ # properties |
 | :---: | :---------: | :---------: | :------: | :---: | :---: | :---: | :---: | :---: |
-| 1 | $41.60 | 20.40% | $212.94 | -$32.58 | -15.98% | 78.31% | 17.63% | -18.00 | 
-| 2 | $47.28 | 20.61% | $243.63 | -$33.06 | -14.41% | 69.93% | 16.13% | -15.67 |
-| 3 | $53.98 | 20.96% | $277.82 | -$33.66 | -13.07% | 62.36% | 14.90% | -13.92 |
-| 4 | $59.47 | 20.57% | $316.06 | -$32.59 | -11.27% | 54.80% | 12.97% | -11.33 |
+| 1 | $41.60 | 20.40% | $212.94 | -$32.58 | -15.98% | 17.63% | -18.00 | 
+| 2 | $47.28 | 20.61% | $243.63 | -$33.06 | -14.41% | 16.13% | -15.67 |
+| 3 | $53.98 | 20.96% | $277.82 | -$33.66 | -13.07% | 14.90% | -13.92 |
+| 4 | $59.47 | 20.57% | $316.06 | -$32.59 | -11.27% | 12.97% | -11.33 |
 
-Subsidizing social learning raises social welfare by a bit less than $2,000 per day. Each guest is better off by about $0.34 per day. Host profit does not change in any meaningful way.
+Subsidizing social learning raises social welfare by a bit less than $2,000 per day. This compares to about $24,000 paid in subsidies each day. Each guest is better off by about $9.93 per day. By design, host profit does not change in any meaningful way.
