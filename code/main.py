@@ -11,6 +11,7 @@ import os
 from scipy.optimize import minimize
 from scipy.special import expit
 import shelve
+from pathlib import Path
 
 os.chdir(os.path.dirname(os.path.abspath('__file__')))
 
@@ -72,8 +73,8 @@ for t in range(1,13*4+1):
 
 data = pd.DataFrame(data,columns=['period','x','K','N','type 1','type 2','type 3','type 4','p','q'])
 
-data.to_pickle('data/data.pkl')
-data = pd.read_pickle('data/data.pkl')
+data.to_pickle(os.path.join(Path().absolute().parent, 'data\\data.pkl'))
+data = pd.read_pickle(os.path.join(Path().absolute().parent, 'data\\data.pkl'))
 
 ###### Demand Estimation ######
 
