@@ -516,7 +516,7 @@ minimize(t_prim, [0,0,0,0], args=(theta_hat,c_hat,[P1_c,s1_c,V1_c],[409.51, 646.
 We find that a per-day subsidy corresponding to about **20-21%** of the rental rate maximizes welfare. From a welfare perspective, rental rates should be **11-16%** lower. All changes are relative to counterfactual 1.
 
 | type | $t^\ast$ | $t^\ast$ in % of price | price | $\Delta$ price in $ | $\Delta$ price in % | $\Delta$ demand | $\Delta$ # properties |
-| :---: | :---------: | :---------: | :------: | :---: | :---: | :---: | :---: | :---: |
+| :---: | :---------: | :---------: | :------: | :---: | :---: | :---: | :---: |
 | 1 | $41.60 | 20.40% | $212.94 | -$32.58 | -15.98% | 17.63% | -18.00 | 
 | 2 | $47.28 | 20.61% | $243.63 | -$33.06 | -14.41% | 16.13% | -15.67 |
 | 3 | $53.98 | 20.96% | $277.82 | -$33.66 | -13.07% | 14.90% | -13.92 |
