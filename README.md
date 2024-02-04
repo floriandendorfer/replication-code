@@ -70,12 +70,12 @@ $$\rho^b(p,x) = \upsilon_rq(p,x)\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$$
 Accordingly, the probability $\rho^0(p,x)$ of getting no review is $1-\rho^g(p,x)-\rho^b(p,x)$. States are arranged in increasing order of type $j$ and, for a given type, in increasing order of $N$ and, for a given $N$, in increasing order of $K$. $S$ is the **state space**. Note: $S$ is in <code>params</code>.
 
 $$ S = \begin{bmatrix} 
-1 & 0 & 0 & 0 & 0 & 0 \\ 
-1 & 0 & 1 & 0 & 0 & 0 \\
-2 & 1 & 1 & 0 & 0 & 0 \\
-2 & 0 & 2 & 0 & 0 & 0 \\
-2 & 1 & 2 & 0 & 0 & 0 \\
-3 & 2 & 2 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 \\ 
+0 & 1 & 1 & 0 & 0 & 0 \\
+1 & 1 & 1 & 0 & 0 & 0 \\
+0 & 2 & 1 & 0 & 0 & 0 \\
+1 & 2 & 1 & 0 & 0 & 0 \\
+2 & 2 & 1 & 0 & 0 & 0 \\
 ... & ... & ... & ... & ... & ... \\ 
 11 & 17 & 0 & 0 & 1 & 0 \\
 12 & 17 & 0 & 0 & 1 & 0 \\
@@ -89,9 +89,9 @@ Function  <code>dT_s(dq,theta,params)</code> stores the **transition matrix** $\
 
 |  | $(0,0,1)$ | $(0,1,1)$ | $(1,1,1)$ | $(0,2,1)$ | $(1,2,1)$ | $(2,2,1)$ | ... | $(20,20,4)$ | 
 | :---: | :---: | :---------: | :------: | :------: | :------: | :------: | :------: | :------: |
-| $(0,0,1)$ | $\rho^0_{(0,0,1)}$ | $\rho^g_{(0,0,1)}$ | $\rho^b_{(0,0,1)}$ | 0 | 0 | 0 | ... | 0 |
-| $(0,1,1)$ | 0 | $\rho^0_{(0,1,1)}$ | 0 | $\rho^g_{(0,1,1)}$ | $\rho^b_{(0,1,1)}$ | 0 | ... | 0 |
-| $(1,1,1)$ | 0 | 0 | $\rho^0_{(1,1,1)}$ | 0 | $\rho^g_{(1,1,1)}$ | $\rho^b_{(1,1,1)}$ | ... | 0 |
+| $(0,0,1)$ | $\rho^0_{(0,0,1)}$ | $\rho^b_{(0,0,1)}$ | $\rho^g_{(0,0,1)}$ | 0 | 0 | 0 | ... | 0 |
+| $(0,1,1)$ | 0 | $\rho^0_{(0,1,1)}$ | 0 | $\rho^b_{(0,1,1)}$ | $\rho^g_{(0,1,1)}$ | 0 | ... | 0 |
+| $(1,1,1)$ | 0 | 0 | $\rho^0_{(1,1,1)}$ | 0 | $\rho^b_{(1,1,1)}$ | $\rho^g_{(1,1,1)}$ | ... | 0 |
 | $(0,2,1)$ | 0 | 0 | 0 | $\rho^0_{(0,2,1)}$ | 0 | 0 | ... | 0 |
 | $(1,2,1)$ | 0 | 0 | 0 | 0 | $\rho^0_{(1,2,1)}$ | 0 | ... | 0 |
 | $(2,2,1)$ | 0 | 0 | 0 | 0 | 0 | $\rho^0_{(2,2,1)}$ | ... | 0 |
@@ -118,7 +118,7 @@ Types are equally distributed in the host population, meaning 2,500 properties h
 
 $$ \lambda_j = 1-\exp(-\delta V((0,0,j))]\bar\kappa_j^{-1} ) $$
 
-Denote the number of properties of type $j$ by $s_j$. The expected, total entry costs of type-$j$ hosts in a given month is the number of inactive hosts $(J/4 - s_j)$ times $\mathbb{E}[\kappa_j|\phi_j\geq \delta V(0,0,j)]$.
+Denote the number of properties of type $j$ by $s_j$. The expected, total entry costs of type $j$ hosts in a given month is the number of inactive hosts $(J/4 - s_j)$ times $\mathbb{E}[\kappa_j|\phi_j\geq \delta V(0,0,j)]$.
 
 $$ \text{Total entry costs} = \sum_{j}\left(J/4 - \sum_xs_j(x)\right)\left(\lambda_j\bar \kappa_j - (1-\lambda_j)\delta V((0,0,j))\right) $$
 
@@ -136,9 +136,9 @@ $$ \text{Total operating costs} = \sum_{x}s(x)\left((1-\chi(p,x))\bar \phi(x) - 
 
 |  | $(0,0,1)$ | $(0,1,1)$ | $(1,1,1)$ | $(0,2,1)$ | $(1,2,1)$ | $(2,2,1)$ | ... | $(0,0,2)$ | ... | $(20,20,4)$ | $(20,20,4)$ |  
 | :---: | :---: | :---------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: |
-| $(0,0,1)$ | $(1-\chi_{(0,0,1)})\rho^0_{(0,0,1)}$ | $(1-\chi_{(0,0,1)})\rho^g_{(0,0,1)}$ | $(1-\chi_{(0,0,1)})\rho^b_{(0,0,1)}$ | 0 | 0 | 0 | ... | ... | ... | 0 | $\chi_{(0,0,1)}$ |
-| $(0,1,1)$ | 0 | $(1-\chi_{(0,1,1)})\rho^0_{(0,1,1)}$ | 0 | $(1-\chi_{(0,1,1)})\rho^g_{(0,1,1)}$ | $(1-\chi_{(0,1,1)})\rho^b_{(0,1,1)}$ | 0 | ... | ... | ... | 0 | $\chi_{(0,1,1)}$ |
-| $(1,1,1)$ | 0 | 0 | $(1-\chi_{(1,1,1)})\rho^0_{(1,1,1)}$ | 0 | $(1-\chi_{(1,1,1)})\rho^g_{(1,1,1)}$ | $(1-\chi_{(1,1,1)})\rho^b_{(1,1,1)}$ | ... | ... | ... | 0 | $\chi_{(1,1,1)}$ |
+| $(0,0,1)$ | $(1-\chi_{(0,0,1)})\rho^0_{(0,0,1)}$ | $(1-\chi_{(0,0,1)})\rho^b_{(0,0,1)}$ | $(1-\chi_{(0,0,1)})\rho^g_{(0,0,1)}$ | 0 | 0 | 0 | ... | ... | ... | 0 | $\chi_{(0,0,1)}$ |
+| $(0,1,1)$ | 0 | $(1-\chi_{(0,1,1)})\rho^0_{(0,1,1)}$ | 0 | $(1-\chi_{(0,1,1)})\rho^b_{(0,1,1)}$ | $(1-\chi_{(0,1,1)})\rho^g_{(0,1,1)}$ | 0 | ... | ... | ... | 0 | $\chi_{(0,1,1)}$ |
+| $(1,1,1)$ | 0 | 0 | $(1-\chi_{(1,1,1)})\rho^0_{(1,1,1)}$ | 0 | $(1-\chi_{(1,1,1)})\rho^b_{(1,1,1)}$ | $(1-\chi_{(1,1,1)})\rho^g_{(1,1,1)}$ | ... | ... | ... | 0 | $\chi_{(1,1,1)}$ |
 | $(0,2,1)$ | 0 | 0 | 0 | $(1-\chi_{(1,2,1)})\rho^0_{(1,2,1)}$ | 0 | 0 | ... | ... | ... | 0 | $\chi_{(1,2,1)}$ |
 | $(1,2,1)$ | 0 | 0 | 0 | 0 | $(1-\chi_{(1,2,1)})\rho^0_{(1,2,1)}$ | 0 | ... | ... | ... | 0 | $\chi_{(1,2,1)}$ |
 | $(2,2,1)$ | 0 | 0 | 0 | 0 | 0 | $(1-\chi_{(2,2,1)})\rho^0_{(2,2,1)}$ | ... | ... | ... | 0 | $\chi_{(2,2,1)}$ |
@@ -163,11 +163,11 @@ $$ V(p,x) = 30q(p,x)p - (1-\chi(p,x))\phi(x) + \delta \mathbf{T}\mathbf{\hat V} 
 
 The FOC requires that $V'(p,x) = 0$. The first-order Taylor series approximation around $p_0$ is $V'(p,x) = V'(p_0,x) + V''(p_0,x)(p-p_0)$. We find $p$ by iterating 
 
-$$p = p_0 + \frac{V'(p_0,x)}{V''(p_0,x)}$$
+$$p = p_0 - \frac{V'(p_0,x)}{V''(p_0,x)}$$
 
 until $|p-p_0| \leq 0.1$. 
 
-<code>dV_s(p,P,s,V,theta,\phi_bar,t,params)</code> and <code>d2V_s(p,P,s,V,theta,\phi_bar,t,params)</code> store the first- and second-order derivative of $V(p,x)$ with respect to p respectively.
+<code>dV_s(p,P,s,V,theta,phi_bar,t,params)</code> and <code>d2V_s(p,P,s,V,theta,phi_bar,t,params)</code> store the first- and second-order derivative of $V(p,x)$ with respect to p respectively.
 
 $$ V'(p,x) = 30(q(p,x) + q'(p,x)p) + (1 - \chi(p,x))\delta \mathbf{T}'(p)\mathbf{\hat V} $$
 
@@ -222,7 +222,7 @@ In code:
 
 We update $\mathbf{\hat P} = \mathbf{P}$, $\mathbf{\hat s}=\mathbf{s}$ and $\mathbf{\hat V}=\mathbf{V}$ and repeat the algorithm until convergence, i.e., 
 
-$$|\mathbf{V}-\mathbf{\hat V}|\leq \text{tol} \ \text{ and } \ |\mathbf{s}-\mathbf{\hat s}|\leq \text{tol} \ \text{ and } \ |\mathbf{V}-\mathbf{\hat V}|\leq \text{tol}.$$
+$$|\mathbf{P}-\mathbf{\hat P}|\leq \text{tol} \ \text{ and } \ |\mathbf{s}-\mathbf{\hat s}|\leq \text{tol} \ \text{ and } \ |\mathbf{V}-\mathbf{\hat V}|\leq \text{tol}.$$
 
 <code>tol</code> is set to 0.000001. To save time, we solve the host's pricing problem only if $\mathbf{V}$ changes substantially, i.e., by more than 10\% since the last time we solved for $p$.
 
