@@ -70,7 +70,7 @@ $$\rho^b(p,x) = \upsilon_rq(p,x)\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$$
 Accordingly, the probability $\rho^0(p,x)$ of getting no review is $1-\rho^g(p,x)-\rho^b(p,x)$. States are arranged in increasing order of type $j$ and, for a given type, in increasing order of $N$ and, for a given $N$, in increasing order of $K$. $S$ is the **state space**. Note: $S$ is in <code>params</code>.
 
 $$ S = \begin{bmatrix} 
-0 & 0 & 0 & 0 & 0 & 0 \\ 
+0 & 0 & 1 & 0 & 0 & 0 \\ 
 0 & 1 & 1 & 0 & 0 & 0 \\
 1 & 1 & 1 & 0 & 0 & 0 \\
 0 & 2 & 1 & 0 & 0 & 0 \\
