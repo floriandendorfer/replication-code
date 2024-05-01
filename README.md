@@ -450,7 +450,7 @@ In code:
 
 We calculate the expected consumer surplus per month. As each property can only be booked once, we focus on the **consumer surplus from the inside good**, i.e., the consumer surplus from Airbnb bookings.
 
-$$ \text{Consumer surplus} = -\frac{30}{\alpha}\sum_x q(x)\ln\left(1 + \sum_{x} s(x)\exp(u(x))\right) $$
+$$ \text{Consumer surplus} = -\frac{30}{\alpha}(\sum_x s(x)q(x))\ln\left(1 + \sum_{x} s(x)\exp(u(x))\right) + \text{constant} $$
 
 In code:
 
