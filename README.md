@@ -326,7 +326,7 @@ res_demand = minimize(O, start_values, args=(data,W1,params), method='BFGS',jac=
 
 In the second step, we choose the efficient weighting matrix. Let $\hat \omicron$ be our estimation result from the first stage.
 
-$$ W_2 = \left(\left(-\frac{1}{I}\mathbf{Z}^T\nabla u(\hat \omicron)\right)\left(-\frac{1}{I}\mathbf{Z}^T\nabla u(\hat \omicron)\right)^T\right)^{-1} $$
+$$ W_2 = \left(\left(-\frac{1}{I}\mathbf{Z}^T\boldsymbol{\xi}(\widehat \omicron)\right)\left(-\frac{1}{I}\mathbf{Z}^T\boldsymbol{\xi}(\widehat \omicron)\right)^T\right)^{-1} $$
 
 In code:
 
@@ -339,7 +339,7 @@ res_demand = minimize(O, start_values, args=(data,W2,params), method='BFGS',jac=
 
 As we have chosen the efficient weighting matrix in the second step, the (heteroscedasticity robust) **standard errors** simplify to
 
-$$ \frac{1}{I}\left( diag\left( \left( \left(\frac{1}{N}\mathbf{Z}^T\nabla u(\hat \omicron)\right)^TW_2\left(\frac{1}{I}\mathbf{Z}^T\nabla u(\hat \omicron)\right) \right)^{-1} \right) \right)^\frac{1}{2} $$
+$$ \frac{1}{I}\left( diag\left( \left( \left(\frac{1}{I}\mathbf{Z}^T\nabla u(\hat \omicron)\right)^TW_2\left(\frac{1}{I}\mathbf{Z}^T\nabla u(\hat \omicron)\right) \right)^{-1} \right) \right)^\frac{1}{2} $$
 
 In code:
 
