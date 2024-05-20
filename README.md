@@ -466,7 +466,7 @@ $$ \text{Profit (inside)} = \sum_{x}s(x)\left(30q(x)P(x) + Sub_j - \left((1-\chi
 
 In code:
 
-<code>s_new @ ((1+f)*np.array([np.diagonal(30 * q_s(P_new,P_new,s_new,theta,t,params)*P_new)]).T + Sub - (np.array([np.repeat(c[4:],231)]).T - np.array([chi_new]).T * (delta * eV_in + np.array([np.repeat(c[4:],231)]).T)))</code>
+<code>s_new @ ((1+f)*np.array([np.diagonal(30 * q_s(P_new,P_new,s_new,theta,t,params)*P_new)]).T + Sub - (np.array([np.repeat(c[4:],231)]).T + np.array([chi_new]).T * (delta * eV_in + np.array([np.repeat(c[4:],231)]).T)))</code>
 
 Hosts who are currently outside the market do not earn revenue but pay the entry cost if they decide to enter that month.
 
