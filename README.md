@@ -462,7 +462,7 @@ Note that our consumer surplus measure likely understates the true consumer surp
 
 We distinguish hosts who are in the market and hosts who are outside the market. Hosts in the market receive the expected monthly revenue of renting out the property as well as the lump-sum subsidy. They also pay the operating cost. See the 'Market Entry & Exit' section for the total expected operation costs per month.  
 
-$$ \text{Profit (inside)} = \sum_{x}s(x)\left(30q(x)P(x) + Sub_j - \left((1-\chi(p,x))\bar \phi(x) - \chi(p,x)\delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]\right)\right) $$
+$$ \text{Profit (inside)} = \sum_{x}s(x)\left(30q(x)P(x) + Sub_j - \left((1-\chi(x))\bar \phi(x) - \chi(x)\delta \mathbb{E}_{\tilde x}[V(\tilde x)|x]\right)\right) $$
 
 In code:
 
