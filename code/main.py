@@ -18,23 +18,23 @@ os.chdir(os.path.dirname(os.path.abspath('__file__')))
 ###### Parameters ######
 
     # demand
-a = 12.2260
-b = 2.1134
-alpha = -0.0068
-beta = np.array([-12.5906,-12.1095,-11.7011,-11.3012])
-gamma = 4.8860
+a = 3.9902
+b = 1.0690
+alpha = -0.0086
+beta = np.array([-10.5354,-9.8218,-9.4401,-8.9099])
+gamma = 2.8607
 theta = [a,b,alpha,beta,gamma]
 
     # supply
-kappa_bar = [55496,96673,161946,270623]
-phi_bar = [2580,3577,4562,5751]
+kappa_bar = [181368,264819,426997,796930]
+phi_bar = [2323,3587,4345,5572]
 c = np.append(kappa_bar,phi_bar)
 
     # other
 delta = .995
 tol = 1e-6
 f = .142
-upsilon_r = 0.7041
+upsilon_r = 0.992
 nmax = 20
 mu = 10000
 J = 10000
@@ -55,21 +55,27 @@ params = [delta,f,J,mu,nmax,S,upsilon_r]
 
 from functions import q_s,solver
 
-P_init = np.array([[300]*len(S)])
+P_init = np.array([[200]*len(S)])
 s_init = np.array([[J/(2*len(S))]*len(S)])
-V_init = (30*q_s(300,P_init,s_init,theta,0,params)*P_init.T)/(1-delta)
+V_init = (28*q_s(200,P_init,s_init,theta,0,params)*P_init.T)/(1-delta)
 
 V_star,s_star,P_star,chi_star,lamb_star = solver(theta,c,[P_init,s_init,V_init],tol,params)
 
 ###### Data Generating Process ######
 
-for t in range(1,13*4+1):
+    # random shock to each price
+    # shocked price in demand
+    # daily and then aggregate to monthly 
+
+for t in range(1,13*4*28+1):
     index = np.repeat(range(0,924),np.random.multinomial(s_star.sum().astype(int),(s_star/s_star.sum()).flatten(),size=(13*4,))[t-1,:])
-    p = (P_star.T + np.random.normal(loc = 0, scale = 25.0, size = (P_star.T).shape))
+    #p = (P_star.T + np.random.normal(loc = 0, scale = 25.0, size = (P_star.T).shape))
+    m = (t/28).astype(int) + 1
     if t == 1:
-        data = np.hstack(( np.zeros((len(index),1)) + t, np.array([index]).T, S[index,:], p[index,:], q_s(p,p,s_star,theta,0,params)[index,:] + np.random.normal(loc = 0, scale = 0.1, size = q_s(p,P_star,s_star,theta,0,params)[index,:].shape ) ))
+        p = P_star.T[index,:] + np.random.normal(loc = 0, scale = 25.0, size = P_star.T[index,:].shape)
+        data = np.hstack(( np.zeros((len(index),1)) + t, np.array([index]).T, S[index,:], p, np.random.binomial q_s(P_star,p,s_star,theta,0,params)[index,:] ))
     else:
-        data = np.vstack((data, np.hstack(( np.zeros((len(index),1)) + t, np.array([index]).T, S[index,:], p[index,:], q_s(p,p,s_star,theta,0,params)[index,:] + np.random.normal(loc = 0, scale = 0.1, size = q_s(P_star,P_star,s_star,theta,0,params)[index,:].shape ) )) ))
+        data = np.vstack((data, np.hstack(( np.zeros((len(index),1)) + t, np.array([index]).T, S[index,:], p[index,:] + np.random.normal(loc = 0, scale = 25.0, size = (1,)), q_s(p,p,s_star,theta,0,params)[index,:] + np.random.normal(loc = 0, scale = 0.1, size = q_s(P_star,P_star,s_star,theta,0,params)[index,:].shape ) )) ))
 
 data = pd.DataFrame(data,columns=['period','x','K','N','type 1','type 2','type 3','type 4','p','q'])
 

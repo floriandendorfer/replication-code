@@ -5,24 +5,24 @@
 |  | name |            |  value |
   | ---: | ---: | :---------: | :------: |
   | demand (<code>theta</code>) | price | $\alpha$ | -0.0068 |
-  || type 1 | $\beta_1$ | -12.5906 |
-  || type 2 | $\beta_2$ | -12.1095 |
-  || type 3 | $\beta_3$ | -11.7011 |
-  || type 4 | $\beta_4$ | -11.3012 |
-  || quality | $\gamma$ | 4.8860 |
-  || prior | $a$ | 12.2260 |
-  ||  | $b$ | 2.1134 |
-  | supply (<code>c</code>) | mean entry cost (type 1) | $\bar \kappa_1$ | 55,496 |
-  |  | mean entry cost (type 2) | $\bar \kappa_2$ | 96,673 |
-  |  | mean entry cost (type 3) | $\bar \kappa_3$ | 161,946 |
-  |  | mean entry cost (type 4) | $\bar \kappa_4$ | 270,233 |
-  || mean fixed cost (type 1) | $\bar \phi_1$ | 2,580 |
-  | | mean fixed cost (type 2) | $\bar \phi_2$ | 3,577 |
-  || mean fixed cost (type 3) | $\bar \phi_3$ | 4,562 |
-  || mean fixed cost (type 4) | $\bar \phi_4$ | 5,751 |
+  || type 1 | $\beta_1$ | -10.5354 |
+  || type 2 | $\beta_2$ | -9.8218 |
+  || type 3 | $\beta_3$ | -9.4401 |
+  || type 4 | $\beta_4$ | -8.9099 |
+  || quality | $\gamma$ | 2.8607 |
+  || prior | $a$ | 3.9902 |
+  ||  | $b$ | 1.0690 |
+  | supply (<code>c</code>) | mean entry cost (type 1) | $\bar \kappa_1$ | 181,368 |
+  |  | mean entry cost (type 2) | $\bar \kappa_2$ | 264,819 |
+  |  | mean entry cost (type 3) | $\bar \kappa_3$ | 426,997 |
+  |  | mean entry cost (type 4) | $\bar \kappa_4$ | 796,930 |
+  || mean fixed cost (type 1) | $\bar \phi_1$ | 2,323 |
+  | | mean fixed cost (type 2) | $\bar \phi_2$ | 3,587 |
+  || mean fixed cost (type 3) | $\bar \phi_3$ | 4,345 |
+  || mean fixed cost (type 4) | $\bar \phi_4$ | 5,572 |
   | other (<code>params</code>) | discount factor | $\delta$ | 0.995 |
   |  | revenue fee | $f$ | 0.142 |
-  |  | review prob. | $\upsilon_r$ | 0.7041 |
+  |  | review prob. | $\upsilon_r$ | 0.992 |
   |  | max. no. of reviews | $\bar N$ | 20 |
   |  | arrival rate | $\mu$ | 10,000 |
   |  | max. no. of listings | $J$ | 10,000 |
