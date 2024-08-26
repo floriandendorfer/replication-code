@@ -375,45 +375,38 @@ res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params),
 
   ### Standard Errors
 
-We use the the numerical approximation of the inverse Hessian $(H(\mathbf{\hat c}))^{-1}$ to compute the standard errors of the estimates.
+We compute the Information $I(\mathbf{\hat c})$ as $\sum_{j,t}\text{Score}_{jt}(\mathbf{\hat c})\text{Score}_{jt}(\mathbf{\hat c})^T$. We numerically approximate $\text{Score}_{jt}$ as follows.
 
-$$ \sqrt{\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
+$$ \text{Score}_{jt}(\mathbf{\hat c}) = \frac{\partial \text{Log-likelihood}}{\partial \mathbf{\hat c}} = \frac{s_{jt}}{\left(s^\ast(x|\mathbf{c})\right)}\frac{\partial s^\ast(x|\mathbf{\hat c})}{\partial \mathbf{\hat c}}, $$
 
-<code>(np.diag(res_supply.hess_inv)/len(data))**0.5
-</code>
+where
 
-We use the delta method to compute the standard errors of $c$.
+$$ \frac{\partial s^\ast(x|\mathbf{\hat c})}{\partial \hat c} = \frac{s^\ast(x|\hat c+\epsilon)-s^\ast(x|\hat c)}{\epsilon}. $$
+
+Function <code>approx_score(k,epsilon,theta,guess,tol,params)</code> carries out the numerical approximation. Using the delta method, the standard error of $\mathbf{\hat c}$ are then calculated as follows.
+
+$$ \sqrt{\frac{diag\left((I(\mathbf{\hat c}))^{-1}\right)}{I}} $$
 
 $$ \sqrt{\left(\frac{\partial f(\mathbf{c})}{\partial \mathbf{c}}\right)^2\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
 
 In code:
 
-<code>((np.exp(res_supply.x) * np.diag(res_supply.hess_inv) * np.exp(res_supply.x))/len(data))**0.5
+<code>scores = scores_x[:,np.hstack((np.array(data['x']))).astype(int)]
+((c_hat * np.diag(np.linalg.inv(scores@scores.T)))* c_hat)**0.5
 </code>
 
   ### Estimation Results
 
-| parameter | estimate | standard error | parameter | estimate | standard error |
-| ---: | :---------: | :------: | ---: | :---------: | :------: |
-  | $\ln(\bar \kappa_1)$ | 10.8625 | (0.00016) | $\bar \kappa_1$ | 52183 | (9.0024) |
-  | $\ln(\bar \kappa_2)$ | 11.4392 | (0.00016) | $\bar \kappa_2$ | 92888 | (15.7957) |
-  | $\ln(\bar \kappa_3)$ | 11.9692 | (0.00017) | $\bar \kappa_3$ | 157812 | (27.2976) |
-  | $\ln(\bar \kappa_4)$ | 12.4895 | (0.00020) | $\bar \kappa_4$ | 265529 | (53.6090) |
-  | $\ln(\bar \phi_1)$ | 7.84021 | (0.00001) | $\bar \phi_1$ | 2541 | (0.0216) |
-  | $\ln(\bar \phi_2)$ | 8.17893 | (0.00001) | $\bar \phi_2$ | 3565 | (0.0268) |
-  | $\ln(\bar \phi_3)$ | 8.42697 | (0.00001) | $\bar \phi_3$ | 4569 | (0.0312) |
-  | $\ln(\bar \phi_4)$ | 8.66163 | (0.00001) | $\bar \phi_4$ | 5777 | (0.0671) |
-
   | parameter | estimate | standard error |
 | ---: | :---------: | :------: |
-  | $\bar \kappa_1$ | 247359 | (4097.0096) |
-  | $\bar \kappa_2$ | 297059 | (4699.9060) |
-  | $\bar \kappa_3$ | 445635 | (7776.0871) |
-  | $\bar \kappa_4$ | 783870 | (10474.4094) |
-  | $\bar \phi_1$ | 2273 | (0.7120) |
-  | $\bar \phi_2$ | 3330 | (0.9916) |
-  | $\bar \phi_3$ | 3961 | (1.6531) |
-  | $\bar \phi_4$ | 4951 | (2.1983) |
+  | $\bar \kappa_1$ | 247,359 | (4,097.0096) |
+  | $\bar \kappa_2$ | 297,059 | (4,699.9060) |
+  | $\bar \kappa_3$ | 445,635 | (7,776.0871) |
+  | $\bar \kappa_4$ | 783,870 | (10,474.4094) |
+  | $\bar \phi_1$ | 2,273 | (0.7120) |
+  | $\bar \phi_2$ | 3,330 | (0.9916) |
+  | $\bar \phi_3$ | 3,961 | (1.6531) |
+  | $\bar \phi_4$ | 4,951 | (2.1983) |
  
 ## Counterfactual Analysis
 
