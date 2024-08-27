@@ -13,28 +13,14 @@ from scipy.special import expit
 import shelve
 from pathlib import Path
 
-os.chdir(os.path.dirname(os.path.abspath('__file__')))
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-###### Parameters ######
+################################# Parameters ##################################
 
-    # demand
-a = 3.9902
-b = 1.0690
-alpha = -0.0086
-beta = np.array([-10.5354,-9.8218,-9.4401,-8.9099])
-gamma = 2.8607
-theta = [a,b,alpha,beta,gamma]
-
-    # supply
-kappa_bar = [181368,264819,426997,796930]
-phi_bar = [2323,3587,4345,5572]
-c = np.append(kappa_bar,phi_bar)
-
-    # other
 delta = .995
 tol = 1e-6
 f = .142
-upsilon_r = 0.992
+upsilon_r = .992
 nmax = 20
 mu = 10000
 J = 10000
@@ -48,52 +34,24 @@ S=np.vstack((np.hstack((S,np.repeat(np.array([[1,0,0,0]]),len(S),axis=0))),
              np.hstack((S,np.repeat(np.array([[0,1,0,0]]),len(S),axis=0))),
              np.hstack((S,np.repeat(np.array([[0,0,1,0]]),len(S),axis=0))),
              np.hstack((S,np.repeat(np.array([[0,0,0,1]]),len(S),axis=0)))
-             ))   
+             ))
 params = [delta,f,J,mu,nmax,S,upsilon_r]
 
-###### Solving The Model ######
+################################ Loading Data #################################
 
-from functions import q_s,solver
-
-P_init = np.array([[200]*len(S)])
-s_init = np.array([[J/(2*len(S))]*len(S)])
-V_init = (28*q_s(200,P_init,s_init,theta,0,params)*P_init.T)/(1-delta)
-
-V_star,s_star,P_star,chi_star,lamb_star = solver(theta,c,[P_init,s_init,V_init],tol,params)
-
-###### Data Generating Process ######
-
-    # random shock to each price
-    # shocked price in demand
-    # daily and then aggregate to monthly 
-
-for t in range(1,13*4*28+1):
-    index = np.repeat(range(0,924),np.random.multinomial(s_star.sum().astype(int),(s_star/s_star.sum()).flatten(),size=(13*4,))[t-1,:])
-    #p = (P_star.T + np.random.normal(loc = 0, scale = 25.0, size = (P_star.T).shape))
-    m = (t/28).astype(int) + 1
-    if t == 1:
-        p = P_star.T[index,:] + np.random.normal(loc = 0, scale = 25.0, size = P_star.T[index,:].shape)
-        data = np.hstack(( np.zeros((len(index),1)) + t, np.array([index]).T, S[index,:], p, np.random.binomial q_s(P_star,p,s_star,theta,0,params)[index,:] ))
-    else:
-        data = np.vstack((data, np.hstack(( np.zeros((len(index),1)) + t, np.array([index]).T, S[index,:], p[index,:] + np.random.normal(loc = 0, scale = 25.0, size = (1,)), q_s(p,p,s_star,theta,0,params)[index,:] + np.random.normal(loc = 0, scale = 0.1, size = q_s(P_star,P_star,s_star,theta,0,params)[index,:].shape ) )) ))
-
-data = pd.DataFrame(data,columns=['period','x','K','N','type 1','type 2','type 3','type 4','p','q'])
-
-data.to_pickle(os.path.join(Path().absolute().parent, 'data\\data.pkl'))
 data = pd.read_pickle(os.path.join(Path().absolute().parent, 'data\\data.pkl'))
 
-###### Demand Estimation ######
+############################## Demand Estimation ##############################
 
     # inversion
 data_est = data.copy()
 data_est['share'] = -np.log(1 - data_est['q'])/mu
-data_est = data_est[data_est['share'] > 0]
-data_est['share_0'] = 1 - data_est.groupby(['period'])['share'].transform('sum')
+data_est = data_est[(data_est['share'] > 0) & (data_est['share'] < np.inf)]
+data_est['share_0'] = 1 - data_est.groupby(['month'])['share'].transform('sum')
 data_est['r'] = 1 + 4*data_est['K']/data_est['N']
-data_est = data_est[(data_est['share'] > 0) & (data_est['r'] >0)]
+data_est = data_est[(data_est['r'] > 0)]
 
     # minimization
-
 from functions import dO,dU,O,xi,Z
 omicron0 = [0,0,0,-10,-10,-10,-10,0]
 
@@ -113,17 +71,36 @@ res_demand.x[7]]
     # standard errors
 G_bar = ( (Z(res_demand.x,data_est,params).T @ (-dU(res_demand.x,data_est,params))) )/len(data_est)
 W2 = np.linalg.inv( ((xi_hat*Z(res_demand.x,data_est,params)).T @ (xi_hat*Z(res_demand.x,data_est,params)))/len(data_est) )
-S1_hat = np.diag(np.linalg.inv((G_bar.T @ W2) @ G_bar))**.5/len(data_est)
+S1_hat = (np.diag(np.linalg.inv((G_bar.T @ W2) @ G_bar))/len(data_est))**.5
 
     # estimation results
 print('Estimates:',res_demand.x)
 print('Standard errors:',S1_hat)
 
-###### Supply Estimation ######
+# +1.24838612      0.07809104
+# +1.50331878      0.08999074
+# -0.00619878      0.00020315
+# -10.2594999      0.10257144
+# -9.72217131      0.10229196
+# -9.44320539      0.10255632
+# -9.07300601      0.10329358
+# +2.00972201      0.11552958    
+
+###############################################################################
+############################## Supply Estimation ##############################
+###############################################################################
 
 from functions import likelihood
+from functions import q_s
 
-s_d = np.array([(data.groupby(['x'])['period'].count()/52).reindex(np.arange(0,len(S)), fill_value=0)])
+    # initial guess
+P_init = np.array([[200]*len(S)])
+s_init = np.zeros((S.shape[0],1)).T
+s_init[0,[0,231,462,693]] = [J/8,J/8,J/8,J/8]
+V_init = (28*q_s(200,P_init,s_init,theta_hat,0,params)*P_init.T)/(1-delta)
+
+    # empirical state distribution
+s_d = np.array([(data.groupby(['x']).size()/52).reindex(np.arange(0,len(S)), fill_value=0)])
 shelve_file = shelve.open("guess") 
 shelve_file['guess'] = [P_init,s_init,V_init] 
 shelve_file.close() 
@@ -131,30 +108,50 @@ shelve_file.close()
     # maximization
 tol=1e-0
 k0 = np.log([100000,100000,100000,100000,3000,3000,3000,3000])
-res_supply = minimize(likelihood, k0, args=(theta_hat,tol,s_d,params), method='BFGS')
+res_supply = minimize(likelihood, k0, args=(theta_hat,tol,s_d,params), method='Nelder-Mead')
 c_hat = np.exp(res_supply.x)
-H_inv = res_supply.hess_inv   
 
     # standard errors
-S2_hat = ((c_hat * np.diag(H_inv) * c_hat)/len(data))**0.5
+from functions import approx_score
+scores_x = approx_score(res_supply.x, 1e-10,theta_hat,[P_init,s_init,V_init],tol,params)
+scores = scores_x[:,np.hstack((np.array(data['x']))).astype(int)]
+S2_hat = ((c_hat * np.diag(np.linalg.inv(scores@scores.T)))* c_hat)**0.5
 
     # estimation results
 print('Estimates:',c_hat)
 print('Standard errors:',S2_hat)
 
-###### Counterfactual Analysis ######
+#[247359. 297059. 445635. 783870.   2273.   3330.   3961.   4951.]
+#4097.00956 4698.90595 7776.08706 10474.4094 0.711975251 .991580160 1.65312917 2.19839718
+ 
+###############################################################################
+############################ Counterfactual Analysis ##########################
+###############################################################################
 
-from functions import simulation1,simulation2,Sub_prim,t_prim
+    # model solution
+from functions import solver,U,ccp_s,T_s
+V_star,s_star,P_star,chi_star,lamb_star = solver(theta_hat,c_hat,[P_init,s_init,V_init],0,tol,params)
 
-    # counterfactual 1    
-Wmax_Sub = minimize(Sub_prim, [0,0,0,0], args=(theta_hat,c_hat,[P_star,s_star,V_star],130,params), method='BFGS')
-Sub_c = np.zeros((S.shape[0],1))
-Sub_c[[0,231,462,693],:] = np.array([Wmax_Sub.x]).T
+q_star = q_s(P_star,P_star,s_star,theta_hat,0,params)    
+T_star = T_s(q_star,theta_hat,params)
+lamb0_star = np.array([np.repeat(lamb_star,231)]).T
+chi0_star = np.array([chi_star]).T
+eV0_in = T_star @ V_star
+eV0_out = V_star.reshape((231,4),order='F')[0,:]
+ps01_out = -(J/4-s_star[0,:231].sum())*(c_hat[0] - (1-lamb0_star[0])*(delta*eV0_out[0] + c_hat[0]))
+ps02_out = -(J/4-s_star[0,231:462].sum())*(c_hat[1] - (1-lamb0_star[231])*(delta*eV0_out[1] + c_hat[1]))
+ps03_out = -(J/4-s_star[0,462:693].sum())*(c_hat[2] - (1-lamb0_star[462])*(delta*eV0_out[2] + c_hat[2]))
+ps04_out = -(J/4-s_star[0,693:].sum())*(c_hat[3] - (1-lamb0_star[693])*(delta*eV0_out[3] + c_hat[3]))
+ps0_in = (s_star.T *( 28*q_star*(1+f)*P_star.T - (np.array([np.repeat(c_hat[4:],231)]).T - chi0_star * (delta*eV0_in + np.array([np.repeat(c_hat[4:],231)]).T)) ) ).sum()
+cs0 = -( mu - s_star @ ( mu*ccp_s(P_star,P_star,s_star,theta_hat,0,params) - q_star ) )*28*np.log(1 + (s_star @ np.array([np.diagonal(np.exp(U(P_star,theta_hat,0,params)))]).T) )/theta_hat[2]
+ps0 = ps0_in + ps01_out + ps02_out + ps03_out + ps04_out
 
-    # counterfactual 2
-W1_c,CS1_c,PS1_c,GS1_c,P1_c,s1_c,V1_c = simulation1(theta_hat,c_hat,[P_star,s_star,V_star],np.zeros((S.shape[0],1)),Sub_c,1000,params)
-W1_c,CS1_c,PS1_c,GS1_c,P1_c,s1_c,V1_c = simulation1(theta_hat,c_hat,[P1_c,s1_c,V1_c],np.zeros((S.shape[0],1)),Sub_c,130,params)
-WMax_t = minimize(t_prim, [0,0,0,0], args=(theta_hat,c_hat,[P1_c,s1_c,V1_c],[409.51, 646.95, 945.56, 1309.57],130,params), method='BFGS')
-t_c = np.zeros((S.shape[0],1))
-t_c[[0,231,462,693],:] = np.array([WMax_t.x]).T
-W2_c,CS2_c,PS2_c,GS2_c,P2_c,s2_c,V2_c = simulation2(theta_hat,c_hat,[P1_c,s1_c,V1_c],t_c,Sub_c,130,params)
+from functions import welfare
+WMax_t_l = minimize(welfare, 0, args=(theta_hat,c_hat,[cs0,ps0],[P_star,s_star,V_star],tol,params), method='Nelder-Mead')
+
+#Entrant tax/subsidy is [82.8790625]
+#Incumbent tax/subsidy is [-13.90044991]
+#Consumer surplus change is [[214470.10647843]]
+#Producer surplus change is [-23624.91984898]
+#Welfare change is [[954.22593315]]
+#Change in # properties: 32

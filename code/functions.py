@@ -64,7 +64,7 @@ def dV_s(p,P,s,V,theta,phi_bar,t,params):
     dT = dT_s(dq,theta,params)
     T = T_s(q,theta,params)
     deV = dT @ V
-    dV = 30*(q + dq*p.T) + delta*deV - np.exp(-delta*(T @ V)/phi_bar)*delta*deV
+    dV = 28*(q + dq*p.T) + delta*deV - np.exp(-delta*(T @ V)/phi_bar)*delta*deV
     return dV.T
 
 def d2V_s(p,P,s,V,theta,phi_bar,t,params):
@@ -78,7 +78,7 @@ def d2V_s(p,P,s,V,theta,phi_bar,t,params):
     d2T = d2T_s(d2q,theta,params)
     deV = dT @ V
     d2eV = d2T @ V
-    d2V = 30*(2*dq + d2q*p.T) + delta*d2eV - np.exp(-delta*(T @ V)/phi_bar)*delta*d2eV + np.exp(-delta*(T @ V)/phi_bar)*delta*delta*deV*deV/phi_bar
+    d2V = 28*(2*dq + d2q*p.T) + delta*d2eV - np.exp(-delta*(T @ V)/phi_bar)*delta*d2eV + np.exp(-delta*(T @ V)/phi_bar)*delta*delta*deV*deV/phi_bar
     return d2V.T
 
 def T_s(q,theta,params):
@@ -173,7 +173,7 @@ def F_s(q,chi,lamb,theta,params):
     entries = np.hstack((entry_terminal,entry_no,entry_bad,entry_good,entry_entry1,entry_entry2,entry_entry3,entry_entry4,entry_exit,entry_exit,entry_exit,entry_exit))
     return csr_matrix((entries, (rows,columns)), shape = (len(Ns), len(Ns)))
 
-def solver(theta,c,guess,tol,params):
+def solver(theta,c,guess,t,tol,params):
     a,b,alpha,beta,gamma = theta
     kappa1, kappa2, kappa3, kappa4 = c[:4]
     phi1, phi2, phi3, phi4 = c[4:]
@@ -191,7 +191,7 @@ def solver(theta,c,guess,tol,params):
             dP = 1e10
             P0 = P_old
             while dP>.1:
-                P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,0,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,0,params)
+                P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)
                 P1 = np.where(np.isnan(P1) == True,P_old,np.where((P1<0),0,np.where((P1>1000),1000,P1)))
                 dP = np.max(np.abs(P1 - P0))
                 P0 = P1
@@ -199,10 +199,11 @@ def solver(theta,c,guess,tol,params):
             dVprim = dV
         else:
             P_new = P_old
-        q_new = q_s(P_new,P_new,s_old,theta,0,params)
+        
+        q_new = q_s(P_new,P_new,s_old,theta,t,params)
         T = T_s(q_new,theta,params)
         eV = T @ V_old
-        V_new = 30*(q_new*P_new.T) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
+        V_new = 28*(q_new*(P_new.T -t)) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
         eV = T @ V_new
         chi = np.exp(-delta*eV/phi_bar).flatten()
         lamb = (1-np.exp(-delta*V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
@@ -272,140 +273,123 @@ def likelihood(k,theta,tol,s_d,params):
     a,b,alpha = theta[:3]
     beta = theta[3]
     gamma = theta[4]
+    start = time.time()
     shelve_file = shelve.open("guess") 
     guess = shelve_file['guess']
     shelve_file.close()    
-    V_star,s_star,P_star,chi_star,lamb_star = solver([a,b,alpha,beta,gamma],np.exp(k),guess,tol,params)
+    V_star,s_star,P_star,chi_star,lamb_star = solver([a,b,alpha,beta,gamma],np.exp(k),guess,0,tol,params)
     ll = np.hstack((np.array([s_d[(s_d>0) & (s_star>0)]]),np.array([[J/4-s_d[0,:231].sum()],[J/4-s_d[0:,231:462].sum()],[J/4-s_d[0,462:693].sum()],[J/4-s_d[0,693:].sum()]]).T)) @ np.log(np.hstack((np.array([s_star[(s_d>0) & (s_star>0)]]),np.array([[J/4-s_star[0,:231].sum()],[J/4-s_star[0,231:462].sum()],[J/4-s_star[0,462:693].sum()],[J/4-s_star[0,693:].sum()]]).T))/J).T
     shelve_file = shelve.open("gfg") 
     shelve_file['guess'] = [P_star,s_star,V_star] 
     shelve_file.close() 
+    print("Most recent cost candidate:",np.exp(k).round(0))
+    print("Most recent likelihood:",round(ll.sum(),6))
+    end = time.time()
+    print("Round time:",round(end - start))
     return -ll.sum()
 
-def simulation1(theta,c,sol,t,Sub,It,params):
-    a,b,alpha,beta,gamma = theta
-    kappa1, kappa2, kappa3, kappa4, phi1, phi2, phi3, phi4 = c
-    phi_bar = np.array([np.repeat([phi1,phi2,phi3,phi4],231)]).T
+def approx_score(k,epsilon,theta,guess,tol,params):
     delta,f,J,mu,nmax,S,upsilon_r = params
-    P_old,s_old,V_old = sol
-    W = np.array([])
-    CS = np.array([])
-    PS = np.array([])
-    GS = np.array([])
-    for it in range(It):
-        dP = 1e10
-        P0 = P_old
-        while dP>1e-1:
-            P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)
-            P1 = np.where(np.isnan(P1) == True,P_old,np.where((P1<0),0,np.where((P1>1000),1000,P1)))
-            dP = np.max(np.abs(P1 - P0))
-            P0 = P1
-        P_new = P1
+    a,b,alpha = theta[:3]
+    beta = theta[3]
+    gamma = theta[4]
+    V_star,s_star,P_star,chi_star,lamb_star = solver([a,b,alpha,beta,gamma],np.exp(k),guess,0,tol,params)
+    s_star = np.array([np.append(s_star,np.array([J/4-s_star[0,:231].sum(),J/4-s_star[0,231:462].sum(),J/4-s_star[0,462:693].sum(),J/4-s_star[0,693:].sum()]))])
+    s_der = np.zeros((len(k),len(s_star.T)))
+    i=0
+    while i<len(k):
+        k[i]=k[i]+epsilon
+        V_new,s_new,P_new,chi_new,lamb_new = solver([a,b,alpha,beta,gamma],np.exp(k),guess,0,tol,params)
+        s_der[i,:]=np.array([np.append(s_new,np.array([J/4-s_new[0,:231].sum(),J/4-s_new[0,231:462].sum(),J/4-s_new[0,462:693].sum(),J/4-s_new[0,693:].sum()]))])
+        i=i+1
+    s_der = (s_der-s_star)/epsilon
+    score = s_der/s_star
+    return score
+
+def counterfactual(theta,c,guess,t_E,tol,params):
+    a,b,alpha,beta,gamma = theta
+    kappa1, kappa2, kappa3, kappa4 = c[:4]
+    phi1, phi2, phi3, phi4 = c[4:]
+    phi_bar = np.array([np.repeat([phi1,phi2,phi3,phi4],231)]).T
+    P_init,s_init,V_init = guess
+    delta,f,J,mu,nmax,S,upsilon_r = params
+    V_old = V_init
+    P_old = P_init
+    s_old = s_init
+    dV = 1e10
+    change = 1e10
+    diff = 1e10
+    while diff>tol: 
+        #t_I = -s_old[0,[0,231,462,693]].sum()*t_E/(s_old[0,1:231].sum()+s_old[0,232:462].sum()+s_old[0,463:693].sum()+s_old[0,694:924].sum())
+        t_I = -s_old[0,[0,231,462,693]].sum()*t_E/(s_old[0,210:231].sum()+s_old[0,441:462].sum()+s_old[0,672:693].sum()+s_old[0,903:924].sum())
+        #t = np.ones((S.shape[0],1))*t_I
+        t = np.ones((S.shape[0],1))*0 
+        t[210:231,:] = np.array([t_I]).T
+        t[441:462,:] = np.array([t_I]).T
+        t[672:693,:] = np.array([t_I]).T
+        t[903:924,:] = np.array([t_I]).T
+        t[[0,231,462,693],:] = np.array([t_E]).T
+        if (change > 0.1):
+            dP = 1e10
+            P0 = P_old
+            while dP>.1:
+                P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)
+                P1 = np.where(np.isnan(P1) == True,P_old,np.where((P1<0),0,np.where((P1>1000),1000,P1)))
+                dP = np.max(np.abs(P1 - P0))
+                P0 = P1
+            P_new = P1
+            dVprim = dV
+        else:
+            P_new = P_old
         q_new = q_s(P_new,P_new,s_old,theta,t,params)
         T = T_s(q_new,theta,params)
         eV = T @ V_old
-        V_new = 30*(q_new*P_new.T) + Sub + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
+        #V_new = 28*(q_new*(P_new.T-t)) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
+        V_new = 28*q_s(P_init,P_init,s_init,theta,0,params)*P_init.T + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
         eV = T @ V_new
         chi = np.exp(-delta*eV/phi_bar).flatten()
         lamb = (1-np.exp(-delta*V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
         F = F_s(q_new,chi,lamb,theta,params)
-        s_new = (np.array([np.append(s_old,np.array([J/4-s_old[0,:231].sum(),J/4-s_old[0,231:462].sum(),J/4-s_old[0,462:693].sum(),J/4-s_old[0,693:].sum()]))])@ F)[:1,:-4]        
-        lamb = np.array([np.repeat(lamb,231)]).T
-        chi = np.array([chi]).T
-        T = T_s(q_new,theta,params)
-        eV_in = T @ V_new
-        eV_out = V_new.reshape((231,4),order='F')[0,:]
-        cs = -(s_new @ q_new)*30*np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha
-        ps_in = (s_new.T * (  (1+f)* (np.array([np.diagonal(30*q_s(P_new,P_new,s_new,theta,t,params)*P_new)]).T) + Sub - (np.array([np.repeat(c[4:],231)]).T - chi * (delta*eV_in + np.array([np.repeat(c[4:],231)]).T)) ) ).sum()
-        ps1_out = -(J/4-s_old[0,:231].sum())*(c[0] - (1-lamb[0])*(delta*eV_out[0] + c[0]))
-        ps2_out = -(J/4-s_old[0,231:462].sum())*(c[1] - (1-lamb[231])*(delta*eV_out[1] + c[1]))
-        ps3_out = -(J/4-s_old[0,462:693].sum())*(c[2] - (1-lamb[462])*(delta*eV_out[2] + c[2]))
-        ps4_out = -(J/4-s_old[0,693:].sum())*(c[3] - (1-lamb[693])*(delta*eV_out[3] + c[3]))
-        gs = -((30*s_new*q_s(P_new,P_new,s_new,theta,t,params).T) @ t + s_new @ Sub)
-        CS = np.append(CS,cs)
-        PS = np.append(PS,(ps_in + ps1_out + ps2_out + ps3_out + ps4_out))
-        GS = np.append(GS,gs)
-        W = np.append(W,cs + ps_in + ps1_out + ps2_out + ps3_out + ps4_out + gs)
+        s_new = (np.array([np.append(s_old,np.array([J/4-s_old[0,:231].sum(),J/4-s_old[0,231:462].sum(),J/4-s_old[0,462:693].sum(),J/4-s_old[0,693:].sum()]))])@ F)[:1,:-4]
+        while np.max(np.abs(s_new - s_old))>1e-2:
+            s_old = s_new
+            s_new = (np.array([np.append(s_old,np.array([J/4-s_old[0,:231].sum(),J/4-s_old[0,231:462].sum(),J/4-s_old[0,462:693].sum(),J/4-s_old[0,693:].sum()]))])@ F)[:1,:-4]
+        dV = np.max(np.abs(V_new - V_old))
+        dP = np.max(np.abs(P_new - P_old))
+        ds = np.max(np.abs(s_new - s_old))
+        diff = max(dV,dP,ds)
+        change = (dVprim - dV)/dVprim
         V_old = V_new
         P_old = P_new
         s_old = s_new
-    return [W,CS,PS,GS,P_new,s_new,V_new]
+    return [V_new,s_new,P_new,chi,lamb,t]
 
-def simulation2(theta,c,sol,t,Sub,It,params):
+def welfare(t_E,theta,c,B,sol,tol,params):
     a,b,alpha,beta,gamma = theta
     kappa1, kappa2, kappa3, kappa4, phi1, phi2, phi3, phi4 = c
-    phi_bar = np.array([np.repeat([phi1,phi2,phi3,phi4],231)]).T
     delta,f,J,mu,nmax,S,upsilon_r = params
-    P_init,s_init,V_init = sol
-    P_old,s_old,V_old = sol
-    W = np.array([])
-    CS = np.array([])
-    PS = np.array([])
-    GS = np.array([])
-    for it in range(It):
-        dP = 1e10
-        P0 = P_old
-        while dP>1e-1:
-            P1 = P0 - dV_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)/d2V_s(P0,P_old,s_old,V_old,theta,phi_bar,t,params)
-            P1 = np.where(np.isnan(P1) == True,P_old,np.where((P1<0),0,np.where((P1>1000),1000,P1)))
-            dP = np.max(np.abs(P1 - P0))
-            P0 = P1
-        P_new = P1
-        q_new = q_s(P_new,P_new,s_old,theta,t,params)
-        T = T_s(q_new,theta,params)
-        eV = T @ V_old
-        V_new = 30*(q_s(P_init,P_init,s_init,theta,np.zeros((S.shape[0],1)),params)*P_init.T) + Sub + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
-        eV = T @ V_new
-        chi = np.exp(-delta*eV/phi_bar).flatten()
-        lamb = (1-np.exp(-delta*V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
-        F = F_s(q_new,chi,lamb,theta,params)
-        s_new = (np.array([np.append(s_old,np.array([J/4-s_old[0,:231].sum(),J/4-s_old[0,231:462].sum(),J/4-s_old[0,462:693].sum(),J/4-s_old[0,693:].sum()]))])@ F)[:1,:-4]        
-        lamb = np.array([np.repeat(lamb,231)]).T
-        chi = np.array([chi]).T
-        T = T_s(q_new,theta,params)
-        eV_in = T @ V_new
-        eV_out = V_new.reshape((231,4),order='F')[0,:]
-        cs = -(s_new @ q_new)*30*np.log(1 + (s_new @ np.array([np.diagonal(np.exp(U(P_new,theta,t,params)))]).T) )/alpha
-        ps_in = (s_new.T * ( f*(np.array([np.diagonal(30*q_s(P_new,P_new,s_new,theta,t,params)*P_new)]).T) + (np.array([np.diagonal(30*q_s(P_init,P_init,s_init,theta,np.zeros((S.shape[0],1)),params)*P_init)]).T) + Sub - (np.array([np.repeat(c[4:],231)]).T - chi * (delta*eV_in + np.array([np.repeat(c[4:],231)]).T)) ) ).sum()
-        ps1_out = -(J/4-s_old[0,:231].sum())*(c[0] - (1-lamb[0])*(delta*eV_out[0] + c[0]))
-        ps2_out = -(J/4-s_old[0,231:462].sum())*(c[1] - (1-lamb[231])*(delta*eV_out[1] + c[1]))
-        ps3_out = -(J/4-s_old[0,462:693].sum())*(c[2] - (1-lamb[462])*(delta*eV_out[2] + c[2]))
-        ps4_out = -(J/4-s_old[0,693:].sum())*(c[3] - (1-lamb[693])*(delta*eV_out[3] + c[3]))
-        gs = -((30*s_new*q_s(P_new,P_new,s_new,theta,t,params).T) @ t + s_new @ (Sub - 30*(q_s(P_new,P_new,s_new,theta,t,params).T*P_new - q_s(P_init,P_init,s_init,theta,np.zeros((S.shape[0],1)),params).T*P_init).T))
-        CS = np.append(CS,cs)
-        PS = np.append(PS,(ps_in + ps1_out + ps2_out + ps3_out + ps4_out))
-        GS = np.append(GS,gs)
-        W = np.append(W,cs + ps_in + ps1_out + ps2_out + ps3_out + ps4_out + gs)
-        V_old = V_new
-        P_old = P_new
-        s_old = s_new
-    return [W,CS,PS,GS,P_new,s_new,V_new]
-
-
-def Sub_prim(Sub,theta,c,sol,It,params):
-    delta,f,J,mu,nmax,S,upsilon_r = params
-    x = np.zeros((S.shape[0],1))
-    x[[0,231,462,693],:] = np.array([Sub]).T
-    Sub = x
-    W,CS,PS,GS,P,s,V = simulation1(theta,c,sol,np.zeros((S.shape[0],1)),Sub,It,params)
-    W = (np.array([W]) @ np.array([delta**np.arange(0,It)]).T)[0][0]
-    print(W)
-    if np.isnan(W):
-        return -np.infty
-    else:
-        return -W
-
-def t_prim(t,theta,c,sol,Sub,It,params):
-    delta,f,J,mu,nmax,S,upsilon_r = params
-    y = np.zeros((S.shape[0],1))
-    y[[0,231,462,693],:] = np.array([Sub]).T
-    Sub = y
-    x = np.zeros((S.shape[0],1))
-    x[[0,231,462,693],:] = np.array([t]).T
-    t = x
-    W,CS,PS,GS,P,s,V = simulation2(theta,c,sol,t,Sub,It,params)
-    W = (np.array([W]) @ np.array([delta**np.arange(0,It)]).T)[0][0]
-    print(W)
+    cs0,ps0 = B
+    V,s,P,chi,lamb,t = counterfactual(theta,c,sol,t_E,tol,params)
+    q = q_s(P,P,s,theta,t,params)    
+    lamb = np.array([np.repeat(lamb,231)]).T
+    chi = np.array([chi]).T
+    T = T_s(q,theta,params)
+    eV_in = T @ V
+    eV_out = V.reshape((231,4),order='F')[0,:]
+    ps1_out = -(J/4-s[0,:231].sum())*(c[0] - (1-lamb[0])*(delta*eV_out[0] + c[0]))
+    ps2_out = -(J/4-s[0,231:462].sum())*(c[1] - (1-lamb[231])*(delta*eV_out[1] + c[1]))
+    ps3_out = -(J/4-s[0,462:693].sum())*(c[2] - (1-lamb[462])*(delta*eV_out[2] + c[2]))
+    ps4_out = -(J/4-s[0,693:].sum())*(c[3] - (1-lamb[693])*(delta*eV_out[3] + c[3]))
+    ps_in = (s.T * ( 28*q*((1+f)*P.T-t) - (np.array([np.repeat(c[4:],231)]).T - chi * (delta*eV_in + np.array([np.repeat(c[4:],231)]).T)) ) ).sum()
+    cs = -( mu - s @ ( mu*ccp_s(P,P,s,theta,t,params) - q ) )*28*np.log(1 + (s @ np.array([np.diagonal(np.exp(U(P,theta,t,params)))]).T) )/alpha
+    ps = ps_in + ps1_out + ps2_out + ps3_out + ps4_out
+    W = ((cs+ps) - (cs0+ps0))*(1-delta)
+    print('Entrant tax/subsidy is',t[0])
+    print('Incumbent tax/subsidy is',t[-1])
+    print("Consumer surplus change is", (cs - cs0))
+    print("Producer surplus change is", (ps - ps0))
+    print("Welfare change is", W)
+    print('Change in # properties:',int(round(s.sum() - sol[1].sum(),0)))
     if np.isnan(W):
         return -np.infty
     else:
