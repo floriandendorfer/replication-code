@@ -204,6 +204,7 @@ def solver(theta,c,guess,t,tol,params):
         T = T_s(q_new,theta,params)
         eV = T @ V_old
         V_new = 28*(q_new*(P_new.T -t)) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
+        #V_new = 28*q_s(P_init,P_init,s_init,theta,0,params)*P_init.T + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
         eV = T @ V_new
         chi = np.exp(-delta*eV/phi_bar).flatten()
         lamb = (1-np.exp(-delta*V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
@@ -306,7 +307,9 @@ def approx_score(k,epsilon,theta,guess,tol,params):
     score = s_der/s_star
     return score
 
-def counterfactual(theta,c,guess,t_E,tol,params):
+def counterfactual(theta,c,guess,t_I,tol,params):
+#def counterfactual(theta,c,guess,t,tol,params):
+#def counterfactual(theta,c,guess,t_E,tol,params):
     a,b,alpha,beta,gamma = theta
     kappa1, kappa2, kappa3, kappa4 = c[:4]
     phi1, phi2, phi3, phi4 = c[4:]
@@ -319,16 +322,20 @@ def counterfactual(theta,c,guess,t_E,tol,params):
     dV = 1e10
     change = 1e10
     diff = 1e10
+    
+    #t_E,t_I = t
+    
     while diff>tol: 
         #t_I = -s_old[0,[0,231,462,693]].sum()*t_E/(s_old[0,1:231].sum()+s_old[0,232:462].sum()+s_old[0,463:693].sum()+s_old[0,694:924].sum())
-        t_I = -s_old[0,[0,231,462,693]].sum()*t_E/(s_old[0,210:231].sum()+s_old[0,441:462].sum()+s_old[0,672:693].sum()+s_old[0,903:924].sum())
+        #t_I = -s_old[0,[0,231,462,693]].sum()*t_E/(s_old[0,210:231].sum()+s_old[0,441:462].sum()+s_old[0,672:693].sum()+s_old[0,903:924].sum())
         #t = np.ones((S.shape[0],1))*t_I
         t = np.ones((S.shape[0],1))*0 
         t[210:231,:] = np.array([t_I]).T
         t[441:462,:] = np.array([t_I]).T
         t[672:693,:] = np.array([t_I]).T
         t[903:924,:] = np.array([t_I]).T
-        t[[0,231,462,693],:] = np.array([t_E]).T
+        #t[[0,231,462,693],:] = np.array([t_E]).T
+        #t[[0,231,462,693],:] = np.array([0]).T
         if (change > 0.1):
             dP = 1e10
             P0 = P_old
@@ -345,7 +352,17 @@ def counterfactual(theta,c,guess,t_E,tol,params):
         T = T_s(q_new,theta,params)
         eV = T @ V_old
         #V_new = 28*(q_new*(P_new.T-t)) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
-        V_new = 28*q_s(P_init,P_init,s_init,theta,0,params)*P_init.T + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
+        #V_new = 28*q_s(P_init,P_init,s_init,theta,0,params)*P_init.T + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
+        #V_new = 28*(q_new*P_new.T) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
+        l = np.ones((S.shape[0],1))*0
+        l[210:231,:] = np.array([1]).T
+        l[441:462,:] = np.array([1]).T
+        l[672:693,:] = np.array([1]).T
+        l[903:924,:] = np.array([1]).T
+        #V_new = 28*(q_new*P_new.T) - 28*l*(s_old[:,[0,231,462,693]] @ (t[[0,231,462,693],:]*q_new[[0,231,462,693],:]))/(s_old[:,[0,231,462,693]]).sum() + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
+        V_new = 28*(q_new*P_new.T) - 28*l*(s_old[:,210:231] @ (t[210:231,:]*q_new[210:231,:]) + s_old[:,441:462] @ (t[441:462,:]*q_new[441:462,:]) + s_old[:,672:693] @ (t[672:693,:]*q_new[672:693,:]) + s_old[:,903:924] @ (t[903:924,:]*q_new[903:924,:]))/(s_old[:,210:231].sum() + s_old[:,441:462].sum() + s_old[:,672:693].sum() + s_old[:,903:924].sum()) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
+        #V_new = 28*(q_new*P_new.T) - 28*(s_old @ (t*q_new))/(s_old).sum() + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
+        #print(28*(s_old @ (t*q_new))/(s_old).sum())
         eV = T @ V_new
         chi = np.exp(-delta*eV/phi_bar).flatten()
         lamb = (1-np.exp(-delta*V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
@@ -364,12 +381,12 @@ def counterfactual(theta,c,guess,t_E,tol,params):
         s_old = s_new
     return [V_new,s_new,P_new,chi,lamb,t]
 
-def welfare(t_E,theta,c,B,sol,tol,params):
+def welfare(t,theta,c,B,sol,tol,params):
     a,b,alpha,beta,gamma = theta
     kappa1, kappa2, kappa3, kappa4, phi1, phi2, phi3, phi4 = c
     delta,f,J,mu,nmax,S,upsilon_r = params
     cs0,ps0 = B
-    V,s,P,chi,lamb,t = counterfactual(theta,c,sol,t_E,tol,params)
+    V,s,P,chi,lamb,t = counterfactual(theta,c,sol,t,tol,params)
     q = q_s(P,P,s,theta,t,params)    
     lamb = np.array([np.repeat(lamb,231)]).T
     chi = np.array([chi]).T
@@ -383,7 +400,7 @@ def welfare(t_E,theta,c,B,sol,tol,params):
     ps_in = (s.T * ( 28*q*((1+f)*P.T-t) - (np.array([np.repeat(c[4:],231)]).T - chi * (delta*eV_in + np.array([np.repeat(c[4:],231)]).T)) ) ).sum()
     cs = -( mu - s @ ( mu*ccp_s(P,P,s,theta,t,params) - q ) )*28*np.log(1 + (s @ np.array([np.diagonal(np.exp(U(P,theta,t,params)))]).T) )/alpha
     ps = ps_in + ps1_out + ps2_out + ps3_out + ps4_out
-    W = ((cs+ps) - (cs0+ps0))*(1-delta)
+    W = ((cs+ps) - (cs0+ps0))
     print('Entrant tax/subsidy is',t[0])
     print('Incumbent tax/subsidy is',t[-1])
     print("Consumer surplus change is", (cs - cs0))
