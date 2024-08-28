@@ -1,7 +1,7 @@
 # Replication code
 
 ## Parameters
-
+  
 |  | name |            |  value |
   | ---: | ---: | :---------: | :------: |
   | demand (<code>theta</code>) | price | $\alpha$ | -0.0068 |
@@ -33,15 +33,17 @@ Function <code>U_s(p,theta,t,params)</code> characterizes a guests's indirect **
 
   $$U_x = \gamma\frac{a + K(x)}{a + b + N(x)} + \beta(x) + \alpha ((1+f)p- t) + \epsilon = u(p,x) + \epsilon$$
   
-$p$ is the daily rental rate of the listing; $t$ is the counterfactual per-unit subsidy. For the moment, we set $t$ equal to zero.
+* $p$ is the daily rental rate of the listing; $t$ is the counterfactual per-unit subsidy (if t>0) or tax (if t<0). For the moment, we set $t$ equal to zero.
 
-The **unobserved quality** $\omega$ is unknown to guests and hosts. However, $\omega$ is known to be iid $Beta(a,b)$ distributed. After observing the number of good reviews $K$ and bad reviews $N-K$ agents form an expectation about the unobserved quality, $E[\omega|N,K]$.</li>
+* The **unobserved quality** $\omega$ is unknown to guests and hosts. However, $\omega$ is known to be iid $Beta(a,b)$ distributed. After observing the number of good reviews $K$ and bad reviews $N-K$ agents form an expectation about the unobserved quality, $E[\omega|N,K] = \frac{a + K}{a + b + N}$.</li>
 
-$\epsilon$ is iid T1EV extreme value distributed.
+* $\epsilon$ is iid T1EV extreme value distributed.
 
 $\mathbf{s}$ is the **state distribution**. $s(x)$ pins down the number of properties in each state. Function <code>ccp_s(p,P,s,theta,t,params)</code> characterizes the probability that a guest ***intends*** to book the property at rate $p$ provided that all remaining hosts set their prices according to $P(x)$.
 
-$$ccp(p,x) = \frac{\exp(u(p,x))}{1+\sum_xs(x)\exp(u(P(x),x))}$$ For later use, we also work out the first-order (<code>dccp_s(p,P,s,theta,t,params)</code>) and second-order (<code>d2ccp_s(p,P,s,theta,t,params)</code>) derivatives of $ccp(p,x)$ with respect to $p$.
+$$ccp(p,x) = \frac{\exp(u(p,x))}{1+\sum_xs(x)\exp(u(P(x),x))}$$ 
+
+For later use, we also work out the first-order (<code>dccp_s(p,P,s,theta,t,params)</code>) and second-order (<code>d2ccp_s(p,P,s,theta,t,params)</code>) derivatives of $ccp(p,x)$ with respect to $p$.
 
 $$ccp'(p,x) = ccp(p,x)(1 - ccp(p,x))\alpha(1+f) $$
 
@@ -61,7 +63,7 @@ Strictly speaking, $q_s$ is the ***daily*** booking probability. As a **time per
 
 ## State Transitions
 
-If a property is booked ($q(p,x) = 1$), $x$ changes with probability $\upsilon_r = 70.41$% between periods. Conditional on being booked, it receives a good review ($\Delta N = 1, \Delta K = 1$) with probability $\frac{a+K(x)}{a+b+N(x)}$. Conditional on being booked, it receives a bad review ($\Delta N = 1, \Delta K = 0$) with probability $\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$. The **probability of getting a good review**  and the **probability of getting a bad review** are $\rho^g(p,x)$ and $\rho^b(p,x)$ respectively. States where $N=20$ are **terminal** and the probability of getting a review is zero.
+If a property is fully booked in a given month ($q(p,x) = 1$), a listing adds $\upsilon_r = 0.992$ reviews between periods and $x$ changes. Conditional on being booked, it receives a good review ($\Delta N = 1, \Delta K = 1$) with probability $\frac{a+K(x)}{a+b+N(x)}$. Conditional on being booked, it receives a bad review ($\Delta N = 1, \Delta K = 0$) with probability $\left(1-\frac{a + K(x)}{a+b+N(x)}\right)$. The **probability of getting a good review**  and the **probability of getting a bad review** are $\rho^g(p,x)$ and $\rho^b(p,x)$ respectively. States where $N=20$ are **terminal** and the probability of getting a review is zero.
 
 $$\rho^g(p,x) = \upsilon_rq(p,x)\frac{a+K(x)}{a+b+N(x)}$$
 
@@ -132,7 +134,7 @@ The expected, total operating costs of properties in a certain state in a given 
 
 $$ \text{Total operating costs} = \sum_{x}s(x)\left((1-\chi(p,x))\bar \phi(x) - \chi(p,x)\delta \mathbb{E}_{\tilde x}[V(\tilde x)|p,x]\right) $$ 
 
-<code>F_s(p,P,s,q,chi,lamb,theta,t,params)</code> contains the **expanded transition matrix** $\mathbf{F}(p)$. It accommodate transitions from and to inactivity by expanding $\mathbf{T}(p)$ by an additional state. Let $\nu^i_s = (1-\chi_s)\rho^i$, $i=g,b,0$ be the transition probability accounting for exit.
+<code>F_s(p,P,s,q,chi,lamb,theta,t,params)</code> contains the **expanded transition matrix** $\mathbf{F}(p)$. It accommodate transitions from and to inactivity by expanding $\mathbf{T}(p)$ by an additional state. Let $\nu^i_x = (1-\chi_s)\rho^i$, $i=g,b,0$ be the transition probability accounting for exit.
 
 <div>
 
@@ -196,7 +198,7 @@ In code:
 <code>q_new = q_s(P_new,P_new,s_old,theta,t,params)
 T = T_s(P_new,P_new,s_old,q_new,theta,t,params)
 eV = T @ V_old
-V_new = 30 * (q_new * P_new.T) + delta * eV - (1 - np.exp(-delta * eV/phi_bar)) * phi_bar</code>
+V_new = 28 * (q_new * P_new.T) + delta * eV - (1 - np.exp(-delta * eV/phi_bar)) * phi_bar</code>
 
   ### Entry & Exit Rate Updates
 
@@ -217,7 +219,7 @@ $$ \left[\mathbf{s},J/4-s_1,J/4-s_2,J/4-s_3,J/4-s_4\right] = \left[\mathbf{s}_0,
 
 In code:
 
-<code>while np.max(np.abs(s_new - s_old))>10e-3:
+<code>while np.max(np.abs(s_new - s_old))>1e-2:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s_old = s_new
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s_new = (np.array([np.append(s_old,np.array([J/4-s_old[0,:231].sum(),J/4-s_old[0,231:462].sum(),J/4-s_old[0,462:693].sum(),J/4-
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s_old[0,693:].sum()]))])@ F)[:1,:-4]</code>
@@ -230,11 +232,11 @@ $$|\mathbf{P}-\mathbf{\hat P}|\leq \text{tol} \ \text{ and } \ |\mathbf{s}-\math
 
 <code>tol</code> is set to 0.000001. To save time, we solve the host's pricing problem only if $\mathbf{V}$ changes substantially, i.e., by more than 10\% since the last time we solved for $p$.
 
-Our initial guess of $P(x)$ is \$300 for all $x$. The initial guess of the state distribution is that half of the properties are in the market, while half are not. Those that are in the market are uniformely distributed across states. The initial guess for the value function is the PDV of the revenue earned by the host if they as well as all competitors set a price of \$300.
+Our initial guess of $P(x)$ is \$200 for all $x$. The initial guess of the state distribution is that half of the properties are in the market, while half are not. Those that are in the market are uniformely distributed across states. The initial guess for the value function is the PDV of the revenue earned by the host if they as well as all competitors set a rental rate of \$200 a night.
 
 In code:
 
-<code>P_init = np.array([[200]*len(S)])
+<code>P_init = np.array([[200] * len(S)])
 s_init = np.zeros((S.shape[0],1)).T
 s_init[0,[0,231,462,693]] = [J/8,J/8,J/8,J/8]
 V_init = (28*q_s(200,P_init,s_init,theta,0,params)*P_init.T)/(1-delta)
@@ -252,19 +254,36 @@ In code:
 
 <img src="graphs/chi_star.png" alt="prices" width="300"/> | <img src="graphs/q_star.png" alt="demand" width="300"/>
 
+## Simulating Data
+
+For this purpose of replicating our estimation results, we simulate four years (52 months or 260 5-day long booking period) worth of data. For each booking period, we draw the equilibrium number of active listings from $\mathbf{s}^\ast$. For each booking spell, each host sets the rental rate of their listing according to $\mathbf{P}^\ast$ plus some random, normally distributed shock. We then calculate the occupancy rate for the rates of all active listings. We aggregate the simulated data to the monthly level.    
+
+Load the data using the following code:
+
+<code>data = pd.read_pickle(os.path.join(Path().absolute().parent, 'data\\data.pkl'))</code>
+
 ## Demand Estimation
+
+  ### Inversion
 
 We estimate the demand parameters using GMM. <code>xi(omicron,adata,params)</code> stores the **structural error term** $\xi_{it}$ of property $i$ at time $\tau$.
 
 $$\xi_{i\tau}(\omicron) = \ln(ccp_{i\tau}) - \ln(ccp_{0\tau}) - u_{i\tau}(\omicron)$$
 
-  ### Inversion
-
-We retrieve $ccp_{it}$ from the data by inverting $q_{i\tau}$.
+We retrieve $ccp_{it}$ from the data by inverting $q_{i\tau}$. 
 
 $$ ccp_{i\tau} = -\ln(1 - q_{i\tau})/\mu $$
 
-$ccp_{0\tau}$ is then $1-\sum_i ccp_{i\tau}$. Notice that, order to arrive at the regression equation, we must take the logarithm *twice*. This introduces additional bias from measurement error and complicates the estimation.
+In code:
+
+<code>data_est = data.copy()
+data_est['share'] = -np.log(1 - data_est['q'])/mu
+data_est = data_est[(data_est['share'] > 0) & (data_est['share'] < np.inf)]</code>
+
+$ccp_{0\tau}$ is then $1-\sum_i ccp_{i\tau}$. Notice that, order to arrive at the regression equation, we must take the logarithm *twice*. This introduces additional bias from measurement error and complicates the estimation. In code:
+
+<code>data_est['share_0'] = 1 - data_est.groupby(['month'])['share'].transform('sum')
+</code>
 
 Rather than estimating $\theta = (a,b,\alpha,\boldsymbol{\beta},\gamma)$ directly, we estimate $\omicron = (\psi,\iota,\alpha,\boldsymbol{\beta},\gamma)$ to facilitate the estimation.
 
@@ -278,7 +297,11 @@ The **objective function** is stored in <code>O(omicron,adata,W,params)</code>. 
 
 $$\left(\frac{1}{I}\mathbf{Z}^T\boldsymbol{\xi}(\omicron)\right)^TW\left(\frac{1}{I}\mathbf{Z}^T\boldsymbol{\xi}(\omicron)\right)$$
 
-$\mathbf{Z}$ is the set of **instruments**. Here, we simply use the rental rate $p$, number of reviews $N$ and $K$ and the average rating $r=1+4(K/N)$, as the prices in the mock data are simply a function of $s$.
+$\mathbf{Z}$ is the set of **instruments**. Here, we simply use the rental rate $p$ , number of reviews $N$ and $K$ and the average rating $r=1+4(K/N)$ (note that in the mock data, rental rates and reviews are not endogenous). We infer a listing's rating from its state. In code: 
+
+<code>data_est['r'] = 1 + 4*data_est['K']/data_est['N']
+data_est = data_est[(data_est['r'] > 0)]
+</code>
 
 We minimize $O(\omicron)$ using the analytical gradient.
 
@@ -294,9 +317,9 @@ $$ W_1 = I\left(\mathbf{Z}^T\mathbf{Z}\right)^{-1} $$
 
 In code:
 
-<code>start_values = [0,0,0,-10,-10,-10,-10,0]
-W1 = np.linalg.inv( ((Z(start_values,data,params)).T @ (Z(start_values,data,params)))/len(data))
-res_demand = minimize(O, start_values, args=(data,W1,params), method='BFGS',jac=dO)</code>
+<code>omicron0 = [0,0,0,-10,-10,-10,-10,0]
+W1 = np.linalg.inv( ((Z(omicron0,data,params)).T @ (Z(omicron0,data,params)))/len(data))
+res_demand = minimize(O, omicron0, args=(data,W1,params), method='BFGS',jac=dO)</code>
 
 In the second step, we choose the efficient weighting matrix. Let $\hat \omicron$ be our estimation result from the first stage.
 
@@ -306,7 +329,7 @@ In code:
 
 <code>xi_hat = xi(res_demand.x,data,params)
 W2 = np.linalg.inv( ((xi_hat * Z(res_demand.x,data,params)).T @ (xi_hat * Z(res_demand.x,data,params)))/len(data) )
-res_demand = minimize(O, start_values, args=(data,W2,params), method='BFGS',jac=dO)
+res_demand = minimize(O, omicron0, args=(data,W2,params), method='BFGS',jac=dO)
 </code>
 
   ### Standard Errors
@@ -335,9 +358,7 @@ S_hat = np.diag(np.linalg.inv((G_bar.T @ W2) @ G_bar))**.5/len(data)
   | $\beta_4$ | -9.0730 | (0.1033) |
   | $\gamma$ | 2.0097 | (0.1155) |
 
-We convert $\hat \omicron$ to $\hat \theta$. 
-
-In code:
+We convert $\hat \omicron$ to $\hat \theta$. In code:
 
 <code>theta_hat = [expit(res_demand.x[0])*np.exp(res_demand.x[1]),
 (1-expit(res_demand.x[0]))*np.exp(res_demand.x[1]),
