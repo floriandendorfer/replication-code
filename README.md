@@ -436,8 +436,48 @@ To calculate the counterfactual welfare change, we first solve for the status-qu
 
 In code:
 <code>V_star,s_star,P_star,chi_star,lamb_star = solver(theta_hat,c_hat,[P_init,s_init,V_init],0,tol,params)
-<\code>
+</code>
 
-We calculate the per-period consumer surplus as follows.
+We calculate the welfare change as $\Delta \text{Welfare} = \Delta (\text{consumer surplus}) +  \Delta (\text{producer surplus})$. Per-period consumer surplus is calculated as follows.
 
-$$ 28\left(\mu - \sum_x^X s(x)(-\ln(1-q_s(x))-q_s(x))\right)\ln\left(1 + \sum_x^X s(x)\nu(P(x),x)\right) + \text{constant} $$
+$$ 28\left(\mu - \sum_x^X s(x)(-\ln(1-q_s(x))-q_s(x))\right)\ln\left(1 + \sum_x^X s(x)u(P(x),x)\right) + \text{constant} $$
+
+Per-period producer surplus is 
+
+$$ \sum_x^Xs(x) 28q_s(x)(1+f)(P(x) - t) - \text{total operating costs} - \text{total entry costs}. $$
+
+Note that, for our purposes here, we assume that hosts bear the cost of the policy. Based on the status-quo model solution we calculate current consumer surplus, producer surplus, and welfare (up to a constant). In code:
+
+<code>q_star = q_s(P_star,P_star,s_star,theta_hat,0,params)    
+T_star = T_s(q_star,theta_hat,params)
+lamb0_star = np.array([np.repeat(lamb_star,231)]).T
+chi0_star = np.array([chi_star]).T
+eV0_in = T_star @ V_star
+eV0_out = V_star.reshape((231,4),order='F')[0,:]
+ps01_out = -(J/4-s_star[0,:231].sum()) * (c_hat[0] - (1-lamb0_star[0]) * (delta * eV0_out[0] + c_hat[0]))
+ps02_out = -(J/4-s_star[0,231:462].sum()) * (c_hat[1] - (1-lamb0_star[231]) * (delta * eV0_out[1] + c_hat[1]))
+ps03_out = -(J/4-s_star[0,462:693].sum()) * (c_hat[2] - (1-lamb0_star[462]) * (delta * eV0_out[2] + c_hat[2]))
+ps04_out = -(J/4-s_star[0,693:].sum()) * (c_hat[3] - (1-lamb0_star[693]) * (delta * eV0_out[3] + c_hat[3]))
+ps0_in = (s_star.T * ( 28 * q_star * (1+f) * P_star.T - (np.array([np.repeat(c_hat[4:],231)]).T - chi0_star * (delta*eV0_in + np.array([np.repeat(c_hat[4:],231)]).T)) ) ).sum()
+cs0 = -( mu - s_star @ ( mu * ccp_s(P_star,P_star,s_star,theta_hat,0,params) - q_star ) ) * 28 * np.log(1 + (s_star @ np.array([np.diagonal(np.exp(U(P_star,theta_hat,0,params)))]).T) )/theta_hat[2]
+ps0 = ps0_in + ps01_out + ps02_out + ps03_out + ps04_out
+</code>
+
+<code>welfare(t,theta,c,B,sol,tol,params)</code> calculates the welfare change if guests receive $\$ t_E$ upon booking an unreviewed ``entrant" listing and $\$ t_I$ upon booking an ``incumbent" listing with 20 reviews. As part of the function, <code>counterfactual(theta,c,guess,t_I,tol,params)</code> solves the the model for a given $t_E$, under the constraint that $t_I$ is such that the **average tax/subsidy is zero**. In code,
+
+<code>t_I = -s_old[0,[0,231,462,693]].sum()*t_E/(s_old[0,210:231].sum()+s_old[0,441:462].sum()+s_old[0,672:693].sum()+s_old[0,903:924].sum())
+        t = np.ones((S.shape[0],1))*t_I
+        t[[0,231,462,693],:] = np.array([t_E]).T</code>
+
+As a second constraint on the model solution, we impose that hosts make the same revenue as in the status-quo equilibrium such that
+
+$$ V_new = 28 * q_s(P_star,P_star,s_star,theta,0,params) * P_star.T + delta * eV - (1 - np.exp(-delta * eV/phi_bar)) * phi_bar. $$
+
+<code>welfare(t,theta,c,B,sol,tol,params)</code> searches over $t_E$, defined on the real numbers, to maximize the welfare increase. In code:
+
+<code>WMax_t_l = minimize(welfare, 0, args=(theta_hat,c_hat,[cs0,ps0],[P_star,s_star,V_star],tol,params), method='Nelder-Mead')</code>
+
+* An entrant subsidy of \72, implying an incumbent tax of \$55, is optimal.
+* Consumer surplus increases by \$76k. Producer surplus decreases by \$30k (recall that this includes the cost of the policy).
+* Accordingly, welfare increases by \$46k.
+* There are 24 more active listings in the counterfactual equilibrium.  
