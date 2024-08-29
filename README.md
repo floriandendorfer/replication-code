@@ -477,7 +477,7 @@ $$ V(p,x) = 28q^\ast(x)P^\ast(x) - (1-\chi(p,x))\phi(x) + \delta \mathbf{T}\math
 
 <code>WMax_t_l = minimize(welfare, 0, args=(theta_hat,c_hat,[cs0,ps0],[P_star,s_star,V_star],tol,params), method='Nelder-Mead')</code>
 
-* An entrant subsidy of \72, implying an incumbent tax of \$55, is optimal.
+* An entrant subsidy of \$72, implying an incumbent tax of \$55, is optimal.
 * Consumer surplus increases by \$76k. Producer surplus decreases by \$30k (recall that this includes the cost of the policy).
 * Accordingly, welfare increases by \$46k.
 * There are 24 more active listings in the counterfactual equilibrium.  
