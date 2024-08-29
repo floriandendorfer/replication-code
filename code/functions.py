@@ -199,12 +199,10 @@ def solver(theta,c,guess,t,tol,params):
             dVprim = dV
         else:
             P_new = P_old
-        
         q_new = q_s(P_new,P_new,s_old,theta,t,params)
         T = T_s(q_new,theta,params)
         eV = T @ V_old
-        V_new = 28*(q_new*(P_new.T -t)) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
-        #V_new = 28*q_s(P_init,P_init,s_init,theta,0,params)*P_init.T + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
+        V_new = 28*(q_new*P_new.T) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
         eV = T @ V_new
         chi = np.exp(-delta*eV/phi_bar).flatten()
         lamb = (1-np.exp(-delta*V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
@@ -307,35 +305,23 @@ def approx_score(k,epsilon,theta,guess,tol,params):
     score = s_der/s_star
     return score
 
-def counterfactual(theta,c,guess,t_I,tol,params):
-#def counterfactual(theta,c,guess,t,tol,params):
-#def counterfactual(theta,c,guess,t_E,tol,params):
+def counterfactual(theta,c,guess,t_E,tol,params):
     a,b,alpha,beta,gamma = theta
     kappa1, kappa2, kappa3, kappa4 = c[:4]
     phi1, phi2, phi3, phi4 = c[4:]
     phi_bar = np.array([np.repeat([phi1,phi2,phi3,phi4],231)]).T
-    P_init,s_init,V_init = guess
+    P_star,s_star,V_star = guess
     delta,f,J,mu,nmax,S,upsilon_r = params
-    V_old = V_init
-    P_old = P_init
-    s_old = s_init
+    V_old = V_star
+    P_old = P_star
+    s_old = s_star
     dV = 1e10
     change = 1e10
     diff = 1e10
-    
-    #t_E,t_I = t
-    
     while diff>tol: 
-        #t_I = -s_old[0,[0,231,462,693]].sum()*t_E/(s_old[0,1:231].sum()+s_old[0,232:462].sum()+s_old[0,463:693].sum()+s_old[0,694:924].sum())
-        #t_I = -s_old[0,[0,231,462,693]].sum()*t_E/(s_old[0,210:231].sum()+s_old[0,441:462].sum()+s_old[0,672:693].sum()+s_old[0,903:924].sum())
-        #t = np.ones((S.shape[0],1))*t_I
-        t = np.ones((S.shape[0],1))*0 
-        t[210:231,:] = np.array([t_I]).T
-        t[441:462,:] = np.array([t_I]).T
-        t[672:693,:] = np.array([t_I]).T
-        t[903:924,:] = np.array([t_I]).T
-        #t[[0,231,462,693],:] = np.array([t_E]).T
-        #t[[0,231,462,693],:] = np.array([0]).T
+        t_I = -s_old[0,[0,231,462,693]].sum()*t_E/(s_old[0,210:231].sum()+s_old[0,441:462].sum()+s_old[0,672:693].sum()+s_old[0,903:924].sum())
+        t = np.ones((S.shape[0],1))*t_I
+        t[[0,231,462,693],:] = np.array([t_E]).T
         if (change > 0.1):
             dP = 1e10
             P0 = P_old
@@ -351,18 +337,7 @@ def counterfactual(theta,c,guess,t_I,tol,params):
         q_new = q_s(P_new,P_new,s_old,theta,t,params)
         T = T_s(q_new,theta,params)
         eV = T @ V_old
-        #V_new = 28*(q_new*(P_new.T-t)) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
-        #V_new = 28*q_s(P_init,P_init,s_init,theta,0,params)*P_init.T + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
-        #V_new = 28*(q_new*P_new.T) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
-        l = np.ones((S.shape[0],1))*0
-        l[210:231,:] = np.array([1]).T
-        l[441:462,:] = np.array([1]).T
-        l[672:693,:] = np.array([1]).T
-        l[903:924,:] = np.array([1]).T
-        #V_new = 28*(q_new*P_new.T) - 28*l*(s_old[:,[0,231,462,693]] @ (t[[0,231,462,693],:]*q_new[[0,231,462,693],:]))/(s_old[:,[0,231,462,693]]).sum() + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
-        V_new = 28*(q_new*P_new.T) - 28*l*(s_old[:,210:231] @ (t[210:231,:]*q_new[210:231,:]) + s_old[:,441:462] @ (t[441:462,:]*q_new[441:462,:]) + s_old[:,672:693] @ (t[672:693,:]*q_new[672:693,:]) + s_old[:,903:924] @ (t[903:924,:]*q_new[903:924,:]))/(s_old[:,210:231].sum() + s_old[:,441:462].sum() + s_old[:,672:693].sum() + s_old[:,903:924].sum()) + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
-        #V_new = 28*(q_new*P_new.T) - 28*(s_old @ (t*q_new))/(s_old).sum() + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
-        #print(28*(s_old @ (t*q_new))/(s_old).sum())
+        V_new = 28*q_s(P_star,P_star,s_star,theta,0,params)*P_star.T + delta*eV - (1 - np.exp(-delta*eV/phi_bar))*phi_bar
         eV = T @ V_new
         chi = np.exp(-delta*eV/phi_bar).flatten()
         lamb = (1-np.exp(-delta*V_new.reshape((231,4),order='F')[0,:]/[kappa1,kappa2,kappa3,kappa4]))
