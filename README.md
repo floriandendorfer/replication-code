@@ -59,7 +59,7 @@ Function <code>dq_s(p,P,s,theta,t,params)</code> and function <code>d2q_s(p,P,s,
   
   $$q''(p,x) = \mu\exp(-\mu \cdot ccp(p,x))(ccp''(p,x)-\mu\cdot ccp'(p,x))$$
 
-Strictly speaking, $q_s$ is the ***daily*** booking probability. As a **time period** in the model is a 4-week interval ("month"), we interpret $q_s$ as the monthly **occupancy rate**. 
+$q_s$ is the ***daily*** booking probability. In the aggregated data and in the model, where a **time period** is defined as a 4-week interval ("month"), $q_s$ is going to reflect the monthly **occupancy rate**. 
 
 ## State Transitions
 
@@ -239,7 +239,7 @@ In code:
 <code>P_init = np.array([[200] * len(S)])
 s_init = np.zeros((S.shape[0],1)).T
 s_init[0,[0,231,462,693]] = [J/8,J/8,J/8,J/8]
-V_init = (28*q_s(200,P_init,s_init,theta,0,params)*P_init.T)/(1-delta)
+V_init = (28 * q_s(200,P_init,s_init,theta,0,params) * P_init.T)/(1-delta)
 s_star = np.where(s_star<0,0,s_star) 
 </code>
 
@@ -256,7 +256,7 @@ In code:
 
 ## Simulating Data
 
-For this purpose of replicating our estimation results, we simulate four years (52 months or 260 5-day long booking period) worth of data. For each booking period, we draw the equilibrium number of active listings from $\mathbf{s}^\ast$. For each booking spell, each host sets the rental rate of their listing according to $\mathbf{P}^\ast$ plus some random, normally distributed shock. We then calculate the occupancy rate for the rates of all active listings. We aggregate the simulated data to the monthly level.    
+For this purpose of replicating our estimation results, we solve the model and simulate four years (52 months or 260 5-day long booking period) worth of data based on the model solution. For each booking period, we draw the equilibrium number of active listings from $\mathbf{s}^\ast$. For each booking period, each host sets the rental rate of their listing according to $\mathbf{P}^\ast$ plus some random, normally distributed shock. We then calculate the occupancy rate given the rental rates of all active listings. We aggregate the simulated data to the monthly level.    
 
 Load the data using the following code:
 
@@ -266,13 +266,13 @@ Load the data using the following code:
 
   ### Inversion
 
-We estimate the demand parameters using GMM. <code>xi(omicron,adata,params)</code> stores the **structural error term** $\xi_{it}$ of property $i$ at time $\tau$.
+We estimate the demand parameters using GMM. <code>xi(omicron,adata,params)</code> stores the **structural error term** $\xi_{it}$ of property $i$ at time $t$.
 
-$$\xi_{i\tau}(\omicron) = \ln(ccp_{i\tau}) - \ln(ccp_{0\tau}) - u_{i\tau}(\omicron)$$
+$$\xi_{it}(\omicron) = \ln(ccp_{it}) - \ln(ccp_{0t}) - u_{it}(\omicron)$$
 
-We retrieve $ccp_{it}$ from the data by inverting $q_{i\tau}$. 
+$ccp_{0t}$ is $1-\sum_i ccp_{it}$. We retrieve $ccp_{it}$ from the data by inverting $q_{it}$. 
 
-$$ ccp_{i\tau} = -\ln(1 - q_{i\tau})/\mu $$
+$$ ccp_{it} = -\ln(1 - q_{it})/\mu $$
 
 In code:
 
@@ -280,7 +280,7 @@ In code:
 data_est['share'] = -np.log(1 - data_est['q'])/mu
 data_est = data_est[(data_est['share'] > 0) & (data_est['share'] < np.inf)]</code>
 
-$ccp_{0\tau}$ is then $1-\sum_i ccp_{i\tau}$. Notice that, order to arrive at the regression equation, we must take the logarithm *twice*. This introduces additional bias from measurement error and complicates the estimation. In code:
+Notice that, order to arrive at the regression equation, we must take the logarithm *twice*. This introduces additional bias from measurement error and complicates the estimation. In code:
 
 <code>data_est['share_0'] = 1 - data_est.groupby(['month'])['share'].transform('sum')
 </code>
@@ -378,11 +378,11 @@ In code:
 
 <code>s_d = np.array([(data.groupby(['x'])['period'].count()/data.groupby(['period']).mean().shape[0]).reindex(np.arange(0,len(S)), fill_value=0)])</code>
 
-<code>l(k,theta,guess,tol,s_d,params)</code> stores the **log-likelihood** function (times -1). 
+<code>likelihood(k,theta,tol,s_d,params)</code> stores the **log-likelihood** function (times -1). 
 
 $$ \text{Log-likelihood} = \sum_{x} s^d(x) \ln \left(s^\ast(x|\mathbf{c}) \right) + \sum_j\left(\frac{J}{4}-\sum_{x}s_j^d(x)\right)\ln\left(\frac{J}{4}-\sum_{x}s_j^\ast(x|\mathbf{c})\right) $$
     
-We exclude states for which we do not observe any observations in the mock data or for which the model predicts that there are no observations as otherwise the log-likelihood is undefined.
+We exclude states for which we do not observe any observations in the mock data. We also exclude states for which the model predicts that there are no observations as otherwise the log-likelihood is undefined.
 
   ### Maximization
 
@@ -391,29 +391,30 @@ We exclude states for which we do not observe any observations in the mock data 
 In code:
 
 <code>k0 = np.log([100000,100000,100000,100000,3000,3000,3000,3000])
-res_supply = minimize(l, k0, args=(theta,[P_init,s_init,V_init],tol,s_d,params), method='BFGS')
+res_supply = minimize(likelihood, k0, args=(theta_hat,tol,s_d,params), method='Nelder-Mead')
+c_hat = np.exp(res_supply.x)
 </code>
 
   ### Standard Errors
 
-We compute the Information $I(\mathbf{\hat c})$ as $\sum_{j,t}\text{Score}_{jt}(\mathbf{\hat c})\text{Score}_{jt}(\mathbf{\hat c})^T$. We numerically approximate $\text{Score}_{jt}$ as follows.
+We compute the $\text{Information}(\mathbf{\hat c})$ as $\sum_{j,t}Score_{jt}(\mathbf{\hat c})Score_{jt}(\mathbf{\hat c})^T$. We numerically approximate $Score_{jt}$ as follows.
 
-$$ \text{Score}_{jt}(\mathbf{\hat c}) = \frac{\partial \text{Log-likelihood}}{\partial \mathbf{\hat c}} = \frac{s_{jt}}{\left(s^\ast(x|\mathbf{c})\right)}\frac{\partial s^\ast(x|\mathbf{\hat c})}{\partial \mathbf{\hat c}}, $$
+$$ Score_{jt}(\mathbf{\hat c}) = \frac{1}{s^\ast(x_{jt}|\mathbf{c})}\frac{\partial s^\ast(x_{jt}|\mathbf{\hat c})}{\partial \mathbf{\hat c}}, $$
 
 where
 
-$$ \frac{\partial s^\ast(x|\mathbf{\hat c})}{\partial \hat c} = \frac{s^\ast(x|\hat c+\epsilon)-s^\ast(x|\hat c)}{\epsilon}. $$
+$$ \frac{\partial s^\ast(x|\mathbf{\hat c})}{\partial \hat c_k} = \frac{s^\ast(x|\mathbf{\hat c} + \boldsymbol{\epsilon}_k)-s^\ast(x|\mathbf{\hat c})}{\boldsymbol{\epsilon}_k}, $$
 
-Function <code>approx_score(k,epsilon,theta,guess,tol,params)</code> carries out the numerical approximation. Using the delta method, the standard error of $\mathbf{\hat c}$ are then calculated as follows.
+$\hat c_k$ being the kth element in $\mathbf{\hat c}$ and $\boldsymbol{\epsilon}_k$ containing $\epsilon$ at the kth position and zeros otherwise.
 
-$$ \sqrt{\frac{diag\left((I(\mathbf{\hat c}))^{-1}\right)}{I}} $$
+Function <code>approx_score(k,epsilon,theta,guess,tol,params)</code> carries out the numerical approximation for each state. Using the delta method, the standard error of $\mathbf{\hat c}$ are then calculated as follows.
 
-$$ \sqrt{\left(\frac{\partial f(\mathbf{c})}{\partial \mathbf{c}}\right)^2\frac{diag\left((H(\mathbf{\hat c}))^{-1}\right)}{I}} $$
+$$ \sqrt{\left(\frac{\partial f(\mathbf{c})}{\partial \mathbf{c}}\right)\frac{diag\left((\text{Information}(\mathbf{\hat c}))^{-1}\right)}{I}\left(\frac{\partial f(\mathbf{c})}{\partial \mathbf{c}}\right)^T} $$
 
 In code:
 
 <code>scores = scores_x[:,np.hstack((np.array(data['x']))).astype(int)]
-((c_hat * np.diag(np.linalg.inv(scores@scores.T)))* c_hat)**0.5
+((c_hat * np.diag(np.linalg.inv(scores @ scores.T))) * c_hat)**0.5
 </code>
 
   ### Estimation Results
@@ -431,3 +432,12 @@ In code:
  
 ## Counterfactual Analysis
 
+To calculate the counterfactual welfare change, we first solve for the status-quo model equilibrium, using the demand and supply estimates.
+
+In code:
+<code>V_star,s_star,P_star,chi_star,lamb_star = solver(theta_hat,c_hat,[P_init,s_init,V_init],0,tol,params)
+<\code>
+
+We calculate the per-period consumer surplus as follows.
+
+$$ 28\left(\mu - \sum_x^X s(x)(-\ln(1-q_s(x))-q_s(x))\right)\ln\left(1 + \sum_x^X s(x)\nu(P(x),x)\right) + \text{constant} $$
