@@ -463,7 +463,7 @@ cs0 = -( mu - s_star @ ( mu * ccp_s(P_star,P_star,s_star,theta_hat,0,params) - q
 ps0 = ps0_in + ps01_out + ps02_out + ps03_out + ps04_out
 </code>
 
-<code>welfare(t,theta,c,B,sol,tol,params)</code> calculates the welfare change if guests receive $\$ t_E$ upon booking an unreviewed ``entrant" listing and $\$ t_I$ upon booking an ``incumbent" listing with 20 reviews. As part of the function, <code>counterfactual(theta,c,guess,t_I,tol,params)</code> solves the the model for a given $t_E$, under the constraint that $t_I$ is such that the **average tax/subsidy is zero**. In code,
+<code>welfare(t,theta,c,B,sol,tol,params)</code> calculates the welfare change if guests receive $t_E$ upon booking an unreviewed ``entrant" listing and $t_I$ upon booking an ``incumbent" listing with 20 reviews (both in USD). As part of the function, <code>counterfactual(theta,c,guess,t_I,tol,params)</code> solves the model for a given $t_E$, under the constraint that $t_I$ is such that the **average tax/subsidy is zero**. In code,
 
 <code>t_I = -s_old[0,[0,231,462,693]].sum()*t_E/(s_old[0,210:231].sum()+s_old[0,441:462].sum()+s_old[0,672:693].sum()+s_old[0,903:924].sum())
         t = np.ones((S.shape[0],1))*t_I
@@ -471,7 +471,7 @@ ps0 = ps0_in + ps01_out + ps02_out + ps03_out + ps04_out
 
 As a second constraint on the model solution, we impose that hosts make the same revenue as in the status-quo equilibrium such that
 
-$$ V_new = 28 * q_s(P_star,P_star,s_star,theta,0,params) * P_star.T + delta * eV - (1 - np.exp(-delta * eV/phi_bar)) * phi_bar. $$
+$$ V(p,x) = 28q^\ast(x)P^\ast(x) - (1-\chi(p,x))\phi(x) + \delta \mathbf{T}\mathbf{\hat V} $$
 
 <code>welfare(t,theta,c,B,sol,tol,params)</code> searches over $t_E$, defined on the real numbers, to maximize the welfare increase. In code:
 
