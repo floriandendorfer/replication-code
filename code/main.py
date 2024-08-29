@@ -77,9 +77,7 @@ S1_hat = (np.diag(np.linalg.inv((G_bar.T @ W2) @ G_bar))/len(data_est))**.5
 print('Estimates:',res_demand.x)
 print('Standard errors:',S1_hat)
 
-###############################################################################
 ############################## Supply Estimation ##############################
-###############################################################################
 
 from functions import likelihood
 from functions import q_s
@@ -114,9 +112,7 @@ S2_hat = ((c_hat * np.diag(np.linalg.inv(scores@scores.T)))* c_hat)**0.5
 print('Estimates:',c_hat)
 print('Standard errors:',S2_hat)
 
-###############################################################################
 ############################ Counterfactual Analysis ##########################
-###############################################################################
 
     # model solution
 from functions import solver,U,ccp_s,T_s
